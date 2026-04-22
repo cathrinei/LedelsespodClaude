@@ -158,7 +158,8 @@ The `data` array in the HTML is populated from the CSV via `embed_csv.py`. Unrat
 - `existing_keys` built from current CSV rows — prevents re-adding duplicates within CSV
 - New episodes filtered against both `rejected` and `existing_keys` before being appended
 - Per-feed output shows: `+ N ny(e)`, `N hoppet over (forkastet)`, `N duplikat(er)` as relevant
-- `_extract_host()` henter vertsnavn direkte fra RSS — prøver `itunes:author` (item), `dc:creator` (item), `itunes:author` (channel), `managingEditor` (channel) i prioritert rekkefølge
+- `_extract_host(podcast_name, item, channel)` henter vertsnavn direkte fra RSS — prioriteringsrekkefølge: `itunes:author` (item) → `dc:creator` (item) → `HOST_OVERRIDES` → `itunes:author` (channel) → `managingEditor` (channel)
+- `HOST_OVERRIDES` dict: manuell overstyring for podcaster der RSS kun inneholder organisasjonsnavn (f.eks. Lederskap (NHH) → "Therese Egeland, Joel W. Berge")
 
 ## auto_rate.py – tekniske noter
 - Krever `pip install anthropic` og miljøvariabel `ANTHROPIC_API_KEY`

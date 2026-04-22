@@ -105,12 +105,27 @@ def parse_date(date_str):
 ITUNES_NS = "http://www.itunes.com/dtds/podcast-1.0.dtd"
 DC_NS     = "http://purl.org/dc/elements/1.1/"
 
+# Manuell overstyring for podcaster der RSS-feeden kun inneholder organisasjonsnavn
+HOST_OVERRIDES = {
+    "lederskap (nhh)": "Therese Egeland, Joel W. Berge",
+}
 
-def _extract_host(item, channel):
-    """Prøver å hente vertsnavn fra RSS-item, faller tilbake til channel-nivå."""
+
+def _extract_host(podcast_name, item, channel):
+    """Prøver å hente vertsnavn fra RSS-item, faller tilbake til HOST_OVERRIDES og channel-nivå."""
+    # 1. Item-nivå (mest spesifikt)
     for el in [
         item.find(f"{{{ITUNES_NS}}}author"),
         item.find(f"{{{DC_NS}}}creator"),
+    ]:
+        if el is not None and el.text and el.text.strip():
+            return el.text.strip()
+    # 2. Kjent overstyring for denne podcasten
+    override = HOST_OVERRIDES.get(podcast_name.strip().lower())
+    if override:
+        return override
+    # 3. Channel-nivå fallback
+    for el in [
         channel.find(f"{{{ITUNES_NS}}}author"),
         channel.find("managingEditor"),
     ]:
@@ -150,7 +165,7 @@ def fetch_new_episodes(podcast_name, feed_url, after_dt):
             enclosure = item.find("enclosure")
             link = enclosure.attrib.get("url", "") if enclosure is not None else ""
 
-        host = _extract_host(item, channel)
+        host = _extract_host(podcast_name, item, channel)
 
         new_eps.append([
             podcast_name,
