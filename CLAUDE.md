@@ -123,6 +123,7 @@ The `data` array in the HTML is populated from the CSV via `embed_csv.py`. Unrat
 - `data-col` in table headers refers to **data array indices** (col 2 is skipped in table display — so `data-col="3"` = date, `data-col="4"` = hosts, etc.)
 - Tags whitelisted via `tagMeta` — 7 tags: `teamledelse`, `personalledelse`, `feedback`, `kultur`, `rekruttering`, `motivasjon`, `coaching`
 - Tags can be combined (comma-separated); `tagsOf(row)` helper used for all tag checks
+- Episode titles are rendered as `<a class="cell-title">` links — clicking opens the episode URL in a new tab; styled to look like plain text (no underline until hover)
 - `safeUrl()` blocks non-HTTP(S) URLs to prevent `javascript:` injection
 - CSP: `default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; connect-src 'self'`
 - Default filter on load: rating 4+; N/A episodes always shown regardless of filter
