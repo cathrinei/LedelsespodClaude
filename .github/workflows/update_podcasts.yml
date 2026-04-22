@@ -1,0 +1,33 @@
+name: Update Podcasts
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '15 8 * * *'  # 10:15 Oslo-tid (CEST = UTC+2)
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Sjekk ut kode
+        uses: actions/checkout@v4
+
+      - name: Sett opp Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Hent nye episoder
+        run: python update_podcasts.py
+
+      - name: Oppdater HTML
+        run: python embed_csv.py
+
+      - name: Commit og push hvis endringer
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add Ledelsepod_2026.csv Ledelsepod_2026.html
+          git diff --cached --quiet || git commit -m "Auto-oppdater episoder $(date +'%Y-%m-%d')"
+          git push
