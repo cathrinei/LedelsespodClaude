@@ -115,6 +115,9 @@ The `data` array in the HTML is populated from the CSV via `embed_csv.py`. Unrat
 - Rendered as clickable **pill buttons** (not a `<select>`) — IDs: `.tag-pill` with `data-tag` attribute
 - Active tag stored in JS module-level variable `let activeTag = ''` — pills set it directly, `getFiltered()` reads it
 - `resetFilters()` sets `activeTag = ''` and resets active pill state
+- Tags in the table rows are also clickable (`<button class="tag">`) — clicking filters the table and syncs the tag pills in the controls bar; clicking the same tag again clears the filter
+- Event delegation on `#tableBody` handles tag clicks — avoids re-binding on every `renderTable()` call
+- Active row tag gets `outline: 2px solid currentColor` to signal selected state
 
 ### Podcast filter
 - `<select id="podcastFilter">` — placed to the right of the rating filter in the controls bar
