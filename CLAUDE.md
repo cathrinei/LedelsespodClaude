@@ -1,16 +1,16 @@
 # LedelsepodClaude – Project Context
 
 ## Purpose
-This project collects and curates Norwegian-language podcast episodes on **teamledelse** (team leadership) and **personalledelse** (people management / HR), published in 2026.
+This project collects and curates Norwegian-language podcast episodes on **teamledelse** (team leadership) and **personalledelse** (people management / HR) — always the rolling last 6 months.
 
 ## Repository & publisering
 - **GitHub:** https://github.com/cathrinei/LedelsespodClaude
-- **GitHub Pages:** https://cathrinei.github.io/LedelsespodClaude/Ledelsepod_2026.html
+- **GitHub Pages:** https://cathrinei.github.io/LedelsespodClaude/Ledelsepod.html
 - Branch: `master` — push til master oppdaterer GitHub Pages automatisk
 
 ## Files
-- `Ledelsepod_2026.csv` — master data, one row per episode
-- `Ledelsepod_2026.html` — interactive table with filtering, sorting, stats (CSV import button hidden)
+- `Ledelsepod.csv` — master data, one row per episode (rullerende 6 måneder)
+- `Ledelsepod.html` — interactive table with filtering, sorting, stats (CSV import button hidden)
 - `README.md` — prosjektbeskrivelse med lenke til GitHub Pages
 - `update_podcasts.py` — RSS fetcher; adds new episodes (Rating=0) since last known date per podcast
 - `auto_rate.py` — automatisk vurdering av Rating=0-episoder via Claude API (claude-haiku-4-5)
@@ -144,7 +144,9 @@ The `data` array in the HTML is populated from the CSV via `embed_csv.py`. Unrat
 - `User-Agent` set to `LedelsepodCrawler/1.0 (privat bruk)` — honest identifier, not browser spoofing
 - Language hardcoded to `"Norwegian"` for all fetched episodes (Norwegian-only project)
 - New episodes get `Rating=0` — automatically rated by `auto_rate.py` in the next step
-- `pending_review()` runs at end of every execution using `existing_rows + all_new` (no second file read) — flags unrated episodes older than 5 days
+- Episodes older than 6 months are pruned from the CSV on every run (rullerende vindu)
+- `default_from` beregnes dynamisk som `today - 6 months` — ikke lenger hardkodet til 2026
+- `pending_review()` runs at end of every execution using pruned rows — flags unrated episodes older than 5 days
 - `REVIEW_AFTER_DAYS = 2` constant controls the threshold
 - Errors distinguish between HTTP errors and network errors
 - `REJECTED_PATH` points to `rejected_episodes.csv` — loaded via `load_rejected()` at startup
@@ -195,7 +197,7 @@ The `data` array in the HTML is populated from the CSV via `embed_csv.py`. Unrat
 1. `python update_podcasts.py` — henter nye episoder
 2. `python auto_rate.py` — vurderer automatisk (krever `ANTHROPIC_API_KEY`)
 3. `python embed_csv.py` — oppdaterer HTML
-4. `git add Ledelsepod_2026.csv Ledelsepod_2026.html && git commit -m "..." && git push`
+4. `git add Ledelsepod.csv Ledelsepod.html && git commit -m "..." && git push`
 
 ### Manuell overstyring (ved behov)
 - Skriv `rate_episodes.py` med `UPDATES`-dict og `REMOVE_KEYWORDS`-liste, kjør det — patcher spesifikke episoder

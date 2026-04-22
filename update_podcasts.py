@@ -5,10 +5,11 @@ Bruk:
   python update_podcasts.py
 
 Skriptet:
-  1. Leser Ledelsepod_2026.csv og finner siste kjente dato per podcast.
+  1. Leser Ledelsepod.csv og finner siste kjente dato per podcast.
   2. Henter RSS-feed for hver kjent podcast.
   3. Legger til nye episoder (nyere enn siste kjente dato) med Rating=0 og tomme felt.
-  4. Skriver oppdatert CSV — klar til å lastes inn via HTML-knappen.
+  4. Fjerner episoder eldre enn 6 måneder fra CSV.
+  5. Skriver oppdatert CSV.
 """
 
 import csv
@@ -23,7 +24,7 @@ import sys
 # Sikre UTF-8 output i alle terminaler (Windows/Mac/Linux)
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
-CSV_PATH      = os.path.join(os.path.dirname(__file__), "Ledelsepod_2026.csv")
+CSV_PATH      = os.path.join(os.path.dirname(__file__), "Ledelsepod.csv")
 REJECTED_PATH = os.path.join(os.path.dirname(__file__), "rejected_episodes.csv")
 
 UNRATED = "0"  # Markør for episoder som mangler manuell vurdering
@@ -173,7 +174,12 @@ def main():
     rejected      = load_rejected()
     existing_keys = {(r[0].strip().lower(), r[1].strip().lower()) for r in existing_rows if len(r) >= 2}
     latest        = latest_date_per_podcast(existing_rows)
-    default_from  = datetime(2026, 1, 1, tzinfo=timezone.utc)
+    # Rullerende 6-månedersvindu — henter ikke episoder eldre enn dette
+    now = datetime.now(timezone.utc)
+    month = now.month - 6
+    year = now.year + (month - 1) // 12
+    month = ((month - 1) % 12) + 1
+    default_from  = now.replace(year=year, month=month)
 
     all_new = []
     print(f"\nSjekker {len(FEEDS)} podcast-feeder...\n")
@@ -202,16 +208,25 @@ def main():
 
         all_new.extend(filtered)
 
-    if not all_new:
-        print("\nIngen nye episoder funnet.\n")
-    else:
-        with open(CSV_PATH, "w", encoding="utf-8", newline="") as f:
-            csv.writer(f).writerows([header] + existing_rows + all_new)
-        print(f"\n{len(all_new)} nye episode(r) lagt til i CSV.")
-        print("Åpne HTML-siden og klikk 'Last inn CSV' for å laste inn oppdaterte data.")
-        print(f"NB: Nye episoder har Rating={UNRATED} og må vurderes manuelt.\n")
+    # Beskjær til siste 6 måneder
+    all_rows = existing_rows + all_new
+    pruned = [r for r in all_rows if len(r) >= 4 and r[3].strip() >= default_from.strftime("%Y-%m-%d")]
+    n_pruned = len(all_rows) - len(pruned)
 
-    pending = pending_review(existing_rows + all_new)
+    with open(CSV_PATH, "w", encoding="utf-8", newline="") as f:
+        csv.writer(f).writerows([header] + pruned)
+
+    if not all_new:
+        print("\nIngen nye episoder funnet.")
+    else:
+        print(f"\n{len(all_new)} nye episode(r) lagt til i CSV.")
+        print(f"NB: Nye episoder har Rating={UNRATED} og vurderes automatisk av auto_rate.py.")
+
+    if n_pruned:
+        print(f"{n_pruned} episode(r) eldre enn 6 måneder fjernet fra CSV.")
+    print()
+
+    pending = pending_review(pruned)
     if pending:
         print(f"⚠  {len(pending)} episode(r) ikke vurdert etter {REVIEW_AFTER_DAYS}+ dager:\n")
         for row in pending:

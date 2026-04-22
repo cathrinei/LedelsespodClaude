@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; connect-src 'self'">
+<title>Teamledelse &amp; Personalledelse</title>
+<style>
+:root {
+  --bg:             #f0f4f1;
+  --surface:        #ffffff;
+  --surface2:       #f7faf7;
+  --border:         #dde6dd;
+  --accent:         #15803d;
+  --accent-light:   #bbf7d0;
+  --text:           #0e1a0e;
+  --text-muted:     #4d6450;
+  --text-faint:     #526b55;
+  --stat-n:         #0e1a0e;
+  --stat-label:     #4d6450;
+  --row-hover:      #edf5ee;
+  --row-border:     #e8ede8;
+  --input-bg:       #f4f8f4;
+  --input-border:   #c4d4c6;
+  --focus-ring:     #15803d;
+  --link:           #166534;
+  --pill-bg:        #e4efe6;
+  --pill-fg:        #1a3a20;
+  --pill-active-bg: #0e1a0e;
+  --pill-active-fg: #ffffff;
+  --shadow:         0 2px 12px rgba(14,46,22,0.09);
+  --shadow-sm:      0 1px 4px rgba(14,46,22,0.06);
+  --radius:         10px;
+  --radius-sm:      6px;
+}
+body.dark {
+  --bg:             #080d08;
+  --surface:        #0f1a10;
+  --surface2:       #162118;
+  --border:         #243626;
+  --accent:         #4ade80;
+  --accent-light:   #14532d;
+  --text:           #dceadc;
+  --text-muted:     #7aaa7c;
+  --text-faint:     #5a9060;
+  --stat-n:         #4ade80;
+  --stat-label:     #7aaa7c;
+  --row-hover:      #142018;
+  --row-border:     #1e2e20;
+  --input-bg:       #162118;
+  --input-border:   #2a3e2c;
+  --focus-ring:     #4ade80;
+  --link:           #86efac;
+  --pill-bg:        #162118;
+  --pill-fg:        #86efac;
+  --pill-active-bg: #4ade80;
+  --pill-active-fg: #080d08;
+  --shadow:         0 2px 12px rgba(0,0,0,0.4);
+  --shadow-sm:      0 1px 4px rgba(0,0,0,0.25);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Inter', 'Segoe UI Variable', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  background: var(--bg);
+  color: var(--text);
+  transition: background 0.25s, color 0.25s;
+}
+
+/* HEADER */
+header {
+  background: linear-gradient(150deg, #0b1f10 0%, #163824 60%, #1e4a30 100%);
+  color: #fff;
+  padding: 1.75rem 2rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  position: relative;
+  overflow: hidden;
+}
+header::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.025'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/svg%3E") repeat;
+  pointer-events: none;
+}
+.header-text { position: relative; z-index: 1; }
+header h1 {
+  font-size: 1.45rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: #ffffff;
+}
+header .subtitle {
+  margin-top: 0.3rem;
+  font-size: 0.8rem;
+  color: rgba(255,255,255,0.55);
+  letter-spacing: 0.01em;
+}
+#darkToggle {
+  position: relative;
+  z-index: 1;
+  flex-shrink: 0;
+  padding: 0.4rem 1rem;
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 20px;
+  background: rgba(255,255,255,0.07);
+  color: rgba(255,255,255,0.85);
+  font-size: 0.78rem;
+  font-weight: 500;
+  cursor: pointer;
+  letter-spacing: 0.02em;
+  transition: background 0.15s, border-color 0.15s;
+  white-space: nowrap;
+}
+#darkToggle:hover { background: rgba(255,255,255,0.14); border-color: rgba(255,255,255,0.35); }
+body.dark header { background: linear-gradient(150deg, #040a04 0%, #0b180c 60%, #0f2014 100%); }
+body.dark #darkToggle { border-color: rgba(255,255,255,0.15); color: rgba(255,255,255,0.7); }
+
+/* STATS BAR */
+.stats-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  padding: 1.1rem 2rem;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+.stat {
+  display: flex;
+  flex-direction: column;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 0.6rem 1.1rem;
+  min-width: 90px;
+  transition: box-shadow 0.15s;
+}
+.stat:hover { box-shadow: var(--shadow-sm); }
+.stat-n {
+  font-size: 1.55rem;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--stat-n);
+  letter-spacing: -0.03em;
+}
+.stat-label {
+  margin-top: 0.25rem;
+  font-size: 0.68rem;
+  color: var(--stat-label);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+}
+
+/* CONTROLS */
+.controls {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+  padding: 0.85rem 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+.controls-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.55rem;
+}
+.search-wrap {
+  position: relative;
+  flex: 1;
+  min-width: 180px;
+  max-width: 300px;
+}
+.search-wrap::before {
+  content: '';
+  position: absolute;
+  left: 0.7rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 14px;
+  height: 14px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%237a937d' stroke-width='2.2' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E") center/contain no-repeat;
+  pointer-events: none;
+}
+body.dark .search-wrap::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%234d754e' stroke-width='2.2' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E");
+}
+#searchBox {
+  width: 100%;
+  padding: 0.48rem 0.75rem 0.48rem 2.1rem;
+  border: 1px solid var(--input-border);
+  border-radius: var(--radius-sm);
+  background: var(--input-bg);
+  color: var(--text);
+  font-size: 0.84rem;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+#searchBox::placeholder { color: var(--text-faint); }
+#searchBox:focus { outline: none; border-color: var(--focus-ring); box-shadow: 0 0 0 3px rgba(21,128,61,0.14); }
+body.dark #searchBox:focus { box-shadow: 0 0 0 3px rgba(74,222,128,0.12); }
+
+.tag-pills { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+.tag-pill {
+  padding: 0.3rem 0.75rem;
+  border-radius: 20px;
+  border: 1px solid transparent;
+  background: var(--pill-bg);
+  color: var(--pill-fg);
+  font-size: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s, border-color 0.12s;
+  white-space: nowrap;
+  letter-spacing: 0.01em;
+}
+.tag-pill:hover { border-color: var(--accent); color: var(--accent); }
+.tag-pill.active {
+  background: var(--pill-active-bg);
+  color: var(--pill-active-fg);
+  border-color: var(--pill-active-bg);
+}
+
+#ratingFilter, #podcastFilter {
+  padding: 0.48rem 0.65rem;
+  border: 1px solid var(--input-border);
+  border-radius: var(--radius-sm);
+  background: var(--input-bg);
+  color: var(--text);
+  font-size: 0.82rem;
+  cursor: pointer;
+}
+#ratingFilter:focus, #podcastFilter:focus { outline: none; border-color: var(--focus-ring); }
+
+.btn {
+  padding: 0.47rem 0.95rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s, border-color 0.12s;
+  border: 1px solid;
+  white-space: nowrap;
+}
+.btn-ghost {
+  background: transparent;
+  border-color: var(--input-border);
+  color: var(--text-muted);
+}
+.btn-ghost:hover { background: var(--surface2); border-color: var(--text-faint); color: var(--text); }
+.btn-primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+.btn-primary:hover { background: var(--link); border-color: var(--link); }
+body.dark .btn-primary { color: var(--bg); }
+
+#updateStatus { font-size: 0.77rem; color: var(--text-faint); }
+
+/* ROW COUNT */
+.row-count {
+  font-size: 0.78rem;
+  color: var(--text-faint);
+  padding: 0.6rem 2rem 0;
+  font-variant-numeric: tabular-nums;
+}
+
+/* TABLE */
+.table-wrap { padding: 0.75rem 2rem 3rem; overflow-x: auto; }
+table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: var(--surface);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  font-size: 0.81rem;
+  overflow: hidden;
+}
+thead tr { background: linear-gradient(135deg, #0b1f10 0%, #163824 100%); }
+body.dark thead tr { background: linear-gradient(135deg, #040a04 0%, #0b180c 100%); }
+thead th {
+  padding: 0.72rem 1.1rem;
+  text-align: left;
+  white-space: nowrap;
+  color: rgba(255,255,255,0.8);
+  font-weight: 600;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.12s;
+}
+thead th:hover { background: rgba(255,255,255,0.07); }
+thead th.sorted { color: #fff; }
+thead th .sort-icon { opacity: 0.4; margin-left: 3px; font-size: 0.68rem; }
+thead th.sorted .sort-icon { opacity: 0.9; }
+thead th:not(:last-child) { border-right: 1px solid rgba(255,255,255,0.08); }
+
+tbody tr { border-bottom: 1px solid var(--row-border); transition: background 0.1s; }
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: var(--row-hover); }
+tbody td { padding: 0.72rem 1.1rem; vertical-align: top; }
+tbody td:not(:last-child) { border-right: 1px solid var(--row-border); }
+
+/* CELL CONTENT */
+.cell-podcast { font-weight: 600; font-size: 0.77rem; color: var(--accent); }
+.cell-title { font-weight: 600; color: var(--text); line-height: 1.35; }
+.cell-date { color: var(--text-muted); font-size: 0.76rem; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.cell-person { color: var(--text-muted); font-size: 0.76rem; line-height: 1.4; }
+.cell-topics { color: var(--text-faint); font-size: 0.75rem; line-height: 1.35; }
+.cell-note { color: var(--text-muted); font-size: 0.76rem; font-style: italic; line-height: 1.35; }
+
+/* RATING BADGE */
+.rating-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  font-weight: 800;
+  font-size: 0.9rem;
+  color: #fff;
+  background: #c4cfc4;
+  flex-shrink: 0;
+}
+.r6 { background: #166534; box-shadow: 0 0 0 3px rgba(22,101,52,0.2); }
+.r5 { background: #1d4ed8; box-shadow: 0 0 0 3px rgba(29,78,216,0.18); }
+.r4 { background: #6d28d9; box-shadow: 0 0 0 3px rgba(109,40,217,0.18); }
+.r3 { background: #92400e; }
+.r2 { background: #991b1b; }
+.r1 { background: #6b7280; }
+
+/* ROW ACCENT — venstrekant per karakter */
+tbody tr[data-rating="6"] td:first-child { border-left: 3px solid #166534; }
+tbody tr[data-rating="5"] td:first-child { border-left: 3px solid #1d4ed8; }
+tbody tr[data-rating="4"] td:first-child { border-left: 3px solid #6d28d9; }
+
+/* TAGS */
+.tag {
+  display: inline-block;
+  border-radius: 4px;
+  padding: 2px 7px;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  margin: 1px 2px 1px 0;
+}
+.tag-teamledelse     { background: #ede9fe; color: #4c1d95; }
+.tag-personalledelse { background: #ccfbf1; color: #065f46; }
+.tag-feedback        { background: #fef3c7; color: #92400e; }
+.tag-kultur          { background: #dbeafe; color: #1e3a8a; }
+.tag-rekruttering    { background: #fce7f3; color: #831843; }
+.tag-motivasjon      { background: #dcfce7; color: #14532d; }
+.tag-coaching        { background: #fff7ed; color: #7c2d12; }
+body.dark .tag-teamledelse     { background: #2e1065; color: #c4b5fd; }
+body.dark .tag-personalledelse { background: #022c22; color: #6ee7b7; }
+body.dark .tag-feedback        { background: #451a03; color: #fcd34d; }
+body.dark .tag-kultur          { background: #1e3a5f; color: #93c5fd; }
+body.dark .tag-rekruttering    { background: #500724; color: #f9a8d4; }
+body.dark .tag-motivasjon      { background: #052e16; color: #86efac; }
+body.dark .tag-coaching        { background: #431407; color: #fdba74; }
+.no-tags { color: var(--text-faint); font-size: 0.76rem; }
+
+/* LISTEN LINK */
+a.listen-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--link);
+  text-decoration: none;
+  font-size: 0.74rem;
+  font-weight: 600;
+  padding: 0.28rem 0.6rem;
+  border-radius: 5px;
+  border: 1px solid var(--accent-light);
+  transition: background 0.12s;
+  white-space: nowrap;
+}
+a.listen-link:hover { background: var(--accent-light); }
+body.dark a.listen-link:hover { color: var(--pill-active-fg); }
+
+/* SCREEN READER ONLY */
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0,0,0,0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* FOCUS */
+button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+/* RESPONSIVE */
+@media (max-width: 720px) {
+  header, .stats-bar, .controls, .row-count { padding-left: 1rem; padding-right: 1rem; }
+  .table-wrap { padding: 0.5rem 0 2rem; }
+  header h1 { font-size: 1.1rem; }
+  .search-wrap { max-width: 100%; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-text">
+    <h1>Teamledelse &amp; Personalledelse</h1>
+    <p class="subtitle">Norske podkast-episoder &bull; <span id="fromDate"></span> &ndash; <span id="todayDate"></span></p>
+  </div>
+  <button id="darkToggle" aria-label="Bytt mellom lys og mørk visning">&#9790; Mørk</button>
+</header>
+
+<div class="stats-bar">
+  <div class="stat"><span class="stat-n" id="statTotal">–</span><span class="stat-label">Episoder</span></div>
+  <div class="stat"><span class="stat-n" id="statShows">–</span><span class="stat-label">Podkastserier</span></div>
+  <div class="stat"><span class="stat-n" id="statTeam">–</span><span class="stat-label">Teamledelse</span></div>
+  <div class="stat"><span class="stat-n" id="statPers">–</span><span class="stat-label">Personalledelse</span></div>
+  <div class="stat"><span class="stat-n" id="statTop">–</span><span class="stat-label">Toppkarakter 6/6</span></div>
+  <div class="stat"><span class="stat-n" id="statUnrated">–</span><span class="stat-label">Uten rating</span></div>
+</div>
+
+<div class="controls">
+  <div class="controls-row">
+    <div class="search-wrap">
+      <label for="searchBox" class="sr-only">Søk i episoder</label>
+      <input type="text" id="searchBox" placeholder="Søk i tittel, podcast, emne…" autocomplete="off" spellcheck="false" aria-label="Søk i episoder">
+    </div>
+    <label for="ratingFilter" class="sr-only">Minimumskarakter</label>
+    <select id="ratingFilter" aria-label="Minimumskarakter">
+      <option value="0">Alle karakterer</option>
+      <option value="4" selected>4+ Nyttig</option>
+      <option value="5">5+ Svært nyttig</option>
+      <option value="6">6 Eksepsjonell</option>
+    </select>
+    <label for="podcastFilter" class="sr-only">Filtrer på podkast</label>
+    <select id="podcastFilter" aria-label="Filtrer på podkast">
+      <option value="">Alle podkaster</option>
+    </select>
+    <button class="btn btn-ghost" id="resetBtn">Nullstill</button>
+    <button class="btn btn-primary" id="updateBtn" style="display:none"><span aria-hidden="true">&#8593;</span> Last inn CSV</button>
+    <input type="file" id="csvFile" accept=".csv" style="display:none">
+    <span id="updateStatus"></span>
+  </div>
+  <div class="controls-row">
+    <div class="tag-pills" id="tagPills" role="group" aria-label="Filtrer på tag">
+      <button class="tag-pill active" data-tag="" aria-pressed="true">Alle</button>
+      <button class="tag-pill" data-tag="teamledelse" aria-pressed="false">Teamledelse</button>
+      <button class="tag-pill" data-tag="personalledelse" aria-pressed="false">Personalledelse</button>
+      <button class="tag-pill" data-tag="feedback" aria-pressed="false">Feedback</button>
+      <button class="tag-pill" data-tag="kultur" aria-pressed="false">Kultur</button>
+      <button class="tag-pill" data-tag="rekruttering" aria-pressed="false">Rekruttering</button>
+      <button class="tag-pill" data-tag="motivasjon" aria-pressed="false">Motivasjon</button>
+      <button class="tag-pill" data-tag="coaching" aria-pressed="false">Coaching</button>
+    </div>
+  </div>
+</div>
+
+<div class="row-count" id="rowCount" aria-live="polite" aria-atomic="true"></div>
+
+<main>
+<div class="table-wrap">
+<table id="mainTable">
+  <caption class="sr-only">Podkast-episoder om teamledelse og personalledelse 2026</caption>
+  <thead>
+    <tr>
+      <th scope="col" data-col="0">Podkast <span class="sort-icon" aria-hidden="true">&#8597;</span></th>
+      <th scope="col" data-col="1">Episode <span class="sort-icon" aria-hidden="true">&#8597;</span></th>
+      <th scope="col" data-col="3" class="sorted" aria-sort="descending">Dato <span class="sort-icon" aria-hidden="true">&#8595;</span></th>
+      <th scope="col" data-col="4">Vert(er) <span class="sort-icon" aria-hidden="true">&#8597;</span></th>
+      <th scope="col" data-col="5">Gjest(er) <span class="sort-icon" aria-hidden="true">&#8597;</span></th>
+      <th scope="col" data-col="6">Emner <span class="sort-icon" aria-hidden="true">&#8597;</span></th>
+      <th scope="col" data-col="7"><span aria-hidden="true">&#9733;</span> Karakter <span class="sort-icon" aria-hidden="true">&#8597;</span></th>
+      <th scope="col">Begrunnelse</th>
+      <th scope="col">Tags</th>
+      <th scope="col">Lytt</th>
+    </tr>
+  </thead>
+  <tbody id="tableBody"></tbody>
+</table>
+</div>
+</main>
+
+<script>
+const data = [
+["Lederpodden", "🚀 Slik bygger du kultur med fart – med Mette Hopsdal", "Norwegian", "2026-01-01", "Tor Åge Skagestad Eikerapen", "Mette Hopsdal", "Kulturbygging, endringsledelse, ledelse i fart", "5", "Kulturbygging og endringsledelse med ekspertgjest — solid og praksisnær episode", "teamledelse,kultur", "https://www.execu.no/lederpodden/294"],
+["Lederpodden", "🦉 Hvordan få autoritet uten å heve stemmen – med Per Nordahl", "Norwegian", "2026-01-09", "Tor Åge Skagestad Eikerapen", "Per Nordahl", "Autoritet, kommunikasjon, ledelsesstil", "5", "Kommunikasjon og autoritet i lederrollen — verdifull for ledere på alle nivåer", "personalledelse,coaching", "https://www.execu.no/lederpodden/295"],
+["Lederpodden", "💬 Når gode råd gjør deg til en dårligere leder", "Norwegian", "2026-01-15", "Tor Åge Skagestad Eikerapen", "—", "Rådgiving, coachende ledelse, lederadferd", "5", "Motintuitivt og innsiktsfullt om rådgiving kontra coachende tilnærming i ledelse", "coaching", "https://www.execu.no/lederpodden/296"],
+["Lederpodden", "🧠 Psykisk helse er blitt et lederansvar – kan KI hjelpe? Med Sondre Liverød og Espen Veierød", "Norwegian", "2026-01-22", "Tor Åge Skagestad Eikerapen", "Sondre Liverød, Espen Veierød", "Psykisk helse, lederansvar, medarbeideromsorg", "5", "Lederansvar for medarbeideres psykiske helse — viktig og aktuelt tema for 2026", "personalledelse", "https://www.lederpodden.no"],
+["Lederpodden", "💡Kan empati gjøre deg til en bedre leder? – Med KG Stave", "Norwegian", "2026-01-30", "Tor Åge Skagestad Eikerapen", "KG Stave", "Empati, emosjonell intelligens, lederstil", "5", "Empati som lederverktøy — forskningstilknyttet og balansert fremstilling", "coaching", "https://www.lederpodden.no"],
+["Lederpodden", "😷 Hva er sykefraværsparadokset? Med Unn Therese Omdal", "Norwegian", "2026-02-06", "Tor Åge Skagestad Eikerapen", "Unn Therese Omdal", "Sykefravær, lederansvar, arbeidsmiljø", "5", "Sykefraværsekspert med paradoks-tilnærming — direkte relevant for personalledere", "personalledelse", "https://www.lederpodden.no"],
+["Lederpodden", "💪 Effektive ledergrupper 3.0 – med Thomas Midelfart og Henning Bang", "Norwegian", "2026-02-12", "Tor Åge Skagestad Eikerapen", "Thomas Midelfart, Henning Bang", "Ledergrupper, teameffektivitet, beslutningsprosesser", "6", "Norges fremste eksperter på ledergrupper — eksepsjonell dybde og forskningstyngde", "teamledelse", "https://www.lederpodden.no"],
+["Lederpodden", "🔋 Historien om Easee – og hva som egentlig gikk galt – med Thomas Ramstad", "Norwegian", "2026-02-19", "Tor Åge Skagestad Eikerapen", "Thomas Ramstad", "Ledelsessvikt, organisasjonskultur, styring", "4", "Easee-saken som ledelsescase — nyttig indirekte lærdom om kultur- og styringssvikt", "teamledelse", "https://www.lederpodden.no"],
+["Lederpodden", "👩🏻‍⚖️ Alt om endringene i arbeidsmiljøloven på 30 min – med Trond Erik Kvalsnes fra Littler", "Norwegian", "2026-02-27", "Tor Åge Skagestad Eikerapen", "Trond Erik Kvalsnes", "Arbeidsmiljøloven, HR, arbeidsrett", "4", "Praktisk juridisk gjennomgang av nye lovkrav — relevant HR-kunnskap", "personalledelse", "https://www.lederpodden.no"],
+["Lederpodden", "🧠 Slik oppdager du lederens blindsone – Med Espen Skorstad og Mats Englund", "Norwegian", "2026-03-05", "Tor Åge Skagestad Eikerapen", "Espen Skorstad, Mats Englund", "Lederseleksjon, psykologisk vurdering, blindsoner", "6", "Espen Skorstad — Norges fremste på psykologisk lederutvelgelse — sterk dybde og høy verdi", "personalledelse,coaching", "https://www.lederpodden.no"],
+["Lederpodden", "🔥 Slutt å roe ned de frustrerte medarbeiderne dine – med Marius Jones fra AFF", "Norwegian", "2026-03-13", "Tor Åge Skagestad Eikerapen", "Marius Jones", "Frustrasjon, motivasjon, medarbeiderledelse", "5", "AFF-forsker med motintuitivt budskap om frustrerte medarbeidere — høy verdi for ledere", "teamledelse,motivasjon", "https://www.lederpodden.no"],
+["Lederpodden", "🔑 Slik låser du opp fastlåst kommunikasjon – når det virkelig gjelder. Med Einar Steen og Idar Johannessen", "Norwegian", "2026-03-19", "Tor Åge Skagestad Eikerapen", "Einar Steen, Idar Johannessen", "Kommunikasjon, konflikt, ledergrupper", "5", "Fastlåst kommunikasjon i ledergrupper — to ekspertgjester med praktisk metodikk", "teamledelse,feedback", "https://www.lederpodden.no"],
+["Lederpodden", "🎯 Rekruttering som faktisk fungerer – fra magefølelse til metode – med Elin Ørjasæter og Maria Molvær Nesseth", "Norwegian", "2026-03-27", "Tor Åge Skagestad Eikerapen", "Elin Ørjasæter, Maria Molvær Nesseth", "Rekruttering, seleksjon, ansettelsesprosess", "5", "To rekrutteringseksperter — solid forskningstilnærming fra magefølelse til metode", "personalledelse,rekruttering", "https://www.execu.no/lederpodden/306"],
+["Lederpodden", "🔁 Fra gründer til CEO – slik får du lederskiftet til å fungere. Med Nadir Nalbant og Petter Kildal Forseth fra Homely", "Norwegian", "2026-04-01", "Tor Åge Skagestad Eikerapen", "Nadir Nalbant, Petter Kildal Forseth", "Lederskifte, rolleovergang, organisasjonsutvikling", "5", "Gründer-til-CEO-overgangen med to reelle casepersoner — praksisnær og innsiktsfull", "personalledelse", "https://www.execu.no/lederpodden/307"],
+["Lederpodden", "🧠 Du er dømt til å bli misforstått - her er hvorfor", "Norwegian", "2026-04-10", "Tor Åge Skagestad Eikerapen", "—", "Kommunikasjon, kognitiv psykologi, misforståelser", "5", "Kognitiv forklaring på kommunikasjonssvikt i ledelse — solid solo-episode", "feedback", "https://www.execu.no/lederpodden/308"],
+["Lederskap (NHH)", "Google, Innovasjon, og Psykologisk Trygghet, med Alexander Mossin", "Norwegian", "2026-01-07", "Therese Egeland, Joel W. Berge", "Alexander Mossin", "Psykologisk trygghet, innovasjon, Google", "6", "Google-forsker på psykologisk trygghet — NHH-akademisk tyngde, essensiell for teamledelse", "teamledelse,kultur", "https://shows.acast.com/lederskap/episodes/google-innovasjon-og-psykologisk-trygghet-med-alexander-moss"],
+["Lederskap (NHH)", "Moderne Askeladden, med Martin Schütt", "Norwegian", "2026-02-04", "Therese Egeland, Joel W. Berge", "Martin Schütt", "Innovasjon, gründerledelse, suksesshistorie", "4", "Gründerperspektiv på ledelse og innovasjon — interessant men bredere enn ledelsestema", "personalledelse", "https://www.askeladden.co"],
+["Lederskap (NHH)", "Aldersmangfold og ledelse", "Norwegian", "2026-02-04", "Therese Egeland, Joel W. Berge", "—", "Aldersmangfold, generasjonsledelse, inkludering", "5", "Forskningstungt og aktuelt om aldersmangfold og generasjonsledelse i arbeidslivet", "personalledelse", "https://shows.acast.com/lederskap/episodes/aldersmangfold-og-ledelse"],
+["Lederskap (NHH)", "Når KI blir mer enn et verktøy, med Alexander Lundervold", "Norwegian", "2026-02-27", "Therese Egeland, Joel W. Berge", "Alexander Lundervold", "KI som medarbeider, agentisk KI, fremtidens ledelse", "4", "KI som organisasjonsmedlem — relevant fremtidsperspektiv for ledelse, KI er hovemotiv", "personalledelse", "https://shows.acast.com/lederskap/episodes/nar-ki-blir-mer-enn-et-verkty"],
+["Lederskap (NHH)", "KI‑entusiasme versus risiko, med Tellef Raabe", "Norwegian", "2026-03-13", "Therese Egeland, Joel W. Berge", "Tellef Raabe", "KI-risiko, nasjonal sikkerhet, organisasjonsrisiko", "4", "KI-risikoperspektiv fra sikkerhetsekspert — ledelse tangentielt berørt", "", "https://shows.acast.com/lederskap/episodes/kientusiasme-versus-risiko-med-tellef-raabe"],
+["Lederskap (NHH)", "Start Smart 2.0, med Anna Måsender og Veronica Heltne", "Norwegian", "2026-03-27", "Therese Egeland, Joel W. Berge", "Anna Måsender, Veronica Heltne", "Teamoppstart, Start Smart, Telenor, teamutvikling", "6", "Telenors implementering av NHH Start Smart — eksepsjonell kombinasjon av forskning og praksis", "teamledelse", "https://shows.acast.com/lederskap/episodes/start-smart-20-med-anna-masender-og-veronica-heltne"],
+["Lederliv", "Øyvind Westby Brekke, Stø", "Norwegian", "2026-01-02", "Ole Christian Apeland", "Øyvind Westby Brekke", "Ledelse, strategi, navigering", "4", "Ledersamtale med Stø-direktøren — interessant men overflatenivå", "personalledelse", "https://shows.acast.com/lederliv/episodes/yvind-westby-brekke-st"],
+["Lederliv", "Egil Hogna, Norconsult", "Norwegian", "2026-01-09", "Ole Christian Apeland", "Egil Hogna", "Ledelse, ingeniørbransje, strategi", "4", "Ledersamtale med Norconsult-sjef — solid men generisk", "personalledelse", "https://shows.acast.com/lederliv/episodes/egil-hogna-norconsult"],
+["Lederliv", "Aina Lemoen Lunde, ANFO", "Norwegian", "2026-01-16", "Ole Christian Apeland", "Aina Lemoen Lunde", "Ledelse, markedsføring, organisasjon", "4", "Ledersamtale med ANFO-direktør — interessant bransjevinkel", "personalledelse", "https://shows.acast.com/lederliv/episodes/aina-lemoen-lunde-anfo"],
+["Lederliv", "Birgitte Ringstad Vartdal, Statkraft", "Norwegian", "2026-01-23", "Ole Christian Apeland", "Birgitte Ringstad Vartdal", "Ledelse, energibransjen, strategi", "5", "Statkraft-CEO om ledelse av stor energiorganisasjon — innsiktsfull og substansiell", "personalledelse", "https://shows.acast.com/lederliv/episodes/birgitte-ringstad-vartdal-statkraft"],
+["Lederliv", "Nina Hjellegjerde, Bellona", "Norwegian", "2026-01-30", "Ole Christian Apeland", "Nina Hjellegjerde", "Ledelse, miljøorganisasjon, motivasjon", "4", "Bellona-leder om ledelse i ideell sektor — nyttig perspektiv", "personalledelse", "https://shows.acast.com/lederliv/episodes/nina-hjellegjerde-bellona"],
+["Lederliv", "Geir Holmgren, Gjensidige", "Norwegian", "2026-02-06", "Ole Christian Apeland", "Geir Holmgren", "Ledelse, finans, organisasjon", "5", "Gjensidige-CEO om ledelse i finansbransjen — solid og substansiell samtale", "personalledelse", "https://shows.acast.com/lederliv/episodes/geir-holmgren-gjensidige"],
+["Lederliv", "Ida Aall Gram, Aspelin Reitan", "Norwegian", "2026-02-13", "Ole Christian Apeland", "Ida Aall Gram", "Ledelse, eiendomsbransje", "4", "Aspelin Reitan-leder om eiendomsledelse — overflatenivå", "personalledelse", "https://shows.acast.com/lederliv/episodes/ida-aall-gram-aspelin-reitan"],
+["Lederliv", "Jan Hjelle, Husbanken", "Norwegian", "2026-02-20", "Ole Christian Apeland", "Jan Hjelle", "Ledelse, offentlig sektor, bolig", "4", "Husbanken-direktør om ledelse i statsforetak — interessant sektorperspektiv", "personalledelse", "https://shows.acast.com/lederliv/episodes/jan-hjelle-husbanken"],
+["Lederliv", "Morten Christophersen, ECOnnect Energy", "Norwegian", "2026-02-27", "Ole Christian Apeland", "Morten Christophersen", "Ledelse, energi, oppstartsbedrift", "4", "ECOnnect Energy-leder om gründerledelse i energisektoren", "personalledelse", "https://shows.acast.com/lederliv/episodes/morten-christophersen-econnect-energy"],
+["Lederliv", "Solveig Øvstebø, Astrup Fearnley Museet", "Norwegian", "2026-03-06", "Ole Christian Apeland", "Solveig Øvstebø", "Ledelse, kultur, museum", "4", "Astrup Fearnley-direktør om kulturledelse — interessant men begrenset dybde", "personalledelse", "https://shows.acast.com/lederliv/episodes/solveig-vsteb-astrup-fearnley-museet"],
+["Lederliv", "Trond Vilhelm Lund, Rørosmeieriet", "Norwegian", "2026-03-13", "Ole Christian Apeland", "Trond Vilhelm Lund", "Ledelse, verdier, merkevare, matbransje", "5", "Rørosmeieriet-sjef — #2 i norsk omdømmemåling 2026, sterk om verdidrevet ledelse og kultur", "teamledelse,kultur", "https://shows.acast.com/lederliv/episodes/trond-vilhelm-lund-rrosmeieriet"],
+["Lederliv", "Pål Molander, Norsk institutt for vannforskning (NIVA)", "Norwegian", "2026-03-20", "Ole Christian Apeland", "Pål Molander", "Ledelse, sykefravær, nedbemanning, offentlig virksomhet", "5", "NIVA-direktør med konkrete erfaringer om sykefravær og nedbemanning — praksisnær og nyttig", "personalledelse", "https://shows.acast.com/lederliv/episodes/pal-molander-norsk-institutt-for-vannforskning-niva"],
+["Lederliv", "Mudassar Mehmood, Mortensrud Fellesskap", "Norwegian", "2026-03-27", "Ole Christian Apeland", "Mudassar Mehmood", "Ledelse, inkludering, frivillighet, lokalsamfunn", "5", "Årets ledestjerne 2025 (DN) — sterk ledelses-case med inspirerende bakgrunn", "personalledelse", "https://shows.acast.com/lederliv/episodes/mudassar-mehmood-mortensrud-fellesskap"],
+["Lederliv", "Trine Skei Grande, Forleggerforeningen", "Norwegian", "2026-04-03", "Ole Christian Apeland", "Trine Skei Grande", "Ledelse, organisasjon, politikk, kommunikasjon", "4", "Forleggerforening-direktør og eks-statsråd om ledelse i org. vs. bedrift — noe dybde", "personalledelse", "https://shows.acast.com/lederliv/episodes/trine-skei-grande-den-norske-forleggerforening"],
+["Lederliv", "Pål Lønseth, Økokrim", "Norwegian", "2026-04-10", "Ole Christian Apeland", "Pål Lønseth", "Ledelse, etterforskning, offentlig etat", "4", "Økokrim-sjef — etterforskning og jus dominerer, ledelsesperspektiv tangentielt", "personalledelse", "https://shows.acast.com/lederliv/episodes/pal-lnseth-kokrim"],
+["HR-podden", "222: Slik lykkes du med rekruttering i 2026, med Hanne Revholt og Sondre Julsrud", "Norwegian", "2026-01-07", "Anne Lise Heide", "Hanne Revholt, Sondre Julsrud", "Rekruttering, talentakkvisisjon, ansettelse", "5", "Rekrutteringseksperter med konkrete råd for 2026 — høy praktisk verdi", "personalledelse,rekruttering", "https://www.buzzsprout.com/1929646/episodes/18454127-222-slik-lykkes-du-med-rekruttering-i-2026-med-hanne-revholt-og-sondre-julsrud.mp3"],
+["HR-podden", "223: Myter og fakta om generasjoner i arbeidslivet, med Kristin Westreng Aas", "Norwegian", "2026-01-14", "Anne Lise Heide", "Kristin Westreng Aas", "Generasjonsledelse, aldersmangfold, arbeidsmiljø", "5", "Generasjonsforskning og ledelse av aldersmangfold — solid og aktuelt", "personalledelse", "https://www.buzzsprout.com/1929646/episodes/18371769-223-myter-og-fakta-om-generasjoner-i-arbeidslivet-med-kristin-westreng-aas.mp3"],
+["HR-podden", "224: Nytt og nyttig om ledergruppeutvikling med Henning Bang og Thomas Nesset Midelfart", "Norwegian", "2026-01-21", "Anne Lise Heide", "Henning Bang, Thomas Nesset Midelfart", "Ledergrupper, effektivitet, teamdynamikk", "6", "Norges fremste ledergruppe-eksperter — eksepsjonell for teamledelse, forskningstung", "teamledelse", "https://www.buzzsprout.com/1929646/episodes/18495292-224-nytt-og-nyttig-om-ledergruppeutvikling-med-henning-bang-og-thomas-nesset-midelfart.mp3"],
+["HR-podden", "225: Psykologisk trygghet i arbeidslivet, boklansering og HR-podden live - DEL 1", "Norwegian", "2026-01-28", "Anne Lise Heide", "Bård Fyhn, Birgitte Lange, Lars Erik Lund", "Psykologisk trygghet, boklansering, HR live", "6", "Boklansering med forsker Bård Fyhn og live-panel — essensiell episode om psykologisk trygghet", "teamledelse,kultur", "https://www.buzzsprout.com/1929646/episodes/18558642-225-psykologisk-trygghet-i-arbeidslivet-boklansering-og-hr-podden-live-del-1.mp3"],
+["HR-podden", "226: Psykologisk trygghet i arbeidslivet, boklansering og HR-podden live - DEL 2", "Norwegian", "2026-01-29", "Anne Lise Heide", "Bård Fyhn, Birgitte Lange, Lars Erik Lund", "Psykologisk trygghet, Q&A, ledelse i praksis", "6", "Del 2 med publikumsspørsmål om psykologisk trygghet i praksis — rik og anvendbar", "teamledelse,kultur", "https://www.buzzsprout.com/1929646/episodes/18558659-226-psykologisk-trygghet-i-arbeidslivet-boklansering-og-hr-podden-live-del-2.mp3"],
+["HR-podden", "227: Nye regler til psykososialt arbeidsmiljø med Avesta Gåskjønli", "Norwegian", "2026-02-04", "Anne Lise Heide", "Avesta Gåskjønli", "Psykososialt arbeidsmiljø, lovkrav, HR", "5", "Nye lovkrav til psykososialt arbeidsmiljø forklart — viktig og praktisk for HR og ledere", "personalledelse", "https://www.buzzsprout.com/1929646/episodes/18584274-227-nye-regler-til-psykososialt-arbeidsmiljo-med-avesta-gaskjonli.mp3"],
+["HR-podden", "228: Hva du bør vite om KI i 2026 med Alexander Haneng", "Norwegian", "2026-02-11", "Anne Lise Heide", "Alexander Haneng", "KI i HR, kompetanseutvikling, organisasjonsendring", "4", "KI fra HR-perspektiv — relevant men KI er hovemotiv fremfor ledelse", "personalledelse", "https://www.buzzsprout.com/1929646/episodes/18610789-228-hva-du-bor-vite-om-ki-i-2026-med-alexander-haneng.mp3"],
+["HR-podden", "229:  Den stille styrken, om høysensitivitet i arbeidslivet med Runar Heggen", "Norwegian", "2026-02-18", "Anne Lise Heide", "Runar Heggen", "Høysensitivitet, mangfold, arbeidsmiljø", "5", "Høysensitivitet som styrke i arbeidslivet — nyansert og verdifullt for personalledere", "personalledelse", "https://www.buzzsprout.com/1929646/episodes/18648881-229-den-stille-styrken-om-hoysensitivitet-i-arbeidslivet-med-runar-heggen.mp3"],
+["HR-podden", "230: Retorisk slagkraft i HR-rollen med Siri Blindheim", "Norwegian", "2026-02-25", "Anne Lise Heide", "Siri Blindheim", "Retorikk, kommunikasjon, HR-rollen", "4", "Retorisk kommunikasjon for HR-rollen — nyttig kompetanse men noe spesifikt", "personalledelse", "https://www.buzzsprout.com/1929646/episodes/18692388-230-retorisk-slagkraft-i-hr-rollen-med-siri-blindheim.mp3"],
+["HR-podden", "231: Tekstdoktorens HR-resept med Christine Calvert", "Norwegian", "2026-03-04", "Anne Lise Heide", "Christine Calvert", "Skriving, kommunikasjon, HR", "4", "Teksthåndverk i HR — nyttig skrivekompetanse for HR-profesjonelle", "personalledelse", "https://www.buzzsprout.com/1929646/episodes/18730739-231-tekstdoktorens-hr-resept-med-christine-calvert.mp3"],
+["HR-podden", "232: Tillit som kulturstrategi med Marcus Sahlin Pettersen & Kristin Bjerke", "Norwegian", "2026-03-11", "Anne Lise Heide", "Marcus Sahlin Pettersen, Kristin Bjerke", "Tillitskultur, organisasjonskultur, minimale regler", "5", "Alv IT-konsulentens tillitsbaserte kultur med minimal byråkrati — konkret og inspirerende", "teamledelse,kultur", "https://www.buzzsprout.com/1929646/episodes/18775286-232-tillit-som-kulturstrategi-med-marcus-sahlin-pettersen-kristin-bjerke.mp3"],
+["HR-podden", "233: Hvordan jobbe systematisk med nye lovkrav til psykososialt arbeidsmiljø med Monica Wibecan", "Norwegian", "2026-03-18", "Anne Lise Heide", "Monica Wibecan", "Psykososialt arbeidsmiljø, systematisk HR, risikovurdering", "5", "Praktisk implementering av psykososialt lovverk — kartlegging og risikovurdering", "personalledelse", "https://www.buzzsprout.com/1929646/episodes/18829201-233-hvordan-jobbe-systematisk-med-nye-lovkrav-til-psykososialt-arbeidsmiljo-med-monica-wibecan.mp3"],
+["HR-podden", "234: Prestasjonsledelse med Karina Andersen Aas og Cecilie Ystenes Myhre", "Norwegian", "2026-03-25", "Anne Lise Heide", "Karina Andersen Aas, Cecilie Ystenes Myhre", "Prestasjonsledelse, resultatorientering, medarbeiderutvikling", "6", "Prestasjonsledelse som muliggjøring — to eksperter med forskningstyngde og praksisnær metodikk", "personalledelse,motivasjon", "https://www.buzzsprout.com/1929646/episodes/18855147-234-prestasjonsledelse-med-karina-andersen-aas-og-cecilie-ystenes-myhre.mp3"],
+["HR-podden", "235: Slik bygger du en sunn tilbakemeldingskultur med Anne Lise Heide", "Norwegian", "2026-04-01", "Anne Lise Heide", "Anne Lise Heide", "Feedbackkultur, tilbakemeldinger, HR-praksis", "6", "Feedbackkultur i praksis — hvorfor det er vanskelig og hva som faktisk fungerer", "personalledelse,feedback", "https://www.buzzsprout.com/1929646/episodes/18893707-235-slik-bygger-du-en-sunn-tilbakemeldingskultur-med-anne-lise-heide.mp3"],
+["HR-podden", "236: Motiverende intervju: Kunsten å skape endring gjennom samtale med Liv Brauer", "Norwegian", "2026-04-08", "Anne Lise Heide", "Liv Brauer", "Motiverende intervju, samtalemetode, endringsledelse", "5", "Motiverende intervju som lederverktøy — praktisk og forskningsforankret samtalemetodikk", "coaching,personalledelse", "https://www.buzzsprout.com/1929646/episodes/18975520-236-motiverende-intervju-kunsten-a-skape-endring-gjennom-samtale-med-liv-brauer.mp3"],
+["Topplederpodcast (MeyerHaugen)", "Topplederpodcast med Ole Erik Almlid, administrerende direktør i NHO", "Norwegian", "2026-02-09", "Siv Jensen, Petter Meyer", "Ole Erik Almlid", "Næringslivsledelse, norsk økonomi, rammebetingelser", "5", "NHO-direktøren om norsk næringsliv og ledelseskrav — bredt og substansielt perspektiv", "personalledelse", "https://meyerhaugen.no/topplederpodcast/"],
+["Topplederpodcast (MeyerHaugen)", "Topplederpodcast med Birger Steen, CEO i NORSAR", "Norwegian", "2026-02-23", "Siv Jensen, Petter Meyer", "Birger Steen", "Ledelse, teknologi, nasjonal sikkerhet", "4", "NORSAR-sjef om ledelse i sikkerhetsorganisasjon — interessant men fagfokus dominerer", "personalledelse", "https://meyerhaugen.no/topplederpodcast/"],
+["Topplederpodcast (MeyerHaugen)", "Topplederpodcast med Espen Swartling, CEO i Allianz Trade Norge", "Norwegian", "2026-04-10", "Siv Jensen, Petter Meyer", "Espen Swartling", "Ledelse, handel, risiko, internasjonal business", "4", "Allianz Trade-CEO om handel og risiko i usikker verden — ledelse tangentielt berørt", "personalledelse", "https://meyerhaugen.no/topplederpodcast/"],
+["Smidigpodden", "Hvordan få ledergruppen din til å bli et team", "Norwegian", "2026-02-18", "Tobias Falkberger, Ida Kjær", "—", "Ledergrupper, teamutvikling, organisasjonsutvikling", "6", "Direkte om å gjøre ledergruppen til et ekte team — eksepsjonelt relevant og konkret", "teamledelse", "https://shows.acast.com/smidigpodden/episodes/lederepisode"],
+["Psykologkameratene", "Psykologisk førstehjelp i kriser: Hvordan hjelpe selv om du ikke er psykolog", "Norwegian", "2026-01-12", "Magnus Odeen, Sivert Straume", "—", "Krisehåndtering, psykologisk støtte, lederansvar", "4", "Krisehåndtering uten psykologutdanning — nyttig for ledere som møter medarbeidere i krise", "personalledelse", "https://psykologkameratene.podbean.com/e/nar-viking-vinner-og-du-trenger-psykologisk-f%c3%b8rstehjelp/"],
+["Psykologkameratene", "Psykemelding: Når psykiske lidelser går ut over arbeidsevnen", "Norwegian", "2026-01-27", "Magnus Odeen, Sivert Straume", "—", "Psykisk sykefravær, arbeid og helse, lederansvar", "5", "Psykisk sykemelding og leders rolle — direkte relevant for personalledere", "personalledelse", "https://psykologkameratene.podbean.com/e/sykemelding-eller-asyl-hvordan-psykisk-helse-og-jobb-henger-sammen/"],
+["Psykologkameratene", "Imposter fenomenet: Blir jeg avslørt nå?", "Norwegian", "2026-02-03", "Magnus Odeen, Sivert Straume", "—", "Impostorsyndrom, selvtillit, lederutvikling", "4", "Impostorsyndrom hos ledere og høytpresterende — relevant for coaching og personalledelse", "coaching", "https://psykologkameratene.podbean.com/e/det-er-en-bedrager-blant-oss-%e2%80%94-hvem-er-ekte-og-hvem-er-impostor/"],
+["Psykologkameratene", "Lær å si nei — for deg som er alt for grei", "Norwegian", "2026-02-10", "Magnus Odeen, Sivert Straume", "—", "Grensesetting, kommunikasjon, selvhevdelse", "4", "Grensesetting i lederrollen — relevant for medarbeiderrelasjon og coaching", "personalledelse,coaching", "https://psykologkameratene.podbean.com/e/l%c3%a6r-a-si-nei-%e2%80%94-uten-darlig-samvittighet/"],
+["Psykologkameratene", "Moralsk frakobling: Når gode mennesker gjør gale ting", "Norwegian", "2026-02-17", "Magnus Odeen, Sivert Straume", "—", "Etikk, organisasjonsadferd, moralsk ansvar", "4", "Moralsk frakobling i organisasjoner — relevant for lederansvar og kulturarbeid", "kultur", "https://psykologkameratene.podbean.com/e/nar-gode-mennesker-gj%c3%b8r-gale-ting-psykologien-bak-moralsk-frakobling/"],
+["Psykologkameratene", "Jobbe når du ikke er 100%? Slik får du det til", "Norwegian", "2026-02-24", "Magnus Odeen, Sivert Straume", "—", "Tilrettelegging, sykefravær, arbeidskapasitet", "4", "Tilrettelegging og gradert nærvær — praktisk for personalledere og HR", "personalledelse", "https://psykologkameratene.podbean.com/e/jobbe-nar-du-ikke-er-100-slik-far-du-det-til/"],
+["Psykologkameratene", "Hvordan koble av jobben- for store og små", "Norwegian", "2026-03-31", "Magnus Odeen, Sivert Straume", "—", "Avkobling, work-life balance, restitusjon", "4", "Avkobling fra jobben for ledere og medarbeidere — relevant for bærekraftig arbeidsliv", "personalledelse", "https://psykologkameratene.podbean.com/e/nar-jobben-aldri-slar-av-hvordan-koble-fra-i-en-hjemmekontorverden/"],
+["Lederpodden", "💡 Slik får du mer kreative løsninger - med idékunstner Håkon Forfod Sønneland", "Norwegian", "2026-04-17", "Tor Åge Skagestad Eikerapen", "Håkon Forfod Sønneland", "Kreativitet, idéutvikling, problemløsning", "4", "Kreativitet som trenbar ferdighet for hverdagslige arbeidsproblemer — praktisk men kreativitet er sekundært lederemne", "teamledelse", "https://www.execu.no/lederpodden/309"],
+["Lederliv", "Hans-Erik Skjæggerud, Yrkesorganisasjonenes Sentralforbund (YS)", "Norwegian", "2026-04-17", "Ole Christian Apeland", "Hans-Erik Skjæggerud", "Fagorganisering, lønnsoppgjør, KI og arbeidsliv", "4", "YS-leder om årets hovedoppgjør og KI-effekter for arbeidstakere — interessant men arbeidsliv er hovemotiv", "personalledelse", "https://shows.acast.com/lederliv/episodes/hans-erik-skjaeggerud-yrkesorganisasjonenes-sentralforbund-y"],
+["HR-podden", "237: Hvordan lykkes med strategisk HR med Rachel Wilson Rugelsjøen", "Norwegian", "2026-04-15", "Anne Lise Heide", "Rachel Wilson Rugelsjøen", "Strategisk HR, virksomhetspartner, lederutvikling", "5", "Strategisk HR som å levere virksomhetens strategi gjennom mennesker — ekspert med klar og direkte relevant these", "personalledelse", "https://www.buzzsprout.com/1929646/episodes/19006463-237-hvordan-lykkes-med-strategisk-hr-med-rachel-wilson-rugelsjoen.mp3"],
+["Topplederpodcast (MeyerHaugen)", "Topplederpodcast med Christoffer Sundby, CEO i Spenn Group", "Norwegian", "2026-04-20", "Siv Jensen, Petter Meyer", "Christoffer Sundby", "Kundelojalitet, merkevarebygging, lederskap fra toppidrett", "4", "Spenn-CEO om lojalitet og vekst — toppidrettsbakgrunn gir ledervinkel, men business er hovemotiv", "personalledelse", "https://meyerhaugen.no/topplederpodcast/"],
+["Lederskap (NHH)", "Flink med folk, med Trond Mjåland og Mathias Reierth", "Norwegian", "2026-04-22", "", "Trond Mjåland, Mathias Reierth", "Mellommenneskelige ferdigheter, relasjoner på jobb", "5", "Episode om å være god med folk i arbeidslivet — praktisk og relasjonsorientert ledelsesinnhold fra NHH-miljøet.", "personalledelse,teamledelse", "https://shows.acast.com/lederskap/episodes/flink-med-folk-med-trond-mjaland-og-mathias-reierth"],
+["HR-podden", "238: Når følelsene styrer - om emosjonell kompetanse på jobben med Aksel Inge Sinding", "Norwegian", "2026-04-22", "", "Aksel Inge Sinding", "Emosjonell kompetanse, følelser på jobb, selvregulering", "5", "Relevant for ledere og HR — hvordan emosjonell kompetanse påvirker atferd og relasjoner i arbeidslivet.", "personalledelse,motivasjon", "https://www.buzzsprout.com/1929646/episodes/19047122-238-nar-folelsene-styrer-om-emosjonell-kompetanse-pa-jobben-med-aksel-inge-sinding.mp3"]
+];
+
+const RATING_COL = 7;
+const DATE_COL   = 3;
+const sort = { col: DATE_COL, asc: false };
+let activeTag = '';
+
+const tagMeta = {
+  teamledelse:     { label: 'Teamledelse',     cls: 'tag-teamledelse'     },
+  personalledelse: { label: 'Personalledelse', cls: 'tag-personalledelse' },
+  feedback:        { label: 'Feedback',        cls: 'tag-feedback'        },
+  kultur:          { label: 'Kultur',          cls: 'tag-kultur'          },
+  rekruttering:    { label: 'Rekruttering',    cls: 'tag-rekruttering'    },
+  motivasjon:      { label: 'Motivasjon',      cls: 'tag-motivasjon'      },
+  coaching:        { label: 'Coaching',        cls: 'tag-coaching'        },
+};
+
+function esc(str) {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+function safeUrl(url) {
+  const s = String(url).trim();
+  return /^https?:\/\//i.test(s) ? esc(s) : '#';
+}
+function renderTags(tags) {
+  if (!tags) return '<span class="no-tags">\u2013</span>';
+  const html = tags.split(',').map(t => {
+    const meta = tagMeta[t.trim()];
+    return meta ? `<span class="tag ${meta.cls}">${meta.label}</span>` : '';
+  }).filter(Boolean).join('');
+  return html || '<span class="no-tags">\u2013</span>';
+}
+function renderTable(rows) {
+  const tbody = document.getElementById('tableBody');
+  tbody.innerHTML = '';
+  rows.forEach(row => {
+    const [podcast, title, , date, hosts, guests, topics, rating, note, tags, link] = row;
+    const tr = document.createElement('tr');
+    if (rating > 0) tr.dataset.rating = rating;
+    tr.innerHTML = `
+      <td><span class="cell-podcast">${esc(podcast)}</span></td>
+      <td><span class="cell-title">${esc(title)}</span></td>
+      <td><span class="cell-date">${esc(date)}</span></td>
+      <td><span class="cell-person">${esc(hosts)}</span></td>
+      <td><span class="cell-person">${esc(guests)}</span></td>
+      <td><span class="cell-topics">${esc(topics)}</span></td>
+      <td style="text-align:center"><span class="rating-badge${+rating >= 1 && +rating <= 6 ? ' r'+rating : ''}">${+rating > 0 ? rating : 'N/A'}</span></td>
+      <td><span class="cell-note">${esc(note)}</span></td>
+      <td>${renderTags(tags)}</td>
+      <td><a class="listen-link" href="${safeUrl(link)}" target="_blank" rel="noopener noreferrer">&#9654; Lytt</a></td>
+    `;
+    tbody.appendChild(tr);
+  });
+  document.getElementById('rowCount').textContent = `Viser ${rows.length} av ${data.length} episoder`;
+}
+function tagsOf(row) { return (row[9] || '').split(',').map(t => t.trim()); }
+function updateStats() {
+  const shows = new Set();
+  let team = 0, pers = 0, top = 0, unrated = 0;
+  data.forEach(r => {
+    shows.add(r[0]);
+    const tags = tagsOf(r);
+    if (tags.includes('teamledelse'))    team++;
+    if (tags.includes('personalledelse')) pers++;
+    if (+r[7] === 6) top++;
+    if (+r[7] === 0) unrated++;
+  });
+  document.getElementById('statTotal').textContent   = data.length;
+  document.getElementById('statShows').textContent   = shows.size;
+  document.getElementById('statTeam').textContent    = team;
+  document.getElementById('statPers').textContent    = pers;
+  document.getElementById('statTop').textContent     = top;
+  document.getElementById('statUnrated').textContent = unrated;
+}
+function fuzzyMatch(query, haystack) {
+  if (haystack.includes(query)) return true;
+  let qi = 0;
+  for (let i = 0; i < haystack.length && qi < query.length; i++) {
+    if (haystack[i] === query[qi]) qi++;
+  }
+  return qi === query.length;
+}
+function getFiltered() {
+  const search        = document.getElementById('searchBox').value.toLowerCase().trim();
+  const minRating     = parseInt(document.getElementById('ratingFilter').value);
+  const podcastFilter = document.getElementById('podcastFilter').value;
+  return data.filter(row => {
+    const [podcast, title, , , hosts, guests, topics, rating, note, tags] = row;
+    if (activeTag && !tagsOf(row).includes(activeTag)) return false;
+    if (+rating > 0 && +rating < minRating) return false;
+    if (podcastFilter && podcast !== podcastFilter) return false;
+    if (search) {
+      const haystack = [podcast, title, hosts, guests, topics, note].join(' ').toLowerCase();
+      if (!fuzzyMatch(search, haystack)) return false;
+    }
+    return true;
+  });
+}
+function getSorted(rows) {
+  return [...rows].sort((a, b) => {
+    const va = a[sort.col], vb = b[sort.col];
+    if (typeof va === 'number') return sort.asc ? va - vb : vb - va;
+    return sort.asc
+      ? String(va).toLowerCase().localeCompare(String(vb).toLowerCase())
+      : String(vb).toLowerCase().localeCompare(String(va).toLowerCase());
+  });
+}
+function sortTable(col) {
+  sort.asc = sort.col === col ? !sort.asc : col !== RATING_COL;
+  sort.col = col;
+  document.querySelectorAll('thead th[data-col]').forEach(th => {
+    const c = parseInt(th.dataset.col);
+    th.classList.toggle('sorted', c === col);
+    const icon = th.querySelector('.sort-icon');
+    if (icon) icon.textContent = c === col ? (sort.asc ? '\u2191' : '\u2193') : '\u2195';
+    if (c === col) th.setAttribute('aria-sort', sort.asc ? 'ascending' : 'descending');
+    else th.removeAttribute('aria-sort');
+  });
+  refresh();
+}
+function refresh() { renderTable(getSorted(getFiltered())); }
+function resetFilters() {
+  document.getElementById('searchBox').value = '';
+  document.getElementById('ratingFilter').value = '4';
+  document.getElementById('podcastFilter').value = '';
+  activeTag = '';
+  document.querySelectorAll('.tag-pill').forEach(b => {
+    const isAll = b.dataset.tag === '';
+    b.classList.toggle('active', isAll);
+    b.setAttribute('aria-pressed', isAll ? 'true' : 'false');
+  });
+  refresh();
+}
+function parseCSV(text) {
+  const rows = [];
+  let row = [], field = '', inQuotes = false, wasQuoted = false;
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i], next = text[i + 1];
+    if (inQuotes) {
+      if (ch === '"' && next === '"') { field += '"'; i++; }
+      else if (ch === '"') { inQuotes = false; }
+      else { field += ch; }
+    } else {
+      if (ch === '"') { inQuotes = true; wasQuoted = true; }
+      else if (ch === ',') {
+        row.push(wasQuoted ? field : field.trim());
+        field = ''; wasQuoted = false;
+      } else if (ch === '\n' || (ch === '\r' && next === '\n')) {
+        row.push(wasQuoted ? field : field.trim());
+        rows.push(row);
+        row = []; field = ''; wasQuoted = false;
+        if (ch === '\r') i++;
+      } else { field += ch; }
+    }
+  }
+  if (field || row.length) { row.push(wasQuoted ? field : field.trim()); rows.push(row); }
+  return rows.filter(r => r.some(f => f));
+}
+
+const _d = new Date();
+document.getElementById('todayDate').textContent =
+  String(_d.getDate()).padStart(2, '0') + '.' +
+  String(_d.getMonth() + 1).padStart(2, '0') + '.' +
+  String(_d.getFullYear()).slice(-2);
+
+const _f = new Date(_d);
+_f.setMonth(_f.getMonth() - 6);
+document.getElementById('fromDate').textContent =
+  String(_f.getDate()).padStart(2, '0') + '.' +
+  String(_f.getMonth() + 1).padStart(2, '0') + '.' +
+  String(_f.getFullYear()).slice(-2);
+
+document.querySelectorAll('.tag-pill').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tag-pill').forEach(b => {
+      b.classList.remove('active');
+      b.setAttribute('aria-pressed', 'false');
+    });
+    btn.classList.add('active');
+    btn.setAttribute('aria-pressed', 'true');
+    activeTag = btn.dataset.tag;
+    refresh();
+  });
+});
+
+// Populate podcast dropdown from data
+const podcastSel = document.getElementById('podcastFilter');
+[...new Set(data.map(r => r[0]))].sort().forEach(name => {
+  const opt = document.createElement('option');
+  opt.value = name; opt.textContent = name;
+  podcastSel.appendChild(opt);
+});
+
+document.getElementById('searchBox').addEventListener('input', refresh);
+document.getElementById('ratingFilter').addEventListener('change', refresh);
+document.getElementById('podcastFilter').addEventListener('change', refresh);
+document.getElementById('resetBtn').addEventListener('click', resetFilters);
+document.getElementById('updateBtn').addEventListener('click', () => document.getElementById('csvFile').click());
+document.getElementById('csvFile').addEventListener('change', function () {
+  const file = this.files[0];
+  if (!file) return;
+  const status = document.getElementById('updateStatus');
+  if (file.size > 5 * 1024 * 1024) {
+    status.textContent = 'Feil: CSV-filen er for stor (maks 5 MB)';
+    status.style.color = '#dc2626';
+    this.value = '';
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const rows = parseCSV(e.target.result);
+      if (rows.length < 2) throw new Error('Tom eller ugyldig CSV');
+      data.length = 0;
+      rows.slice(1).forEach(r => {
+        const rating = parseInt(r[7]);
+        data.push([r[0], r[1], r[2], r[3], r[4], r[5], r[6], isNaN(rating) ? 0 : rating, r[8], r[9], r[10]]);
+      });
+      updateStats();
+      refresh();
+      status.textContent = `\u2713 ${data.length} episoder lastet inn fra ${file.name}`;
+      status.style.color = '#16a34a';
+    } catch (err) {
+      status.textContent = `Feil: ${err.message}`;
+      status.style.color = '#dc2626';
+    }
+    this.value = '';
+  };
+  reader.readAsText(file, 'UTF-8');
+});
+document.querySelectorAll('thead th[data-col]').forEach(th =>
+  th.addEventListener('click', () => sortTable(parseInt(th.dataset.col)))
+);
+const darkToggle = document.getElementById('darkToggle');
+function applyDark(on) {
+  document.body.classList.toggle('dark', on);
+  darkToggle.textContent = on ? '\u2600 Lys' : '\u263E M\u00F8rk';
+}
+applyDark(localStorage.getItem('darkMode') === '1');
+darkToggle.addEventListener('click', () => {
+  const on = !document.body.classList.contains('dark');
+  localStorage.setItem('darkMode', on ? '1' : '0');
+  applyDark(on);
+});
+updateStats();
+refresh();
+
+</script>
+</body>
+</html>

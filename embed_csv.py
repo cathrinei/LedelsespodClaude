@@ -1,5 +1,5 @@
 """
-embed_csv.py — Leser Ledelsepod_2026.csv og skriver data-arrayen inn i Ledelsepod_2026.html.
+embed_csv.py — Leser Ledelsepod.csv og skriver data-arrayen inn i Ledelsepod.html.
 
 Kjør etter at CSV er oppdatert og vurdert:
   python embed_csv.py
@@ -14,8 +14,8 @@ import sys
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
 BASE      = os.path.dirname(os.path.abspath(__file__))
-CSV_PATH  = os.path.join(BASE, "Ledelsepod_2026.csv")
-HTML_PATH = os.path.join(BASE, "Ledelsepod_2026.html")
+CSV_PATH  = os.path.join(BASE, "Ledelsepod.csv")
+HTML_PATH = os.path.join(BASE, "Ledelsepod.html")
 
 
 def main():

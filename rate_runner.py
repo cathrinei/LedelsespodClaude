@@ -11,7 +11,7 @@ import sys
 
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
-CSV_PATH      = os.path.join(os.path.dirname(os.path.abspath(__file__)), "Ledelsepod_2026.csv")
+CSV_PATH      = os.path.join(os.path.dirname(os.path.abspath(__file__)), "Ledelsepod.csv")
 REJECTED_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "rejected_episodes.csv")
 
 
