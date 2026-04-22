@@ -365,7 +365,14 @@ tbody tr[data-rating="4"] td:first-child { border-left: 3px solid #6d28d9; }
   font-weight: 600;
   letter-spacing: 0.02em;
   margin: 1px 2px 1px 0;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  outline-offset: 2px;
 }
+.tag:hover { filter: brightness(0.92); }
+.tag:focus-visible { outline: 2px solid var(--focus-ring); }
+.tag[aria-pressed="true"] { outline: 2px solid currentColor; outline-offset: 1px; }
 .tag-teamledelse     { background: #ede9fe; color: #4c1d95; }
 .tag-personalledelse { background: #ccfbf1; color: #065f46; }
 .tag-feedback        { background: #fef3c7; color: #78350f; }
@@ -653,8 +660,9 @@ function safeUrl(url) {
 function renderTags(tags) {
   if (!tags) return '<span class="no-tags">\u2013</span>';
   const html = tags.split(',').map(t => {
-    const meta = tagMeta[t.trim()];
-    return meta ? `<span class="tag ${meta.cls}">${meta.label}</span>` : '';
+    const key = t.trim();
+    const meta = tagMeta[key];
+    return meta ? `<button class="tag ${meta.cls}" data-tag="${key}" aria-pressed="${activeTag === key ? 'true' : 'false'}">${meta.label}</button>` : '';
   }).filter(Boolean).join('');
   return html || '<span class="no-tags">\u2013</span>';
 }
@@ -911,6 +919,22 @@ document.querySelectorAll('.stat-btn').forEach(btn => {
   btn.addEventListener('click', activate);
   btn.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); activate(); } });
 });
+// Klikk på tags i tabellen — event delegation på tbody
+document.getElementById('tableBody').addEventListener('click', e => {
+  const btn = e.target.closest('button.tag[data-tag]');
+  if (!btn) return;
+  const tag = btn.dataset.tag;
+  activeTag = activeTag === tag ? '' : tag;
+  document.querySelectorAll('.tag-pill').forEach(p => {
+    const isActive = p.dataset.tag === activeTag;
+    const isAll = p.dataset.tag === '' && !activeTag;
+    p.classList.toggle('active', isActive || isAll);
+    p.setAttribute('aria-pressed', (isActive || isAll) ? 'true' : 'false');
+  });
+  refresh();
+  updateStatBtns();
+});
+
 updateStats();
 refresh();
 
