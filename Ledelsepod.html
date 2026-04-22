@@ -424,6 +424,54 @@ button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible
   header h1 { font-size: 1.1rem; }
   .search-wrap { max-width: 100%; }
 }
+
+/* Kortcelle — skjult på desktop, synlig på mobil */
+.card-cell { display: none; }
+
+@media (max-width: 600px) {
+
+  /* Header: stabel tittel over toggle */
+  header { flex-direction: column; align-items: flex-start; gap: 0.75rem; padding: 1.1rem 1rem 1rem; }
+  #darkToggle { align-self: flex-start; }
+
+  /* Stats: 2-kolonners grid */
+  .stats-bar { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem; padding: 0.75rem 1rem; }
+  .stat { min-width: 0; }
+  .stat-n { font-size: 1.2rem; }
+  .stat-label { font-size: 0.62rem; }
+
+  /* Kontroller: stables vertikalt, full bredde */
+  .controls { padding: 0.75rem 1rem; }
+  .controls-row { flex-direction: column; align-items: stretch; }
+  .search-wrap { max-width: 100%; min-width: 0; }
+  #ratingFilter, #podcastFilter { width: 100%; }
+  .btn { width: 100%; text-align: center; }
+
+  /* Tabell → kortlayout */
+  #mainTable thead { display: none; }
+  #mainTable tbody tr { display: block; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 0.75rem; box-shadow: var(--shadow-sm); overflow: hidden; }
+  #mainTable tbody tr:last-child { border-bottom: 1px solid var(--border); }
+  #mainTable tbody tr:hover { background: var(--row-hover); }
+  #mainTable tbody td:not(.card-cell) { display: none; }
+  .table-wrap { padding: 0.5rem 0.75rem 2rem; overflow-x: visible; }
+
+  /* Bevar rating-fargekant på kortene */
+  #mainTable tbody tr[data-rating="6"] { border-left: 3px solid #166534; }
+  #mainTable tbody tr[data-rating="5"] { border-left: 3px solid #1d4ed8; }
+  #mainTable tbody tr[data-rating="4"] { border-left: 3px solid #6d28d9; }
+
+  /* Vis kortcellen */
+  .card-cell { display: block; padding: 0; border: none; }
+
+  /* Kortstruktur */
+  .ep-card { padding: 0.85rem 1rem; display: flex; flex-direction: column; gap: 0.45rem; }
+  .ep-card__header { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; }
+  .ep-card__title { font-size: 0.88rem; line-height: 1.4; display: block; }
+  .ep-card__meta { display: flex; flex-wrap: wrap; gap: 0.35rem 0.75rem; align-items: center; }
+  .ep-card__tags { display: flex; flex-wrap: wrap; gap: 0.25rem; }
+  .ep-card__listen { margin-top: 0.1rem; }
+
+}
 </style>
 </head>
 <body>
@@ -629,6 +677,23 @@ function renderTable(rows) {
       <td>${renderTags(tags)}</td>
       <td><a class="listen-link" href="${safeUrl(link)}" target="_blank" rel="noopener noreferrer">&#9654; Lytt</a></td>
     `;
+    tr.insertAdjacentHTML('beforeend', `
+      <td class="card-cell" colspan="10">
+        <div class="ep-card">
+          <div class="ep-card__header">
+            <span class="cell-podcast">${esc(podcast)}</span>
+            <span class="rating-badge${+rating >= 1 && +rating <= 6 ? ' r'+rating : ''}">${+rating > 0 ? rating : 'N/A'}</span>
+          </div>
+          <a class="cell-title ep-card__title" href="${safeUrl(link)}" target="_blank" rel="noopener noreferrer">${esc(title)}</a>
+          <div class="ep-card__meta">
+            <span class="cell-date">${esc(date)}</span>
+            <span class="cell-person">${esc(hosts)}</span>
+          </div>
+          <div class="ep-card__tags">${renderTags(tags)}</div>
+          <a class="listen-link ep-card__listen" href="${safeUrl(link)}" target="_blank" rel="noopener noreferrer">&#9654; Lytt</a>
+        </div>
+      </td>
+    `);
     tbody.appendChild(tr);
   });
   document.getElementById('rowCount').textContent = `Viser ${rows.length} av ${data.length} episoder`;
