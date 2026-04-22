@@ -3,16 +3,22 @@
 ## Purpose
 This project collects and curates Norwegian-language podcast episodes on **teamledelse** (team leadership) and **personalledelse** (people management / HR), published in 2026.
 
+## Repository & publisering
+- **GitHub:** https://github.com/cathrinei/LedelsespodClaude
+- **GitHub Pages:** https://cathrinei.github.io/LedelsespodClaude/Ledelsepod_2026.html
+- Branch: `master` — push til master oppdaterer GitHub Pages automatisk
+
 ## Files
 - `Ledelsepod_2026.csv` — master data, one row per episode
 - `Ledelsepod_2026.html` — interactive table with filtering, sorting, stats (CSV import button hidden)
+- `README.md` — prosjektbeskrivelse med lenke til GitHub Pages
 - `update_podcasts.py` — RSS fetcher; adds new episodes (Rating=0) since last known date per podcast
 - `auto_rate.py` — automatisk vurdering av Rating=0-episoder via Claude API (claude-haiku-4-5)
 - `rate_runner.py` — stabil kjørelogikk for manuell episodeevaluering; importeres av `rate_episodes.py`
 - `rate_episodes.py` — data-only (UPDATES + REMOVE_KEYWORDS); skrives per raterunde, slettes etter bruk
 - `embed_csv.py` — skriver CSV-innholdet inn i HTML-filens `data`-array; kjøres etter hver raterunde
 - `rejected_episodes.csv` — denylist; episodes here are never re-fetched by `update_podcasts.py`
-- `.github/workflows/update_podcasts.yml` — GitHub Actions workflow; kjører daglig 10:15 Oslo-tid og kan trigges manuelt
+- `.github/workflows/update_podcasts.yml` — GitHub Actions workflow; daglig kjøring deaktivert inntil videre, manuell trigger tilgjengelig
 
 ## CSV columns
 
