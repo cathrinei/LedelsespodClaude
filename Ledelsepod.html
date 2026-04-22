@@ -141,6 +141,11 @@ body.dark #darkToggle { border-color: rgba(255,255,255,0.15); color: rgba(255,25
   transition: box-shadow 0.15s;
 }
 .stat:hover { box-shadow: var(--shadow-sm); }
+.stat-btn { cursor: pointer; transition: box-shadow 0.15s, border-color 0.15s, background 0.15s; }
+.stat-btn:hover { border-color: var(--accent); }
+.stat-btn.active { background: var(--accent); border-color: var(--accent); }
+.stat-btn.active .stat-n, .stat-btn.active .stat-label { color: #fff; }
+.stat-btn:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2px; }
 .stat-n {
   font-size: 1.55rem;
   font-weight: 700;
@@ -432,11 +437,11 @@ button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible
 </header>
 
 <div class="stats-bar">
-  <div class="stat"><span class="stat-n" id="statTotal">–</span><span class="stat-label">Episoder</span></div>
+  <div class="stat stat-btn" role="button" tabindex="0" data-filter="reset" aria-pressed="false"><span class="stat-n" id="statTotal">–</span><span class="stat-label">Episoder</span></div>
   <div class="stat"><span class="stat-n" id="statShows">–</span><span class="stat-label">Podkastserier</span></div>
-  <div class="stat"><span class="stat-n" id="statTeam">–</span><span class="stat-label">Teamledelse</span></div>
-  <div class="stat"><span class="stat-n" id="statPers">–</span><span class="stat-label">Personalledelse</span></div>
-  <div class="stat"><span class="stat-n" id="statTop">–</span><span class="stat-label">Toppkarakter 6/6</span></div>
+  <div class="stat stat-btn" role="button" tabindex="0" data-filter="tag:teamledelse" aria-pressed="false"><span class="stat-n" id="statTeam">–</span><span class="stat-label">Teamledelse</span></div>
+  <div class="stat stat-btn" role="button" tabindex="0" data-filter="tag:personalledelse" aria-pressed="false"><span class="stat-n" id="statPers">–</span><span class="stat-label">Personalledelse</span></div>
+  <div class="stat stat-btn" role="button" tabindex="0" data-filter="rating:6" aria-pressed="false"><span class="stat-n" id="statTop">–</span><span class="stat-label">Toppkarakter 6/6</span></div>
   <div class="stat"><span class="stat-n" id="statUnrated">–</span><span class="stat-label">Uten rating</span></div>
 </div>
 
@@ -707,6 +712,7 @@ function resetFilters() {
     b.setAttribute('aria-pressed', isAll ? 'true' : 'false');
   });
   refresh();
+  if (typeof updateStatBtns === 'function') updateStatBtns();
 }
 function parseCSV(text) {
   const rows = [];
@@ -806,6 +812,46 @@ darkToggle.addEventListener('click', () => {
   const on = !document.body.classList.contains('dark');
   localStorage.setItem('darkMode', on ? '1' : '0');
   applyDark(on);
+});
+function updateStatBtns() {
+  document.querySelectorAll('.stat-btn').forEach(btn => {
+    const f = btn.dataset.filter;
+    let active = false;
+    if (f && f.startsWith('tag:')) {
+      active = activeTag === f.slice(4);
+    } else if (f && f.startsWith('rating:')) {
+      active = document.getElementById('ratingFilter').value === f.slice(7) && !activeTag;
+    }
+    btn.classList.toggle('active', active);
+    btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+  });
+}
+document.querySelectorAll('.stat-btn').forEach(btn => {
+  const activate = () => {
+    const f = btn.dataset.filter;
+    if (f === 'reset') {
+      resetFilters();
+    } else if (f.startsWith('tag:')) {
+      const tag = f.slice(4);
+      activeTag = activeTag === tag ? '' : tag;
+      document.getElementById('ratingFilter').value = '4';
+      document.querySelectorAll('.tag-pill').forEach(p => p.classList.toggle('active', p.dataset.tag === activeTag));
+      refresh();
+    } else if (f.startsWith('rating:')) {
+      const val = f.slice(7);
+      if (document.getElementById('ratingFilter').value === val && !activeTag) {
+        document.getElementById('ratingFilter').value = '4';
+      } else {
+        document.getElementById('ratingFilter').value = val;
+        activeTag = '';
+        document.querySelectorAll('.tag-pill').forEach(p => p.classList.remove('active'));
+      }
+      refresh();
+    }
+    updateStatBtns();
+  };
+  btn.addEventListener('click', activate);
+  btn.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); activate(); } });
 });
 updateStats();
 refresh();
