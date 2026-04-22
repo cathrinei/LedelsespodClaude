@@ -1,7 +1,7 @@
 # LedelsepodClaude – Project Context
 
 ## Purpose
-This project collects and curates Norwegian-language podcast episodes on **teamledelse** (team leadership) and **personalledelse** (people management / HR) — always the rolling last 6 months.
+This project collects and curates Norwegian-language podcast episodes on **teamledelse** (team leadership) and **personalledelse** (people management / HR) — always the rolling last 6 months. Dataset starts from January 2026 (Oct–Dec 2025 episodes unavailable from RSS feeds).
 
 ## Repository & publisering
 - **GitHub:** https://github.com/cathrinei/LedelsespodClaude

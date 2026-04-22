@@ -425,7 +425,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible
 <header>
   <div class="header-text">
     <h1>Teamledelse &amp; Personalledelse</h1>
-    <p class="subtitle">Norske podkast-episoder &bull; <span id="fromDate"></span> &ndash; <span id="todayDate"></span></p>
+    <p class="subtitle">Norske podkast-episoder &bull; Siste 6 m&aring;neder</p>
   </div>
   <button id="darkToggle" aria-label="Bytt mellom lys og mørk visning">&#9790; Mørk</button>
 </header>
@@ -569,7 +569,59 @@ const data = [
 ["HR-podden", "237: Hvordan lykkes med strategisk HR med Rachel Wilson Rugelsjøen", "Norwegian", "2026-04-15", "Anne Lise Heide", "Rachel Wilson Rugelsjøen", "Strategisk HR, virksomhetspartner, lederutvikling", "5", "Strategisk HR som å levere virksomhetens strategi gjennom mennesker — ekspert med klar og direkte relevant these", "personalledelse", "https://www.buzzsprout.com/1929646/episodes/19006463-237-hvordan-lykkes-med-strategisk-hr-med-rachel-wilson-rugelsjoen.mp3"],
 ["Topplederpodcast (MeyerHaugen)", "Topplederpodcast med Christoffer Sundby, CEO i Spenn Group", "Norwegian", "2026-04-20", "Siv Jensen, Petter Meyer", "Christoffer Sundby", "Kundelojalitet, merkevarebygging, lederskap fra toppidrett", "4", "Spenn-CEO om lojalitet og vekst — toppidrettsbakgrunn gir ledervinkel, men business er hovemotiv", "personalledelse", "https://meyerhaugen.no/topplederpodcast/"],
 ["Lederskap (NHH)", "Flink med folk, med Trond Mjåland og Mathias Reierth", "Norwegian", "2026-04-22", "", "Trond Mjåland, Mathias Reierth", "Mellommenneskelige ferdigheter, relasjoner på jobb", "5", "Episode om å være god med folk i arbeidslivet — praktisk og relasjonsorientert ledelsesinnhold fra NHH-miljøet.", "personalledelse,teamledelse", "https://shows.acast.com/lederskap/episodes/flink-med-folk-med-trond-mjaland-og-mathias-reierth"],
-["HR-podden", "238: Når følelsene styrer - om emosjonell kompetanse på jobben med Aksel Inge Sinding", "Norwegian", "2026-04-22", "", "Aksel Inge Sinding", "Emosjonell kompetanse, følelser på jobb, selvregulering", "5", "Relevant for ledere og HR — hvordan emosjonell kompetanse påvirker atferd og relasjoner i arbeidslivet.", "personalledelse,motivasjon", "https://www.buzzsprout.com/1929646/episodes/19047122-238-nar-folelsene-styrer-om-emosjonell-kompetanse-pa-jobben-med-aksel-inge-sinding.mp3"]
+["HR-podden", "238: Når følelsene styrer - om emosjonell kompetanse på jobben med Aksel Inge Sinding", "Norwegian", "2026-04-22", "", "Aksel Inge Sinding", "Emosjonell kompetanse, følelser på jobb, selvregulering", "5", "Relevant for ledere og HR — hvordan emosjonell kompetanse påvirker atferd og relasjoner i arbeidslivet.", "personalledelse,motivasjon", "https://www.buzzsprout.com/1929646/episodes/19047122-238-nar-folelsene-styrer-om-emosjonell-kompetanse-pa-jobben-med-aksel-inge-sinding.mp3"],
+["Lederpodden", "🛡️ Forsvarsmekanismene du ikke visste du hadde – med Hans Christoffer Aargard Terjesen", "Norwegian", "2025-10-23", "", "", "", "0", "Ny episode — ikke vurdert ennå", "", "https://www.execu.no/lederpodden/284"],
+["Lederpodden", "🧘🏻‍♂️ Life/work-balanse funker ikke for alle – med Per Ellev Tomasgård", "Norwegian", "2025-10-30", "", "", "", "0", "Ny episode — ikke vurdert ennå", "", "https://www.execu.no/lederpodden/285"],
+["Lederpodden", "🏆 Slik blir du en prestasjonsleder – med Cecilie Ystenes Myhre og Karina Andersen Aas", "Norwegian", "2025-11-06", "", "", "", "0", "Ny episode — ikke vurdert ennå", "", "https://www.execu.no/lederpodden/286"],
+["Lederpodden", "⚔️ Vikingkoden over Janteloven? Med businessfilosof Anders Indset", "Norwegian", "2025-11-13", "", "", "", "0", "Ny episode — ikke vurdert ennå", "", "https://www.lederpodden.no"],
+["Lederpodden", "🦹🏼‍♂️ Teknologiens usynlige makt – med Elisabeth Austad Asser", "Norwegian", "2025-11-20", "", "", "", "0", "Ny episode — ikke vurdert ennå", "", "https://www.execu.no/lederpodden/288"],
+["Lederpodden", "🤝 Slik får du tillit som leder – med Per Nordahl", "Norwegian", "2025-11-27", "", "", "", "0", "Ny episode — ikke vurdert ennå", "", "https://www.execu.no/lederpodden/289"],
+["Lederpodden", "🧐 Hvor smart er egentlig KI? Med professor Jan Ketil Arnulf", "Norwegian", "2025-12-05", "", "", "", "0", "Ny episode — ikke vurdert ennå", "", "https://www.execu.no/lederpodden/290"],
+["Lederpodden", "📣 Psykologisk trygghet er ikke koselig – med Bård Fyhn fra NHH", "Norwegian", "2025-12-11", "", "", "", "0", "Ny episode — ikke vurdert ennå", "", "https://www.execu.no/lederpodden/291"],
+["Lederpodden", "⏰ Hvordan få de mest erfarne til å jobbe lenger? Med Hans Christoffer Aargaard Terjesen", "Norwegian", "2025-12-18", "", "", "", "0", "Ny episode — ikke vurdert ennå", "", "https://www.execu.no/lederpodden/293"],
+["Lederpodden", "👩🏻‍🏫 Hvorfor trenger vi et felles språk for kompetanse? Med Stig Elsfjordstrand", "Norwegian", "2025-12-26", "", "", "", "0", "Ny episode — ikke vurdert ennå", "", "https://www.execu.no/lederpodden/293"],
+["Lederskap (NHH)", "Kreativitet og KI, med Ole Fredrik Norbye", "Norwegian", "2025-11-12", "", "", "", "0", "Ny episode — ikke vurdert ennå", "", "https://shows.acast.com/lederskap/episodes/kreativitet-og-ki-med-ole-fredrik-norbye"],
+["Lederskap (NHH)", "Psykologisk kaptial, med Jøri Horverak", "Norwegian", "2025-11-26", "", "", "", "0", "Ny episode — ikke vurdert ennå", "", "https://shows.acast.com/lederskap/episodes/psykologisk-kaptial-med-jri-horverak"],
+["Lederliv", "Agnes Árnadóttir, Brim Explorer", "Norwegian", "2025-10-24", "", "", "", "0", "Ny episode — ikke vurdert ennå", "", "https://shows.acast.com/lederliv/episodes/agnes-arnadottir-brim-explorer"],
+["Lederliv", "Eldar Berli, Norges Jeger- og Fiskerforbund", "Norwegian", "2025-10-31", "", "", "", "0", "Ny episode — ikke vurdert ennå", "", "https://shows.acast.com/lederliv/episodes/eldar-berli-norges-jeger-og-fiskerforbund"],
+["Lederliv", "Linda Refvik, NF&TA", "Norwegian", "2025-11-07", "", "", "", "0", "Ny episode — ikke vurdert ennå", "", "https://shows.acast.com/lederliv/episodes/linda-refvik-nfta"],
+["Lederliv", "Espen Flyvholm, Bagorama/Sajaco Nordic", "Norwegian", "2025-11-14", "", "", "", "0", "Ny episode — ikke vurdert ennå", "", "https://shows.acast.com/lederliv/episodes/espen-flyvholm-bagoramasajaco-nordic"],
+["Lederliv", "Hans Christian Holte, avgått NAV-direktør", "Norwegian", "2025-11-21", "", "", "", "0", "Ny episode — ikke vurdert ennå", "", "https://shows.acast.com/lederliv/episodes/hans-christian-holte-avgatt-nav-direktr"],
+["Lederliv", "Christian Printzell Halvorsen, Vend", "Norwegian", "2025-11-28", "", "", "", "0", "Ny episode — ikke vurdert ennå", "", "https://shows.acast.com/lederliv/episodes/christian-printzell-halvorsen-vend"],
+["Lederliv", "Merete Berdal, Jotron", "Norwegian", "2025-12-05", "", "", "", "0", "Ny episode — ikke vurdert ennå", "", "https://shows.acast.com/lederliv/episodes/merete-berdal-jotron"],
+["Lederliv", "Lise Sannerud, Kriminalomsorgsdirektoratet", "Norwegian", "2025-12-12", "", "", "", "0", "Ny episode — ikke vurdert ennå", "", "https://shows.acast.com/lederliv/episodes/lise-sannerud-kriminalomsorgsdirektoratet"],
+["Lederliv", "Sunniva Gylver, biskop i Oslo", "Norwegian", "2025-12-19", "", "", "", "0", "Ny episode — ikke vurdert ennå", "", "https://shows.acast.com/lederliv/episodes/sunniva-gylver-biskop-i-oslo"],
+["Lederliv", "Fredrik Kiøsterud, Qvisten Animation", "Norwegian", "2025-12-26", "", "", "", "0", "Ny episode — ikke vurdert ennå", "", "https://shows.acast.com/lederliv/episodes/fredrik-kisterud-qvisten-animation"],
+["HR-podden", "211: Hvorfor robusthet og resiliens er viktigere enn noen gang, med Cecilie Thorsen", "Norwegian", "2025-10-29", "", "", "", "0", "Ny episode — ikke vurdert ennå", "", "https://www.buzzsprout.com/1929646/episodes/18027637-211-hvorfor-robusthet-og-resiliens-er-viktigere-enn-noen-gang-med-cecilie-thorsen.mp3"],
+["HR-podden", "212: Nytt og nyttig om AI og HR-tech med Petter Meyer og Sverre Haugen", "Norwegian", "2025-11-05", "", "", "", "0", "Ny episode — ikke vurdert ennå", "", "https://www.buzzsprout.com/1929646/episodes/18123551-212-nytt-og-nyttig-om-ai-og-hr-tech-med-petter-meyer-og-sverre-haugen.mp3"],
+["HR-podden", "213: Hvordan gjøre kulturutvikling i praksis, med Mette Hopsdal", "Norwegian", "2025-11-12", "", "", "", "0", "Ny episode — ikke vurdert ennå", "", "https://www.buzzsprout.com/1929646/episodes/18027652-213-hvordan-gjore-kulturutvikling-i-praksis-med-mette-hopsdal.mp3"],
+["HR-podden", "214: Hvordan jobber en god coach med Toril Nygreen Grave", "Norwegian", "2025-11-19", "", "", "", "0", "Ny episode — ikke vurdert ennå", "", "https://www.buzzsprout.com/1929646/episodes/18027647-214-hvordan-jobber-en-god-coach-med-toril-nygreen-grave.mp3"],
+["HR-podden", "215: Hvordan lykkes med konfliktbehandling, med organisasjonspsykolog Roar Skare (DEL 1)", "Norwegian", "2025-11-26", "", "", "", "0", "Ny episode — ikke vurdert ennå", "", "https://www.buzzsprout.com/1929646/episodes/18204276-215-hvordan-lykkes-med-konfliktbehandling-med-organisasjonspsykolog-roar-skare-del-1.mp3"],
+["HR-podden", "216: Hvordan lykkes med konfliktbehandling, med organisasjonspsykolog Roar Skare (DEL 2)", "Norwegian", "2025-11-27", "", "", "", "0", "Ny episode — ikke vurdert ennå", "", "https://www.buzzsprout.com/1929646/episodes/18204292-216-hvordan-lykkes-med-konfliktbehandling-med-organisasjonspsykolog-roar-skare-del-2.mp3"],
+["HR-podden", "217: Sykefraværsutviklingen - fakta, myter og mulige løsninger, med statistikksjef i Nav, Ulf Andersen", "Norwegian", "2025-12-03", "", "", "", "0", "Ny episode — ikke vurdert ennå", "", "https://www.buzzsprout.com/1929646/episodes/18243345-217-sykefravaersutviklingen-fakta-myter-og-mulige-losninger-med-statistikksjef-i-nav-ulf-andersen.mp3"],
+["HR-podden", "218: Slik skaper du arbeidsglede med Cathrine Berget", "Norwegian", "2025-12-10", "", "", "", "0", "Ny episode — ikke vurdert ennå", "", "https://www.buzzsprout.com/1929646/episodes/18278026-218-slik-skaper-du-arbeidsglede-med-cathrine-berget.mp3"],
+["HR-podden", "219: Copilot-tips og andre Microsoft-hacks for en bedre hverdag med Jon Gunnar Pettersen", "Norwegian", "2025-12-17", "", "", "", "0", "Ny episode — ikke vurdert ennå", "", "https://www.buzzsprout.com/1929646/episodes/18330505-219-copilot-tips-og-andre-microsoft-hacks-for-en-bedre-hverdag-med-jon-gunnar-pettersen.mp3"],
+["HR-podden", "220: Julehilsen & HR-årshjul fra oss i Leonda", "Norwegian", "2025-12-24", "", "", "", "0", "Ny episode — ikke vurdert ennå", "", "https://www.buzzsprout.com/1929646/episodes/18371750-220-julehilsen-hr-arshjul-fra-oss-i-leonda.mp3"],
+["HR-podden", "221: Godt nytt år + HR-aktiviteter med Leonda i 2026", "Norwegian", "2025-12-31", "", "", "", "0", "Ny episode — ikke vurdert ennå", "", "https://www.buzzsprout.com/1929646/episodes/18371761-221-godt-nytt-ar-hr-aktiviteter-med-leonda-i-2026.mp3"],
+["Topplederpodcast (MeyerHaugen)", "Topplederpodcast med Cathrine Instebø, daglig leder for Norges Skiforbund langrenn", "Norwegian", "2025-11-03", "", "", "", "0", "Ny episode — ikke vurdert ennå", "", "https://meyerhaugen.no/topplederpodcast/"],
+["Topplederpodcast (MeyerHaugen)", "Topplederpodcast med Eirik Aalvik Stranden, Managing Director Scandinavia for Finago (tidl. 24SevenOffice)", "Norwegian", "2025-11-14", "", "", "", "0", "Ny episode — ikke vurdert ennå", "", "https://meyerhaugen.no/topplederpodcast/"],
+["Topplederpodcast (MeyerHaugen)", "Topplederpodcast med Audun Lysbakken og Åslaug Sem-Jacobsen", "Norwegian", "2025-11-20", "", "", "", "0", "Ny episode — ikke vurdert ennå", "", "https://meyerhaugen.no/topplederpodcast/"],
+["Topplederpodcast (MeyerHaugen)", "Topplederpodcast med Olav Willumsen Haugå, CEO og grunnlegger av Deepinsight", "Norwegian", "2025-11-28", "", "", "", "0", "Ny episode — ikke vurdert ennå", "", "https://meyerhaugen.no/topplederpodcast/"],
+["Topplederpodcast (MeyerHaugen)", "Topplederpodcast med Anders Nilsen, adm.dir. i Power Norge", "Norwegian", "2025-12-04", "", "", "", "0", "Ny episode — ikke vurdert ennå", "", "https://meyerhaugen.no/topplederpodcast/"],
+["Topplederpodcast (MeyerHaugen)", "Topplederpodcast med Camilla Amundsen, Managing Director i Rambøll Norway", "Norwegian", "2025-12-18", "", "", "", "0", "Ny episode — ikke vurdert ennå", "", "https://meyerhaugen.no/topplederpodcast/"],
+["Smidigpodden", "Samarbeid mellom team føles adhoc og lite effektivt del 2 med Tobias Falkberger og Ida Kjær", "Norwegian", "2025-11-06", "", "", "", "0", "Ny episode — ikke vurdert ennå", "", "https://shows.acast.com/smidigpodden/episodes/samarbeid-mellom-team-fles-adhoc-og-lite-effektivt-del-2-med"],
+["Smidigpodden", "OKR i praksis: endring, forbedring og læring som faktisk skjer", "Norwegian", "2025-11-19", "", "", "", "0", "Ny episode — ikke vurdert ennå", "", "https://shows.acast.com/smidigpodden/episodes/okr"],
+["Smidigpodden", "Ledelse: en balansekunst (del 1)", "Norwegian", "2025-12-03", "", "", "", "0", "Ny episode — ikke vurdert ennå", "", "https://shows.acast.com/smidigpodden/episodes/ledelse-en-balansekunst-del-1"],
+["Smidigpodden", "Ledelse: en balansekunst (del 2)", "Norwegian", "2025-12-17", "", "", "", "0", "Ny episode — ikke vurdert ennå", "", "https://shows.acast.com/smidigpodden/episodes/ledelse-en-balansekunst-del-2"],
+["Psykologkameratene", "Hvorfor snakker ledere så vanskelig? Vi blåser i tåkeluren", "Norwegian", "2025-10-28", "", "", "", "0", "Ny episode — ikke vurdert ennå", "", "https://psykologkameratene.podbean.com/e/slutt-med-management%e2%80%91speak-%e2%80%94-snakk-klart-og-bli-troverdig/"],
+["Psykologkameratene", "Slutt å gå i ring — hvordan vinne over overtenkingen", "Norwegian", "2025-11-04", "", "", "", "0", "Ny episode — ikke vurdert ennå", "", "https://psykologkameratene.podbean.com/e/slutt-a-ga-i-ring-%e2%80%94-hvordan-vinne-over-overtenkingen/"],
+["Psykologkameratene", "På sofaen: Blir du rasende av ubehagelige lyder? Kanskje du har misofoni?", "Norwegian", "2025-11-11", "", "", "", "0", "Ny episode — ikke vurdert ennå", "", "https://psykologkameratene.podbean.com/e/misofoni-nar-vanlige-lyder-blir-umulige-a-tale/"],
+["Psykologkameratene", "Julebord: Blir det lagånd når slipset blir pannebånd?", "Norwegian", "2025-11-18", "", "", "", "0", "Ny episode — ikke vurdert ennå", "", "https://psykologkameratene.podbean.com/e/julebord-nar-slipset-blir-panneband-og-alt-kan-skje/"],
+["Psykologkameratene", "Funker det å sparke sjefen?", "Norwegian", "2025-11-25", "", "", "", "0", "Ny episode — ikke vurdert ennå", "", "https://psykologkameratene.podbean.com/e/nar-sjefen-ma-ga-%e2%80%94-hvorfor-ledere-sparkes-og-hva-som-skjer-etterpa/"],
+["Psykologkameratene", "«Jeg er ikke sint — jeg er bare veldig, veldig skuffet»", "Norwegian", "2025-12-03", "", "", "", "0", "Ny episode — ikke vurdert ennå", "", "https://psykologkameratene.podbean.com/e/%c2%abjeg-er-ikke-sint-%e2%80%94-jeg-er-bare-veldig-veldig-skuffet%c2%bb/"],
+["Psykologkameratene", "Julestress, gavepress og krøllete dress", "Norwegian", "2025-12-09", "", "", "", "0", "Ny episode — ikke vurdert ennå", "", "https://psykologkameratene.podbean.com/e/nar-julen-blir-et-prosjekt-hvordan-overleve-pakkelister-og-prestasjonsangst/"],
+["Psykologkameratene", "Gavepsykologi: hvordan gi gaver som andre faktisk liker", "Norwegian", "2025-12-16", "", "", "", "0", "Ny episode — ikke vurdert ennå", "", "https://psykologkameratene.podbean.com/e/gavesykologi-hvorfor-vi-gir-%e2%80%94-og-hvorfor-det-gar-galt/"],
+["Psykologkameratene", "Guttastemning:smuss, kluss og bærumsruss", "Norwegian", "2026-03-10", "", "", "", "0", "Ny episode — ikke vurdert ennå", "", "https://psykologkameratene.podbean.com/e/gutterstemning-nar-festhumor-gar-for-langt/"]
 ];
 
 const RATING_COL = 7;
@@ -733,18 +785,6 @@ function parseCSV(text) {
   return rows.filter(r => r.some(f => f));
 }
 
-const _d = new Date();
-document.getElementById('todayDate').textContent =
-  String(_d.getDate()).padStart(2, '0') + '.' +
-  String(_d.getMonth() + 1).padStart(2, '0') + '.' +
-  String(_d.getFullYear()).slice(-2);
-
-const _f = new Date(_d);
-_f.setMonth(_f.getMonth() - 6);
-document.getElementById('fromDate').textContent =
-  String(_f.getDate()).padStart(2, '0') + '.' +
-  String(_f.getMonth() + 1).padStart(2, '0') + '.' +
-  String(_f.getFullYear()).slice(-2);
 
 document.querySelectorAll('.tag-pill').forEach(btn => {
   btn.addEventListener('click', () => {
