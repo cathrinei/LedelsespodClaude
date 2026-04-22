@@ -5,12 +5,14 @@ This project collects and curates Norwegian-language podcast episodes on **teaml
 
 ## Files
 - `Ledelsepod_2026.csv` — master data, one row per episode
-- `Ledelsepod_2026.html` — interactive table with filtering, sorting, stats, CSV import
+- `Ledelsepod_2026.html` — interactive table with filtering, sorting, stats (CSV import button hidden)
 - `update_podcasts.py` — RSS fetcher; adds new episodes (Rating=0) since last known date per podcast
-- `rate_runner.py` — stabil kjørelogikk for episodeevaluering; importeres av `rate_episodes.py`
+- `auto_rate.py` — automatisk vurdering av Rating=0-episoder via Claude API (claude-haiku-4-5)
+- `rate_runner.py` — stabil kjørelogikk for manuell episodeevaluering; importeres av `rate_episodes.py`
 - `rate_episodes.py` — data-only (UPDATES + REMOVE_KEYWORDS); skrives per raterunde, slettes etter bruk
 - `embed_csv.py` — skriver CSV-innholdet inn i HTML-filens `data`-array; kjøres etter hver raterunde
 - `rejected_episodes.csv` — denylist; episodes here are never re-fetched by `update_podcasts.py`
+- `.github/workflows/update_podcasts.yml` — GitHub Actions workflow; kjører daglig 10:15 Oslo-tid og kan trigges manuelt
 
 ## CSV columns
 
@@ -30,7 +32,7 @@ This project collects and curates Norwegian-language podcast episodes on **teaml
 
 ## CSV policy
 - **Only episodes rated 4–6 are kept.** Episodes rated 1–3 are removed entirely.
-- **Unrated episodes (Rating=0 / N/A)** are kept temporarily — pending manual review.
+- **Unrated episodes (Rating=0 / N/A)** are rated automatically by `auto_rate.py` — no manual review needed.
 - Always update the CSV **before** the HTML when making data changes. CSV is the source of truth.
 - Do not add short videos, teasers, trailers, or highlight compilations — full-length episodes only.
 
@@ -82,19 +84,16 @@ Two layers — combine with comma (e.g. `teamledelse,feedback`):
 ## HTML – tekniske noter
 
 ### Data array
-The `data` array in the HTML is populated from the CSV. Update the CSV first, then sync via the "↑ Last inn CSV" button. Unrated episodes (Rating=0) display as **N/A** and always pass through the rating filter.
+The `data` array in the HTML is populated from the CSV via `embed_csv.py`. Unrated episodes (Rating=0) display as **N/A** and always pass through the rating filter.
 
 ### Stats
 `updateStats()` computes all stats from the `data` array:
 - Total episodes, shows, teamledelse-tagged count, personalledelse-tagged count, top-rated (6/6), unrated (N/A)
 
 ### "↑ Last inn CSV"-knappen
-1. Åpner fil-picker (`<input type="file" accept=".csv">`)
-2. Leser fil med `FileReader` (UTF-8), maks 5 MB
-3. `parseCSV()` parses innholdet — håndterer komma i quotede felt og CRLF/LF
-4. `data` array tømmes og fylles på nytt; header-rad hoppes over
-5. Rating felt (kolonne 7) parses med `parseInt` + `isNaN`-fallback til 0
-6. `updateStats()` og `refresh()` kjøres umiddelbart
+- Knappen er skjult (`display:none`) — data oppdateres automatisk via GitHub Actions
+- Funksjonaliteten er beholdt i koden (kan vises igjen ved å fjerne `style="display:none"`)
+- Logikk: åpner fil-picker, leser med `FileReader` (UTF-8, maks 5 MB), `parseCSV()` → `data`-array → `updateStats()` + `refresh()`
 
 ### Dark mode
 - Toggle button (☾ Mørk / ☀ Lys) in top-right of header
@@ -131,14 +130,14 @@ The `data` array in the HTML is populated from the CSV. Update the CSV first, th
 - Rating badge class applied with `+rating >= 1` (not array `.includes()`) to handle string values from data array
 - `getFiltered()` uses `+rating` for numeric coercion — handles both string (pre-populated) and int (CSV-loaded) rating values
 - `updateStats()` runs a single pass over `data` to compute all six stats
-- `data` array is **pre-populated** in the HTML (no CSV import needed on first load) — update CSV first, then sync via the "↑ Last inn CSV" button
+- `data` array is **pre-populated** in the HTML via `embed_csv.py` — no manual CSV import needed
 
 ## update_podcasts.py – tekniske noter
 - `FEEDS` dict: add new podcasts with name (must match CSV) and RSS URL — 8 feeds currently
 - Fetches only episodes newer than last known date per podcast (`latest_date_per_podcast`)
 - `User-Agent` set to `LedelsepodCrawler/1.0 (privat bruk)` — honest identifier, not browser spoofing
 - Language hardcoded to `"Norwegian"` for all fetched episodes (Norwegian-only project)
-- New episodes get `Rating=0` — must be reviewed manually
+- New episodes get `Rating=0` — automatically rated by `auto_rate.py` in the next step
 - `pending_review()` runs at end of every execution using `existing_rows + all_new` (no second file read) — flags unrated episodes older than 5 days
 - `REVIEW_AFTER_DAYS = 2` constant controls the threshold
 - Errors distinguish between HTTP errors and network errors
@@ -146,6 +145,17 @@ The `data` array in the HTML is populated from the CSV. Update the CSV first, th
 - `existing_keys` built from current CSV rows — prevents re-adding duplicates within CSV
 - New episodes filtered against both `rejected` and `existing_keys` before being appended
 - Per-feed output shows: `+ N ny(e)`, `N hoppet over (forkastet)`, `N duplikat(er)` as relevant
+
+## auto_rate.py – tekniske noter
+- Krever `pip install anthropic` og miljøvariabel `ANTHROPIC_API_KEY`
+- Leser CSV, finner alle rader med `Rating=0`, kaller Claude API for hver
+- Modell: `claude-haiku-4-5` (kostnadseffektiv)
+- Prompt caching: `cache_control: {type: "ephemeral"}` på system-prompten — rubrikk og tagskjema caches på tvers av alle episoder i samme kjøring
+- Svarformat: JSON med feltene `host`, `guest`, `main_topics`, `rating`, `rating_notes`, `tags`
+- Rating 4–6: beholdes i CSV med utfylte felt
+- Rating 1–3: fjernes fra CSV og skrives til `rejected_episodes.csv` (med deduplicering via `normalize()`)
+- Output: norske statusmeldinger med `OK`/`WARN`-prefixer, samme stil som `rate_runner.py`
+- I GitHub Actions: kjøres med `ANTHROPIC_API_KEY` fra repository secret
 
 ## rate_runner.py – tekniske noter
 - Stabil fil med all kjørelogikk — aldri slettes
@@ -169,12 +179,23 @@ The `data` array in the HTML is populated from the CSV. Update the CSV first, th
 - `_append_rejected()` in `rate_runner.py` deduplicates before writing — safe to run multiple times; uses `normalize()` for consistent casing and a single `os.path.exists` check
 
 ## Workflow
-1. `python update_podcasts.py` — henter nye episoder, hopper over forkastede og duplikater, flagger uraterte
-2. Skriv `rate_episodes.py` med `UPDATES`-dict og `REMOVE_KEYWORDS`-liste, kjør det — patcher CSV og skriver forkastede til `rejected_episodes.csv`
-3. `python embed_csv.py` — skriver oppdatert CSV inn i HTML-filens `data`-array
-4. Episoder med rating 1–3 fjernes fra CSV av `rate_episodes.py` og skrives til `rejected_episodes.csv` — hentes aldri inn igjen
-5. For å blokkere en episode permanent uten å rate den: legg til manuelt i `rejected_episodes.csv`
-6. For å legge til en ny podcast: legg til RSS-feed i `FEEDS`-dicten i `update_podcasts.py`
+
+### Automatisk (GitHub Actions — daglig 10:15 Oslo-tid, eller manuell trigger)
+1. `update_podcasts.py` — henter nye episoder (Rating=0)
+2. `auto_rate.py` — vurderer nye episoder automatisk via Claude API
+3. `embed_csv.py` — skriver oppdatert CSV inn i HTML
+4. Auto-commit og push → GitHub Pages oppdateres
+
+### Manuelt (lokalt)
+1. `python update_podcasts.py` — henter nye episoder
+2. `python auto_rate.py` — vurderer automatisk (krever `ANTHROPIC_API_KEY`)
+3. `python embed_csv.py` — oppdaterer HTML
+4. `git add Ledelsepod_2026.csv Ledelsepod_2026.html && git commit -m "..." && git push`
+
+### Manuell overstyring (ved behov)
+- Skriv `rate_episodes.py` med `UPDATES`-dict og `REMOVE_KEYWORDS`-liste, kjør det — patcher spesifikke episoder
+- For å blokkere en episode permanent: legg til manuelt i `rejected_episodes.csv`
+- For å legge til en ny podcast: legg til RSS-feed i `FEEDS`-dicten i `update_podcasts.py`
 7. **Etter HTML-endringer — WCAG AA-sjekk:** verifiser følgende før publisering:
    - **Kontrast:** all brødtekst ≥ 4.5:1, stor tekst (18pt / 14pt bold) ≥ 3:1 — sjekk både lys og mørk modus
    - **Nye interaktive elementer:** knapper og lenker må ha synlig tekst eller `aria-label`; skjemafelt må ha tilknyttet `<label>` eller `aria-label`
