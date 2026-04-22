@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; connect-src 'self'">
-<title>Teamledelse &amp; Personalledelse – 2026</title>
+<title>Teamledelse &amp; Personalledelse</title>
 <style>
 :root {
   --bg:             #f0f4f1;
@@ -424,8 +424,8 @@ button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible
 
 <header>
   <div class="header-text">
-    <h1>Teamledelse &amp; Personalledelse &mdash; 2026</h1>
-    <p class="subtitle">Norske podkast-episoder &bull; Januar 2026 &ndash; <span id="todayDate"></span></p>
+    <h1>Teamledelse &amp; Personalledelse</h1>
+    <p class="subtitle">Norske podkast-episoder &bull; <span id="fromDate"></span> &ndash; <span id="todayDate"></span></p>
   </div>
   <button id="darkToggle" aria-label="Bytt mellom lys og mørk visning">&#9790; Mørk</button>
 </header>
@@ -738,6 +738,13 @@ document.getElementById('todayDate').textContent =
   String(_d.getDate()).padStart(2, '0') + '.' +
   String(_d.getMonth() + 1).padStart(2, '0') + '.' +
   String(_d.getFullYear()).slice(-2);
+
+const _f = new Date(_d);
+_f.setMonth(_f.getMonth() - 6);
+document.getElementById('fromDate').textContent =
+  String(_f.getDate()).padStart(2, '0') + '.' +
+  String(_f.getMonth() + 1).padStart(2, '0') + '.' +
+  String(_f.getFullYear()).slice(-2);
 
 document.querySelectorAll('.tag-pill').forEach(btn => {
   btn.addEventListener('click', () => {
