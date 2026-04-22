@@ -261,7 +261,7 @@ body.dark #searchBox:focus { box-shadow: 0 0 0 3px rgba(74,222,128,0.12); }
 .btn-ghost {
   background: transparent;
   border-color: var(--input-border);
-  color: var(--text-muted);
+  color: var(--text);
 }
 .btn-ghost:hover { background: var(--surface2); border-color: var(--text-faint); color: var(--text); }
 .btn-primary {
@@ -327,7 +327,7 @@ tbody td:not(:last-child) { border-right: 1px solid var(--row-border); }
 .cell-title:hover { color: var(--accent); text-decoration: underline; }
 .cell-date { color: var(--text-muted); font-size: 0.76rem; white-space: nowrap; font-variant-numeric: tabular-nums; }
 .cell-person { color: var(--text-muted); font-size: 0.76rem; line-height: 1.4; }
-.cell-topics { color: var(--text-faint); font-size: 0.75rem; line-height: 1.35; }
+.cell-topics { color: var(--text-muted); font-size: 0.75rem; line-height: 1.35; }
 .cell-note { color: var(--text-muted); font-size: 0.76rem; font-style: italic; line-height: 1.35; }
 
 /* RATING BADGE */
@@ -368,11 +368,11 @@ tbody tr[data-rating="4"] td:first-child { border-left: 3px solid #6d28d9; }
 }
 .tag-teamledelse     { background: #ede9fe; color: #4c1d95; }
 .tag-personalledelse { background: #ccfbf1; color: #065f46; }
-.tag-feedback        { background: #fef3c7; color: #92400e; }
+.tag-feedback        { background: #fef3c7; color: #78350f; }
 .tag-kultur          { background: #dbeafe; color: #1e3a8a; }
 .tag-rekruttering    { background: #fce7f3; color: #831843; }
 .tag-motivasjon      { background: #dcfce7; color: #14532d; }
-.tag-coaching        { background: #fff7ed; color: #7c2d12; }
+.tag-coaching        { background: #fff7ed; color: #6b2110; }
 body.dark .tag-teamledelse     { background: #2e1065; color: #c4b5fd; }
 body.dark .tag-personalledelse { background: #022c22; color: #6ee7b7; }
 body.dark .tag-feedback        { background: #451a03; color: #fcd34d; }
@@ -672,17 +672,17 @@ function renderTable(rows) {
       <td><span class="cell-person">${esc(hosts)}</span></td>
       <td><span class="cell-person">${esc(guests)}</span></td>
       <td><span class="cell-topics">${esc(topics)}</span></td>
-      <td style="text-align:center"><span class="rating-badge${+rating >= 1 && +rating <= 6 ? ' r'+rating : ''}">${+rating > 0 ? rating : 'N/A'}</span></td>
+      <td style="text-align:center"><span class="rating-badge${+rating >= 1 && +rating <= 6 ? ' r'+rating : ''}" aria-label="Karakter ${+rating > 0 ? rating : 'ikke vurdert'}">${+rating > 0 ? rating : 'N/A'}</span></td>
       <td><span class="cell-note">${esc(note)}</span></td>
       <td>${renderTags(tags)}</td>
-      <td><a class="listen-link" href="${safeUrl(link)}" target="_blank" rel="noopener noreferrer">&#9654; Lytt</a></td>
+      <td><a class="listen-link" href="${safeUrl(link)}" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">&#9654;</span> Lytt</a></td>
     `;
     tr.insertAdjacentHTML('beforeend', `
       <td class="card-cell" colspan="10">
         <div class="ep-card">
           <div class="ep-card__header">
             <span class="cell-podcast">${esc(podcast)}</span>
-            <span class="rating-badge${+rating >= 1 && +rating <= 6 ? ' r'+rating : ''}">${+rating > 0 ? rating : 'N/A'}</span>
+            <span class="rating-badge${+rating >= 1 && +rating <= 6 ? ' r'+rating : ''}" aria-label="Karakter ${+rating > 0 ? rating : 'ikke vurdert'}">${+rating > 0 ? rating : 'N/A'}</span>
           </div>
           <a class="cell-title ep-card__title" href="${safeUrl(link)}" target="_blank" rel="noopener noreferrer">${esc(title)}</a>
           <div class="ep-card__meta">
@@ -690,7 +690,7 @@ function renderTable(rows) {
             <span class="cell-person">${esc(hosts)}</span>
           </div>
           <div class="ep-card__tags">${renderTags(tags)}</div>
-          <a class="listen-link ep-card__listen" href="${safeUrl(link)}" target="_blank" rel="noopener noreferrer">&#9654; Lytt</a>
+          <a class="listen-link ep-card__listen" href="${safeUrl(link)}" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">&#9654;</span> Lytt</a>
         </div>
       </td>
     `);
