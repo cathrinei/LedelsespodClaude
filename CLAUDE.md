@@ -201,6 +201,31 @@ The `data` array in the HTML is populated from the CSV via `embed_csv.py`. Unrat
 - Skriv `rate_episodes.py` med `UPDATES`-dict og `REMOVE_KEYWORDS`-liste, kjør det — patcher spesifikke episoder
 - For å blokkere en episode permanent: legg til manuelt i `rejected_episodes.csv`
 - For å legge til en ny podcast: legg til RSS-feed i `FEEDS`-dicten i `update_podcasts.py`
+
+### Branch-workflow (for større endringer)
+Bruk en egen branch for nye features — merge til master når klar.
+
+```
+# Start ny branch
+git checkout -b navn-på-branch
+
+# Jobb normalt, commit og push
+git add .
+git commit -m "Beskrivelse"
+git push -u origin navn-på-branch
+```
+
+**Merge via GitHub (anbefalt):**
+- GitHub foreslår automatisk en Pull Request når du pusher en ny branch
+- Review endringene, merge, og slett branchen i GitHub-grensesnittet
+
+**Merge via terminal:**
+```
+git checkout master
+git merge navn-på-branch
+git push
+git branch -d navn-på-branch  # slett branch lokalt
+```
 7. **Etter HTML-endringer — WCAG AA-sjekk:** verifiser følgende før publisering:
    - **Kontrast:** all brødtekst ≥ 4.5:1, stor tekst (18pt / 14pt bold) ≥ 3:1 — sjekk både lys og mørk modus
    - **Nye interaktive elementer:** knapper og lenker må ha synlig tekst eller `aria-label`; skjemafelt må ha tilknyttet `<label>` eller `aria-label`
