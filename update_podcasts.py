@@ -102,6 +102,23 @@ def parse_date(date_str):
         return None
 
 
+ITUNES_NS = "http://www.itunes.com/dtds/podcast-1.0.dtd"
+DC_NS     = "http://purl.org/dc/elements/1.1/"
+
+
+def _extract_host(item, channel):
+    """Prøver å hente vertsnavn fra RSS-item, faller tilbake til channel-nivå."""
+    for el in [
+        item.find(f"{{{ITUNES_NS}}}author"),
+        item.find(f"{{{DC_NS}}}creator"),
+        channel.find(f"{{{ITUNES_NS}}}author"),
+        channel.find("managingEditor"),
+    ]:
+        if el is not None and el.text and el.text.strip():
+            return el.text.strip()
+    return ""
+
+
 def fetch_new_episodes(podcast_name, feed_url, after_dt):
     """Returnerer (episoder, feilmelding). Episoder er None ved feil, [] hvis ingen nye."""
     raw, error = fetch_feed(feed_url)
@@ -133,12 +150,14 @@ def fetch_new_episodes(podcast_name, feed_url, after_dt):
             enclosure = item.find("enclosure")
             link = enclosure.attrib.get("url", "") if enclosure is not None else ""
 
+        host = _extract_host(item, channel)
+
         new_eps.append([
             podcast_name,
             title,
             "Norwegian",
             pub_dt.strftime("%Y-%m-%d"),
-            "",        # Host(s)
+            host,      # Host(s) — fra RSS
             "",        # Guest(s)
             "",        # Main Topic(s)
             UNRATED,   # Rating — krever manuell vurdering

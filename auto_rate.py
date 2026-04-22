@@ -189,7 +189,7 @@ def main() -> None:
             removed_rows.append(row)
             rows_to_remove.add(i)
         else:
-            row[4] = result.get("host", row[4]) or row[4]
+            row[4] = row[4] or result.get("host", "") or ""
             row[5] = result.get("guest", row[5]) or row[5]
             row[6] = result.get("main_topics", row[6]) or row[6]
             row[7] = str(rating)
