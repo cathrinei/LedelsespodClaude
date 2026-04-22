@@ -153,6 +153,7 @@ The `data` array in the HTML is populated from the CSV via `embed_csv.py`. Unrat
 - `existing_keys` built from current CSV rows — prevents re-adding duplicates within CSV
 - New episodes filtered against both `rejected` and `existing_keys` before being appended
 - Per-feed output shows: `+ N ny(e)`, `N hoppet over (forkastet)`, `N duplikat(er)` as relevant
+- `_extract_host()` henter vertsnavn direkte fra RSS — prøver `itunes:author` (item), `dc:creator` (item), `itunes:author` (channel), `managingEditor` (channel) i prioritert rekkefølge
 
 ## auto_rate.py – tekniske noter
 - Krever `pip install anthropic` og miljøvariabel `ANTHROPIC_API_KEY`
@@ -160,6 +161,7 @@ The `data` array in the HTML is populated from the CSV via `embed_csv.py`. Unrat
 - Modell: `claude-haiku-4-5` (kostnadseffektiv)
 - Prompt caching: `cache_control: {type: "ephemeral"}` på system-prompten — rubrikk og tagskjema caches på tvers av alle episoder i samme kjøring
 - Svarformat: JSON med feltene `host`, `guest`, `main_topics`, `rating`, `rating_notes`, `tags`
+- `host`-feltet fra Claude brukes kun hvis RSS-hentet vertsnavn mangler (RSS har prioritet)
 - Rating 4–6: beholdes i CSV med utfylte felt
 - Rating 1–3: fjernes fra CSV og skrives til `rejected_episodes.csv` (med deduplicering via `normalize()`)
 - Output: norske statusmeldinger med `OK`/`WARN`-prefixer, samme stil som `rate_runner.py`
