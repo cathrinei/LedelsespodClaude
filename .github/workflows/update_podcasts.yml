@@ -2,8 +2,8 @@ name: Update Podcasts
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: '15 8 * * *'  # 10:15 Oslo-tid (CEST = UTC+2)
+  # schedule:
+  #   - cron: '15 8 * * *'  # 10:15 Oslo-tid (CEST = UTC+2) — aktiveres når ANTHROPIC_API_KEY er satt
 
 jobs:
   update:

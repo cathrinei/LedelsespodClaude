@@ -180,11 +180,10 @@ The `data` array in the HTML is populated from the CSV via `embed_csv.py`. Unrat
 
 ## Workflow
 
-### Automatisk (GitHub Actions — daglig 10:15 Oslo-tid, eller manuell trigger)
-1. `update_podcasts.py` — henter nye episoder (Rating=0)
-2. `auto_rate.py` — vurderer nye episoder automatisk via Claude API
-3. `embed_csv.py` — skriver oppdatert CSV inn i HTML
-4. Auto-commit og push → GitHub Pages oppdateres
+### Automatisk (GitHub Actions — deaktivert inntil videre)
+- Daglig kjøring (10:15 Oslo-tid) er kommentert ut i `.github/workflows/update_podcasts.yml`
+- Aktiveres ved å uncommente `schedule`-blokken og sette `ANTHROPIC_API_KEY` som repository secret
+- Manuell trigger (Actions-knapp i GitHub) er fortsatt tilgjengelig
 
 ### Manuelt (lokalt)
 1. `python update_podcasts.py` — henter nye episoder
