@@ -1,17 +1,17 @@
 # LedelsespodClaude
 
-Kurert samling av norske podkastepisoder om **teamledelse** og **personalledelse**, publisert i 2026.
+Kurert samling av norske podkastepisoder om **teamledelse** og **personalledelse** — alltid de siste 6 månedene.
 
 ## Se oversikten
 
-**[Åpne interaktiv episodeoversikt](https://cathrinei.github.io/LedelsespodClaude/Ledelsepod_2026.html)**
+**[Åpne interaktiv episodeoversikt](https://cathrinei.github.io/LedelsespodClaude/Ledelsepod.html)**
 
 ## Innhold
 
 | Fil | Beskrivelse |
 |---|---|
-| `Ledelsepod_2026.csv` | Masterdata — én rad per episode |
-| `Ledelsepod_2026.html` | Interaktiv tabell med filtrering, sortering og statistikk |
+| `Ledelsepod.csv` | Masterdata — én rad per episode |
+| `Ledelsepod.html` | Interaktiv tabell med filtrering, sortering og statistikk |
 | `update_podcasts.py` | Henter nye episoder fra RSS-feeder |
 | `rate_runner.py` | Kjørelogikk for episodeevaluering |
 | `rate_episodes.py` | Data for hver raterunde (skrives og slettes per runde) |
