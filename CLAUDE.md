@@ -19,6 +19,7 @@ This project collects and curates Norwegian-language podcast episodes on **teaml
 - `embed_csv.py` — skriver CSV-innholdet inn i HTML-filens `data`-array; kjøres etter hver raterunde
 - `rejected_episodes.csv` — denylist; episodes here are never re-fetched by `update_podcasts.py`
 - `.github/workflows/update_podcasts.yml` — GitHub Actions workflow; daglig kjøring deaktivert inntil videre, manuell trigger tilgjengelig
+- `.gitignore` — ekskluderer `__pycache__/`, `*.pyc`, `*.pyo`, `.env`
 
 ## CSV columns
 
@@ -142,6 +143,15 @@ The `data` array in the HTML is populated from the CSV via `embed_csv.py`. Unrat
 - `getFiltered()` uses `+rating` for numeric coercion — handles both string (pre-populated) and int (CSV-loaded) rating values
 - `updateStats()` runs a single pass over `data` to compute all six stats
 - `data` array is **pre-populated** in the HTML via `embed_csv.py` — no manual CSV import needed
+
+### Mobilvisning (≤600px)
+- Breakpoint `@media (max-width: 600px)` bytter fra tabell til kortlayout
+- `renderTable()` injiserer en `<td class="card-cell" colspan="10">` per rad via `insertAdjacentHTML` — skjult på desktop, synlig på mobil
+- Kortet viser: podcastnavn, rating-badge, klikkbar tittel, dato, vert, tags, Lytt-knapp. Gjester, emner og begrunnelse utelates
+- Tabell og `<thead>` skjules med `display:none` på mobil; `tbody tr` blir `display:block` med kortutseende
+- Rating-fargekant (`border-left`) bevares på `<tr>` også i kortvisning
+- Header stables vertikalt, stats vises i 2-kolonners grid, kontroller full bredde på mobil
+- Dark mode fungerer automatisk via CSS-variabler
 
 ## update_podcasts.py – tekniske noter
 - `FEEDS` dict: add new podcasts with name (must match CSV) and RSS URL — 8 feeds currently
