@@ -438,11 +438,9 @@ button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible
 
 <div class="stats-bar">
   <div class="stat stat-btn" role="button" tabindex="0" data-filter="reset" aria-pressed="false"><span class="stat-n" id="statTotal">–</span><span class="stat-label">Episoder</span></div>
-  <div class="stat"><span class="stat-n" id="statShows">–</span><span class="stat-label">Podkastserier</span></div>
   <div class="stat stat-btn" role="button" tabindex="0" data-filter="tag:teamledelse" aria-pressed="false"><span class="stat-n" id="statTeam">–</span><span class="stat-label">Teamledelse</span></div>
   <div class="stat stat-btn" role="button" tabindex="0" data-filter="tag:personalledelse" aria-pressed="false"><span class="stat-n" id="statPers">–</span><span class="stat-label">Personalledelse</span></div>
   <div class="stat stat-btn" role="button" tabindex="0" data-filter="rating:6" aria-pressed="false"><span class="stat-n" id="statTop">–</span><span class="stat-label">Toppkarakter 6/6</span></div>
-  <div class="stat"><span class="stat-n" id="statUnrated">–</span><span class="stat-label">Uten rating</span></div>
 </div>
 
 <div class="controls">
@@ -637,22 +635,17 @@ function renderTable(rows) {
 }
 function tagsOf(row) { return (row[9] || '').split(',').map(t => t.trim()); }
 function updateStats() {
-  const shows = new Set();
-  let team = 0, pers = 0, top = 0, unrated = 0;
+  let team = 0, pers = 0, top = 0;
   data.forEach(r => {
-    shows.add(r[0]);
     const tags = tagsOf(r);
     if (tags.includes('teamledelse'))    team++;
     if (tags.includes('personalledelse')) pers++;
     if (+r[7] === 6) top++;
-    if (+r[7] === 0) unrated++;
   });
-  document.getElementById('statTotal').textContent   = data.length;
-  document.getElementById('statShows').textContent   = shows.size;
-  document.getElementById('statTeam').textContent    = team;
-  document.getElementById('statPers').textContent    = pers;
-  document.getElementById('statTop').textContent     = top;
-  document.getElementById('statUnrated').textContent = unrated;
+  document.getElementById('statTotal').textContent = data.length;
+  document.getElementById('statTeam').textContent  = team;
+  document.getElementById('statPers').textContent  = pers;
+  document.getElementById('statTop').textContent   = top;
 }
 function fuzzyMatch(query, haystack) {
   if (haystack.includes(query)) return true;
