@@ -95,6 +95,9 @@ The `data` array in the HTML is populated from the CSV via `embed_csv.py`. Unrat
 ### Stats
 `updateStats()` computes all stats from the `data` array:
 - Total episodes, shows, teamledelse-tagged count, personalledelse-tagged count, top-rated (6/6), unrated (N/A)
+- Four stat cards are clickable filter shortcuts (`.stat-btn`): **Episoder** (reset all), **Teamledelse** (tag filter), **Personalledelse** (tag filter), **Toppkarakter 6/6** (rating=6)
+- Active stat card gets green background; clicking again toggles the filter off
+- `updateStatBtns()` syncs active state of stat cards with current filter state; called after every filter action and from `resetFilters()`
 
 ### "↑ Last inn CSV"-knappen
 - Knappen er skjult (`display:none`) — data oppdateres automatisk via GitHub Actions
@@ -132,7 +135,7 @@ The `data` array in the HTML is populated from the CSV via `embed_csv.py`. Unrat
 - Rating badges use solid colors (no gradient): green `#166534` (6), blue `#1d4ed8` (5), purple `#6d28d9` (4) — with subtle `box-shadow` ring
 - Rows get `data-rating` attribute in `renderTable()` — used for CSS left-border accent per rating level (`td:first-child`)
 - Thin vertical column dividers: `rgba(255,255,255,0.08)` on `thead th:not(:last-child)`, `var(--row-border)` on `tbody td:not(:last-child)`
-- Horizontal row dividers: `border-bottom: 1px solid var(--border)` on `tbody tr` — uses `--border` (more visible than `--row-border`) to match column divider weight
+- Horizontal row dividers: `border-bottom: 1px solid var(--input-border)` on `tbody tr` — uses `--input-border` (`#c4d4c6`) for clearly visible separation against white surface
 - Column header and cell horizontal padding: `1.1rem`
 - `--text-faint` darkened to `#526b55` (light) / `#5a9060` (dark) — passes WCAG AA (≥4.5:1)
 - Rating badge class applied with `+rating >= 1` (not array `.includes()`) to handle string values from data array
