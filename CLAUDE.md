@@ -13,12 +13,12 @@ This project collects and curates Norwegian-language podcast episodes on **teaml
 - `Ledelsepod.html` — interactive table with filtering, sorting, stats (CSV import button hidden)
 - `README.md` — prosjektbeskrivelse med lenke til GitHub Pages
 - `update_podcasts.py` — RSS fetcher; adds new episodes (Rating=0) since last known date per podcast
-- `auto_rate.py` — automatisk vurdering av Rating=0-episoder via Claude API (claude-haiku-4-5)
+- `auto_rate.py` — automatisk vurdering av Rating=0-episoder via GitHub Models (gpt-4o-mini, gratis)
 - `rate_runner.py` — stabil kjørelogikk for manuell episodeevaluering; importeres av `rate_episodes.py`
 - `rate_episodes.py` — data-only (UPDATES + REMOVE_KEYWORDS); skrives per raterunde, slettes etter bruk
 - `embed_csv.py` — skriver CSV-innholdet inn i HTML-filens `data`-array; kjøres etter hver raterunde
 - `rejected_episodes.csv` — denylist; episodes here are never re-fetched by `update_podcasts.py`
-- `.github/workflows/update_podcasts.yml` — GitHub Actions workflow; daglig kjøring deaktivert inntil videre, manuell trigger tilgjengelig
+- `.github/workflows/update_podcasts.yml` — GitHub Actions workflow; kjører daglig kl 10:15, manuell trigger tilgjengelig
 - `.gitignore` — ekskluderer `__pycache__/`, `*.pyc`, `*.pyo`, `.env`
 
 ## CSV columns
@@ -175,16 +175,16 @@ The `data` array in the HTML is populated from the CSV via `embed_csv.py`. Unrat
 - `HOST_OVERRIDES` dict: manuell overstyring for podcaster der RSS kun inneholder organisasjonsnavn (f.eks. Lederskap (NHH) → "Therese Egeland, Joel W. Berge")
 
 ## auto_rate.py – tekniske noter
-- Krever `pip install anthropic` og miljøvariabel `ANTHROPIC_API_KEY`
-- Leser CSV, finner alle rader med `Rating=0`, kaller Claude API for hver
-- Modell: `claude-haiku-4-5` (kostnadseffektiv)
-- Prompt caching: `cache_control: {type: "ephemeral"}` på system-prompten — rubrikk og tagskjema caches på tvers av alle episoder i samme kjøring
+- Krever `pip install openai` og miljøvariabel `GITHUB_TOKEN`
+- `GITHUB_TOKEN` er alltid tilgjengelig i GitHub Actions — ingen secrets å sette opp
+- Bruker GitHub Models via OpenAI-kompatibelt API: `https://models.inference.ai.azure.com`
+- Modell: `gpt-4o-mini` (gratis for offentlige repos, 150 req/dag)
+- Leser CSV, finner alle rader med `Rating=0`, kaller API for hver episode
 - Svarformat: JSON med feltene `host`, `guest`, `main_topics`, `rating`, `rating_notes`, `tags`
-- `host`-feltet fra Claude brukes kun hvis RSS-hentet vertsnavn mangler (RSS har prioritet)
+- `host`-feltet fra modellen brukes kun hvis RSS-hentet vertsnavn mangler (RSS har prioritet)
 - Rating 4–6: beholdes i CSV med utfylte felt
 - Rating 1–3: fjernes fra CSV og skrives til `rejected_episodes.csv` (med deduplicering via `normalize()`)
 - Output: norske statusmeldinger med `OK`/`WARN`-prefixer, samme stil som `rate_runner.py`
-- I GitHub Actions: kjøres med `ANTHROPIC_API_KEY` fra repository secret
 
 ## rate_runner.py – tekniske noter
 - Stabil fil med all kjørelogikk — aldri slettes
@@ -209,14 +209,14 @@ The `data` array in the HTML is populated from the CSV via `embed_csv.py`. Unrat
 
 ## Workflow
 
-### Automatisk (GitHub Actions — deaktivert inntil videre)
-- Daglig kjøring (10:15 Oslo-tid) er kommentert ut i `.github/workflows/update_podcasts.yml`
-- Aktiveres ved å uncommente `schedule`-blokken og sette `ANTHROPIC_API_KEY` som repository secret
-- Manuell trigger (Actions-knapp i GitHub) er fortsatt tilgjengelig
+### Automatisk (GitHub Actions — aktiv)
+- Kjører daglig kl 10:15 Oslo-tid
+- Ingen secrets nødvendig — bruker `GITHUB_TOKEN` (automatisk tilgjengelig)
+- Manuell trigger tilgjengelig via Actions-knappen i GitHub
 
 ### Manuelt (lokalt)
 1. `python update_podcasts.py` — henter nye episoder
-2. `python auto_rate.py` — vurderer automatisk (krever `ANTHROPIC_API_KEY`)
+2. `python auto_rate.py` — vurderer automatisk (krever `GITHUB_TOKEN` satt i miljøet)
 3. `python embed_csv.py` — oppdaterer HTML
 4. `git add Ledelsepod.csv Ledelsepod.html && git commit -m "..." && git push`
 

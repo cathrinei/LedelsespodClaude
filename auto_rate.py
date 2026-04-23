@@ -1,16 +1,16 @@
 """
-auto_rate.py — Automatisk vurdering av uraterte episoder (Rating=0) via Claude API.
+auto_rate.py — Automatisk vurdering av uraterte episoder (Rating=0) via GitHub Models.
 
 Bruk:
   python auto_rate.py
 
 Krever:
-  pip install anthropic
-  Miljøvariabel ANTHROPIC_API_KEY satt
+  pip install openai
+  Miljøvariabel GITHUB_TOKEN satt (tilgjengelig automatisk i GitHub Actions)
 
 Hva skriptet gjør:
-  1. Leser Ledelsepod_2026.csv og finner episoder med Rating=0
-  2. Kaller Claude (haiku-4-5) for å vurdere hver episode
+  1. Leser Ledelsepod.csv og finner episoder med Rating=0
+  2. Kaller gpt-4o-mini via GitHub Models for å vurdere hver episode
   3. Episoder med rating 4-6 beholdes i CSV med utfylte felt
   4. Episoder med rating 1-3 fjernes fra CSV og skrives til rejected_episodes.csv
 """
@@ -20,7 +20,7 @@ import json
 import os
 import sys
 
-import anthropic
+from openai import OpenAI
 
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
@@ -97,9 +97,9 @@ def append_rejected(removed_rows: list[list]) -> None:
             w.writerow([row[0], row[1]])
 
 
-def rate_episode(client: anthropic.Anthropic, podcast: str, title: str,
+def rate_episode(client: OpenAI, podcast: str, title: str,
                  pub_date: str, link: str) -> dict | None:
-    """Kaller Claude API og returnerer ratingdata som dict, eller None ved feil."""
+    """Kaller GitHub Models og returnerer ratingdata som dict, eller None ved feil."""
     user_msg = (
         f"Podcast: {podcast}\n"
         f"Tittel: {title}\n"
@@ -109,17 +109,15 @@ def rate_episode(client: anthropic.Anthropic, podcast: str, title: str,
     )
 
     try:
-        response = client.messages.create(
-            model="claude-haiku-4-5",
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[
+                {"role": "system", "content": SYSTEM_PROMPT},
+                {"role": "user", "content": user_msg},
+            ],
             max_tokens=512,
-            system=[{
-                "type": "text",
-                "text": SYSTEM_PROMPT,
-                "cache_control": {"type": "ephemeral"}
-            }],
-            messages=[{"role": "user", "content": user_msg}]
         )
-        text = next((b.text for b in response.content if b.type == "text"), "")
+        text = response.choices[0].message.content or ""
         # Strip markdown code fences if present
         text = text.strip()
         if text.startswith("```"):
@@ -131,18 +129,21 @@ def rate_episode(client: anthropic.Anthropic, podcast: str, title: str,
     except json.JSONDecodeError as e:
         print(f"WARN JSON-feil for '{title[:60]}': {e}")
         return None
-    except anthropic.APIError as e:
+    except Exception as e:
         print(f"WARN API-feil for '{title[:60]}': {e}")
         return None
 
 
 def main() -> None:
-    api_key = os.environ.get("ANTHROPIC_API_KEY")
-    if not api_key:
-        print("FEIL: Miljøvariabel ANTHROPIC_API_KEY er ikke satt.")
+    token = os.environ.get("GITHUB_TOKEN")
+    if not token:
+        print("FEIL: Miljøvariabel GITHUB_TOKEN er ikke satt.")
         sys.exit(1)
 
-    client = anthropic.Anthropic(api_key=api_key)
+    client = OpenAI(
+        base_url="https://models.inference.ai.azure.com",
+        api_key=token,
+    )
 
     with open(CSV_PATH, encoding="utf-8", newline="") as f:
         reader = csv.reader(f)
