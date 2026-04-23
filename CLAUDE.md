@@ -139,7 +139,7 @@ The `data` array in the HTML is populated from the CSV via `embed_csv.py`. Unrat
 - Rating badges use solid colors (no gradient): green `#166534` (6), blue `#1d4ed8` (5), purple `#6d28d9` (4) — with subtle `box-shadow` ring
 - Rows get `data-rating` attribute in `renderTable()` — used for CSS left-border accent per rating level (`td:first-child`)
 - Thin vertical column dividers: `rgba(255,255,255,0.08)` on `thead th:not(:last-child)`, `var(--table-divider)` on `tbody td:not(:last-child)`
-- Horizontal row dividers: `border-bottom: 1px solid var(--table-divider)` on `tbody tr` — begge bruker `--table-divider` (`#a8c0aa` lyst / `#3a5a3c` mørkt) for tydelig og konsistent rutenett
+- Horizontal row dividers: `border-bottom: 1px solid var(--table-divider)` on `tbody tr` — begge bruker `--table-divider` (`#7a9c7e` lyst / `#4a6e4c` mørkt) for tydelig og konsistent rutenett
 - Column header and cell horizontal padding: `1.1rem`
 - `--text-faint` darkened to `#526b55` (light) / `#5a9060` (dark) — passes WCAG AA (≥4.5:1)
 - Rating badge class applied with `+rating >= 1` (not array `.includes()`) to handle string values from data array
