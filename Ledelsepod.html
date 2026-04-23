@@ -20,6 +20,7 @@
   --stat-label:     #4d6450;
   --row-hover:      #edf5ee;
   --row-border:     #e8ede8;
+  --table-divider:  #a8c0aa;
   --input-bg:       #f4f8f4;
   --input-border:   #c4d4c6;
   --focus-ring:     #15803d;
@@ -47,6 +48,7 @@ body.dark {
   --stat-label:     #7aaa7c;
   --row-hover:      #142018;
   --row-border:     #1e2e20;
+  --table-divider:  #3a5a3c;
   --input-bg:       #162118;
   --input-border:   #2a3e2c;
   --focus-ring:     #4ade80;
@@ -315,11 +317,11 @@ thead th .sort-icon { opacity: 0.4; margin-left: 3px; font-size: 0.68rem; }
 thead th.sorted .sort-icon { opacity: 0.9; }
 thead th:not(:last-child) { border-right: 1px solid rgba(255,255,255,0.08); }
 
-tbody tr { border-bottom: 1px solid var(--input-border); transition: background 0.1s; }
+tbody tr { border-bottom: 1px solid var(--table-divider); transition: background 0.1s; }
 tbody tr:last-child { border-bottom: none; }
 tbody tr:hover { background: var(--row-hover); }
 tbody td { padding: 0.72rem 1.1rem; vertical-align: top; }
-tbody td:not(:last-child) { border-right: 1px solid var(--input-border); }
+tbody td:not(:last-child) { border-right: 1px solid var(--table-divider); }
 
 /* CELL CONTENT */
 .cell-podcast { font-weight: 600; font-size: 0.77rem; color: var(--accent); }
