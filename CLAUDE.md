@@ -225,8 +225,15 @@ The `data` array in the HTML is populated from the CSV via `embed_csv.py`. Unrat
 - For å blokkere en episode permanent: legg til manuelt i `rejected_episodes.csv`
 - For å legge til en ny podcast: legg til RSS-feed i `FEEDS`-dicten i `update_podcasts.py`
 
-### Branch-workflow (for større endringer)
-Bruk en egen branch for nye features — merge til master når klar.
+### Branch-workflow
+**Alltid opprett en ny branch når datoen er ny** — bruk dato som branchnavn (`YYYY-MM-DD`):
+
+```
+git checkout -b 2026-04-23
+git push -u origin 2026-04-23
+```
+
+All utvikling skjer på datobranchen. Merge til master via PR når sesjonen er ferdig.
 
 ```
 # Start ny branch
