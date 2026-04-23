@@ -53,7 +53,8 @@
       "Bash(git merge *)",
       "Bash(git stash *)",
       "Bash(python -c ' *)",
-      "mcp__Claude_Preview__preview_start"
+      "mcp__Claude_Preview__preview_start",
+      "Bash(gh pr *)"
     ]
   }
 }
