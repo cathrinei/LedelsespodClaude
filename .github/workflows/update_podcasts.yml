@@ -18,8 +18,16 @@ jobs:
         with:
           python-version: '3.12'
 
+      - name: Installer avhengigheter
+        run: pip install openai
+
       - name: Hent nye episoder
         run: python update_podcasts.py
+
+      - name: Vurder nye episoder automatisk
+        run: python auto_rate.py
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Oppdater HTML
         run: python embed_csv.py
