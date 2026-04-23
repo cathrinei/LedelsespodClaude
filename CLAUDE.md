@@ -228,6 +228,8 @@ The `data` array in the HTML is populated from the CSV via `embed_csv.py`. Unrat
 ### Branch-workflow
 **Alltid opprett en ny branch når datoen er ny** — bruk dato som branchnavn (`YYYY-MM-DD`):
 
+**CLAUDE.md skal alltid committes i samme commit som kodeendringene den dokumenterer** — ikke i en separat PR etterpå.
+
 ```
 git checkout -b 2026-04-23
 git push -u origin 2026-04-23
