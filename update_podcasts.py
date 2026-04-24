@@ -108,6 +108,7 @@ DC_NS     = "http://purl.org/dc/elements/1.1/"
 # Manuell overstyring for podcaster der RSS-feeden kun inneholder organisasjonsnavn
 HOST_OVERRIDES = {
     "lederskap (nhh)": "Therese Egeland, Joel W. Berge",
+    "lederliv":        "Ole Christian Apeland",
 }
 
 

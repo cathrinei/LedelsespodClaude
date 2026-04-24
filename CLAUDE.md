@@ -172,7 +172,7 @@ The `data` array in the HTML is populated from the CSV via `embed_csv.py`. Unrat
 - New episodes filtered against both `rejected` and `existing_keys` before being appended
 - Per-feed output shows: `+ N ny(e)`, `N hoppet over (forkastet)`, `N duplikat(er)` as relevant
 - `_extract_host(podcast_name, item, channel)` henter vertsnavn direkte fra RSS — prioriteringsrekkefølge: `itunes:author` (item) → `dc:creator` (item) → `HOST_OVERRIDES` → `itunes:author` (channel) → `managingEditor` (channel)
-- `HOST_OVERRIDES` dict: manuell overstyring for podcaster der RSS kun inneholder organisasjonsnavn (f.eks. Lederskap (NHH) → "Therese Egeland, Joel W. Berge")
+- `HOST_OVERRIDES` dict: manuell overstyring for podcaster der RSS kun inneholder forkortet navn eller organisasjonsnavn — aktive oppføringer: Lederskap (NHH) → "Therese Egeland, Joel W. Berge", Lederliv → "Ole Christian Apeland"
 
 ## auto_rate.py – tekniske noter
 - Krever `pip install openai` og miljøvariabel `GITHUB_TOKEN`
