@@ -22,10 +22,10 @@ jobs:
         run: pip install openai
 
       - name: Hent nye episoder
-        run: python update_podcasts.py
+        run: python update_podcasts.py 2>&1 | tee /tmp/fetch_output.txt
 
       - name: Vurder nye episoder automatisk
-        run: python auto_rate.py
+        run: python auto_rate.py 2>&1 | tee /tmp/rate_output.txt
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -39,3 +39,18 @@ jobs:
           git add Ledelsepod.csv Ledelsepod.html
           git diff --cached --quiet || git commit -m "Auto-oppdater episoder $(date +'%Y-%m-%d')"
           git push
+
+      - name: Skriv kjøringssammendrag
+        if: always()
+        run: |
+          echo "## 📻 Episodeoppdatering $(date +'%Y-%m-%d')" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Henting" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat /tmp/fetch_output.txt >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Vurdering" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat /tmp/rate_output.txt >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY

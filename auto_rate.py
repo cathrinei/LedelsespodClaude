@@ -176,13 +176,15 @@ def main() -> None:
 
         result = rate_episode(client, podcast, title, pub_date, link)
         if result is None:
-            print(f"    WARN Hopper over (ingen gyldig respons)\n")
+            print(f"    FJERNES  Ingen gyldig respons — fjernes midlertidig (re-prøves neste kjøring)\n")
+            rows_to_remove.add(i)
             continue
 
         rating = int(result.get("rating", 0))
 
         if rating <= 0 or rating > 6:
-            print(f"    WARN Ugyldig rating ({rating}) — hopper over\n")
+            print(f"    FJERNES  Ugyldig rating ({rating}) — fjernes midlertidig (re-prøves neste kjøring)\n")
+            rows_to_remove.add(i)
             continue
 
         if rating <= 3:
