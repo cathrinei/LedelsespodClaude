@@ -496,6 +496,13 @@ button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible
   .ep-card__tags { display: flex; flex-wrap: wrap; gap: 0.25rem; }
   .ep-card__listen { margin-top: 0.1rem; }
 
+  /* Sveip-tilbakemelding — gul glimt når favoritt togges */
+  @keyframes fav-flash {
+    0%   { background: rgba(245,158,11,0.25); }
+    100% { background: transparent; }
+  }
+  .ep-card.fav-flashed { animation: fav-flash 0.45s ease-out forwards; }
+
 }
 </style>
 </head>
@@ -751,6 +758,7 @@ function renderTable(rows) {
     const [podcast, title, , date, hosts, guests, topics, rating, note, tags, link] = row;
     const tr = document.createElement('tr');
     if (rating > 0) tr.dataset.rating = rating;
+    tr.dataset.fav = favId(row);
     tr.innerHTML = `
       <td><button class="cell-podcast" data-podcast="${esc(podcast)}" aria-pressed="${document.getElementById('podcastFilter').value === podcast ? 'true' : 'false'}">${esc(podcast)}</button></td>
       <td><button class="fav-btn" data-fav="${esc(favId(row))}" aria-label="${favorites.has(favId(row)) ? 'Fjern fra favoritter' : 'Legg til favoritter'}" aria-pressed="${favorites.has(favId(row)) ? 'true' : 'false'}" style="padding:0 0.35rem 0 0; vertical-align:middle">&#9733;</button><a class="cell-title" href="${safeUrl(link)}" target="_blank" rel="noopener noreferrer">${esc(title)}</a></td>
@@ -1034,6 +1042,33 @@ document.getElementById('tableBody').addEventListener('click', e => {
   refresh();
   updateStatBtns();
 });
+
+// Sveip høyre på mobilkort for å toggle favoritt
+(function () {
+  let touchStartX = 0;
+  const tbody = document.getElementById('tableBody');
+  tbody.addEventListener('touchstart', e => {
+    touchStartX = e.touches[0].clientX;
+  }, { passive: true });
+  tbody.addEventListener('touchend', e => {
+    const dx = e.changedTouches[0].clientX - touchStartX;
+    if (dx < 60) return;                        // ikke et høyresveip
+    const tr = e.target.closest('tr[data-fav]');
+    if (!tr) return;
+    const id = tr.dataset.fav;
+    if (favorites.has(id)) { favorites.delete(id); } else { favorites.add(id); }
+    saveFavs();
+    refresh();
+    // Visuell tilbakemelding — gul glimt på kortet
+    const card = tr.querySelector('.ep-card');
+    if (card) {
+      card.classList.remove('fav-flashed');
+      // Tvinger reflow slik at animasjonen starter på nytt ved gjentatt sveip
+      void card.offsetWidth;
+      card.classList.add('fav-flashed');
+    }
+  }, { passive: true });
+}());
 
 document.getElementById('favToggle').addEventListener('click', () => {
   showFavsOnly = !showFavsOnly;
