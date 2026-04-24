@@ -184,7 +184,9 @@ The `data` array in the HTML is populated from the CSV via `embed_csv.py`. Unrat
 - `host`-feltet fra modellen brukes kun hvis RSS-hentet vertsnavn mangler (RSS har prioritet)
 - Rating 4–6: beholdes i CSV med utfylte felt
 - Rating 1–3: fjernes fra CSV og skrives til `rejected_episodes.csv` (med deduplicering via `normalize()`)
-- Output: norske statusmeldinger med `OK`/`WARN`-prefixer, samme stil som `rate_runner.py`
+- Ingen gyldig respons / ugyldig rating: fjernes midlertidig fra CSV, legges **ikke** i `rejected_episodes.csv` — re-hentes og re-prøves neste kjøring
+- Ingen N/A-episoder skal bli liggende i CSV etter en vellykket kjøring
+- Output: norske statusmeldinger med `OK`/`FJERNES`-prefixer
 
 ## rate_runner.py – tekniske noter
 - Stabil fil med all kjørelogikk — aldri slettes
