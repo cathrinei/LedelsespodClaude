@@ -54,7 +54,13 @@
       "Bash(git stash *)",
       "Bash(python -c ' *)",
       "mcp__Claude_Preview__preview_start",
-      "Bash(gh pr *)"
+      "Bash(gh pr *)",
+      "Bash(python auto_rate.py)",
+      "Bash(pip3 install *)",
+      "Bash(where python *)",
+      "Bash(python -m pip install openai -q)",
+      "Bash(python -m auto_rate)",
+      "Bash(gh run *)"
     ]
   }
 }
