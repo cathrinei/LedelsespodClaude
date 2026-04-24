@@ -1045,14 +1045,17 @@ document.getElementById('tableBody').addEventListener('click', e => {
 
 // Sveip høyre på mobilkort for å toggle favoritt
 (function () {
-  let touchStartX = 0;
+  let touchStartX = 0, touchStartY = 0;
   const tbody = document.getElementById('tableBody');
   tbody.addEventListener('touchstart', e => {
     touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
   }, { passive: true });
   tbody.addEventListener('touchend', e => {
     const dx = e.changedTouches[0].clientX - touchStartX;
-    if (dx < 60) return;                        // ikke et høyresveip
+    const dy = e.changedTouches[0].clientY - touchStartY;
+    // Krev horisontal dominans — avviser scroll-gester (viktig for iOS Safari)
+    if (dx < 60 || Math.abs(dy) > Math.abs(dx) * 0.75) return;
     const tr = e.target.closest('tr[data-fav]');
     if (!tr) return;
     const id = tr.dataset.fav;
