@@ -266,6 +266,13 @@ body.dark #searchBox:focus { box-shadow: 0 0 0 3px rgba(74,222,128,0.12); }
   color: var(--text);
 }
 .btn-ghost:hover { background: var(--surface2); border-color: var(--text-faint); color: var(--text); }
+.btn-ghost.filters-active { border-color: var(--accent); color: var(--accent); font-weight: 600; }
+.empty-state { text-align: center; padding: 3rem 1rem; color: var(--text-muted); font-size: 0.9rem; }
+.empty-state .empty-reset { background: none; border: none; color: var(--accent); cursor: pointer; font-size: inherit; text-decoration: underline; padding: 0; }
+.fav-btn { background: none; border: none; cursor: pointer; font-size: 1rem; color: var(--text-faint); padding: 0 0 0 0.35rem; line-height: 1; vertical-align: middle; }
+.fav-btn:hover { color: #f59e0b; }
+.fav-btn[aria-pressed="true"] { color: #f59e0b; }
+#favToggle.filters-active { border-color: #f59e0b; color: #f59e0b; font-weight: 600; }
 .btn-primary {
   background: var(--accent);
   border-color: var(--accent);
@@ -526,6 +533,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible
     <select id="podcastFilter" aria-label="Filtrer på podkast">
       <option value="">Alle podkaster</option>
     </select>
+    <button class="btn btn-ghost" id="favToggle" aria-pressed="false">&#9733; Favoritter</button>
     <button class="btn btn-ghost" id="resetBtn">Nullstill</button>
     <button class="btn btn-primary" id="updateBtn" style="display:none"><span aria-hidden="true">&#8593;</span> Last inn CSV</button>
     <input type="file" id="csvFile" accept=".csv" style="display:none">
@@ -679,15 +687,72 @@ function renderTags(tags) {
   }).filter(Boolean).join('');
   return html || '<span class="no-tags">\u2013</span>';
 }
+// — Favoritter —
+const FAV_KEY = 'ledelsepod_favorites';
+function loadFavs() { try { return new Set(JSON.parse(localStorage.getItem(FAV_KEY) || '[]')); } catch { return new Set(); } }
+function saveFavs() { localStorage.setItem(FAV_KEY, JSON.stringify([...favorites])); }
+function favId(row) { return row[0] + '::' + row[1]; }
+let favorites = loadFavs();
+let showFavsOnly = false;
+
+// — URL-tilstand —
+function filtersToUrl() {
+  const params = new URLSearchParams();
+  const search  = document.getElementById('searchBox').value;
+  const rating  = document.getElementById('ratingFilter').value;
+  const podcast = document.getElementById('podcastFilter').value;
+  if (search)          params.set('search',  search);
+  if (rating !== '4')  params.set('rating',  rating);
+  if (podcast)         params.set('podcast', podcast);
+  if (activeTag)       params.set('tag',     activeTag);
+  if (showFavsOnly)    params.set('favs',    '1');
+  const qs = params.toString();
+  history.replaceState(null, '', qs ? '?' + qs : location.pathname);
+}
+function applyUrlFilters() {
+  const params = new URLSearchParams(location.search);
+  if (params.has('search'))  document.getElementById('searchBox').value = params.get('search');
+  if (params.has('rating'))  document.getElementById('ratingFilter').value = params.get('rating');
+  if (params.has('podcast')) document.getElementById('podcastFilter').value = params.get('podcast');
+  if (params.has('tag')) {
+    activeTag = params.get('tag');
+    document.querySelectorAll('.tag-pill').forEach(p => {
+      const isActive = p.dataset.tag === activeTag;
+      const isAll = p.dataset.tag === '' && !activeTag;
+      p.classList.toggle('active', isActive || isAll);
+      p.setAttribute('aria-pressed', (isActive || isAll) ? 'true' : 'false');
+    });
+  }
+  if (params.get('favs') === '1') {
+    showFavsOnly = true;
+    document.getElementById('favToggle').classList.add('filters-active');
+    document.getElementById('favToggle').setAttribute('aria-pressed', 'true');
+  }
+}
+
+function updateResetBtn() {
+  const search  = document.getElementById('searchBox').value;
+  const rating  = document.getElementById('ratingFilter').value;
+  const podcast = document.getElementById('podcastFilter').value;
+  const active  = !!(search || rating !== '4' || podcast || activeTag);
+  const btn = document.getElementById('resetBtn');
+  btn.classList.toggle('filters-active', active);
+  btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+}
 function renderTable(rows) {
   const tbody = document.getElementById('tableBody');
   tbody.innerHTML = '';
+  if (rows.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="10" class="empty-state">Ingen episoder matcher filteret — <button class="empty-reset" onclick="resetFilters()">nullstill filtre</button></td></tr>`;
+    document.getElementById('rowCount').textContent = 'Ingen treff';
+    return;
+  }
   rows.forEach(row => {
     const [podcast, title, , date, hosts, guests, topics, rating, note, tags, link] = row;
     const tr = document.createElement('tr');
     if (rating > 0) tr.dataset.rating = rating;
     tr.innerHTML = `
-      <td><button class="cell-podcast" data-podcast="${esc(podcast)}" aria-pressed="${document.getElementById('podcastFilter').value === podcast ? 'true' : 'false'}">${esc(podcast)}</button></td>
+      <td><button class="cell-podcast" data-podcast="${esc(podcast)}" aria-pressed="${document.getElementById('podcastFilter').value === podcast ? 'true' : 'false'}">${esc(podcast)}</button><button class="fav-btn" data-fav="${esc(favId(row))}" aria-label="${favorites.has(favId(row)) ? 'Fjern fra favoritter' : 'Legg til favoritter'}" aria-pressed="${favorites.has(favId(row)) ? 'true' : 'false'}">&#9733;</button></td>
       <td><a class="cell-title" href="${safeUrl(link)}" target="_blank" rel="noopener noreferrer">${esc(title)}</a></td>
       <td><span class="cell-date">${esc(date)}</span></td>
       <td><span class="cell-person">${esc(hosts)}</span></td>
@@ -750,6 +815,7 @@ function getFiltered() {
     if (activeTag && !tagsOf(row).includes(activeTag)) return false;
     if (+rating > 0 && +rating < minRating) return false;
     if (podcastFilter && podcast !== podcastFilter) return false;
+    if (showFavsOnly && !favorites.has(favId(row))) return false;
     if (search) {
       const haystack = [podcast, title, hosts, guests, topics, note].join(' ').toLowerCase();
       if (!fuzzyMatch(search, haystack)) return false;
@@ -779,12 +845,15 @@ function sortTable(col) {
   });
   refresh();
 }
-function refresh() { renderTable(getSorted(getFiltered())); }
+function refresh() { renderTable(getSorted(getFiltered())); updateResetBtn(); filtersToUrl(); }
 function resetFilters() {
   document.getElementById('searchBox').value = '';
   document.getElementById('ratingFilter').value = '4';
   document.getElementById('podcastFilter').value = '';
   activeTag = '';
+  showFavsOnly = false;
+  document.getElementById('favToggle').classList.remove('filters-active');
+  document.getElementById('favToggle').setAttribute('aria-pressed', 'false');
   document.querySelectorAll('.tag-pill').forEach(b => {
     const isAll = b.dataset.tag === '';
     b.classList.toggle('active', isAll);
@@ -934,6 +1003,15 @@ document.querySelectorAll('.stat-btn').forEach(btn => {
 });
 // Klikk på tags i tabellen — event delegation på tbody
 document.getElementById('tableBody').addEventListener('click', e => {
+  // Klikk på favoritt-stjerne
+  const favBtn = e.target.closest('button.fav-btn[data-fav]');
+  if (favBtn) {
+    const id = favBtn.dataset.fav;
+    if (favorites.has(id)) { favorites.delete(id); } else { favorites.add(id); }
+    saveFavs();
+    refresh();
+    return;
+  }
   // Klikk på podkastnavn — oppdater podcastFilter og refresh
   const podBtn = e.target.closest('button.cell-podcast[data-podcast]');
   if (podBtn) {
@@ -957,7 +1035,15 @@ document.getElementById('tableBody').addEventListener('click', e => {
   updateStatBtns();
 });
 
+document.getElementById('favToggle').addEventListener('click', () => {
+  showFavsOnly = !showFavsOnly;
+  document.getElementById('favToggle').classList.toggle('filters-active', showFavsOnly);
+  document.getElementById('favToggle').setAttribute('aria-pressed', showFavsOnly ? 'true' : 'false');
+  refresh();
+});
+
 updateStats();
+applyUrlFilters();
 refresh();
 
 </script>
