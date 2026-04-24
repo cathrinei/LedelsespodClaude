@@ -103,6 +103,7 @@ The `data` array in the HTML is populated from the CSV via `embed_csv.py`. Unrat
 - Tom tilstand: når `renderTable()` får `rows.length === 0` vises en rad med melding og snarvei til `resetFilters()`
 - **URL-tilstand**: `filtersToUrl()` oppdaterer URL-parametere (`search`, `rating`, `podcast`, `tag`, `favs`) ved hver filterendring via `history.replaceState` — filtrert visning kan deles som URL; `applyUrlFilters()` leser og gjenoppretter tilstand ved sideinnlasting
 - **Favoritter**: `favorites` er et `Set` lagret i `localStorage` (`ledelsepod_favorites`); stjerne-knapp (`.fav-btn`) per rad i EPISODE-cellen (foran tittelen); `favId(row)` bruker `podcast::title` som nøkkel; Favoritter-knapp i kontrollbar toggler `showFavsOnly`-filter; gul stjerne (`#f59e0b`) når aktiv
+- **Mobil sveip-til-favoritt**: sveip høyre (>60px, horisontal dominans) på et episodekort toggler favoritt — event delegation via `touchstart`/`touchend` på `#tableBody` (passive listeners); Y-koordinat spores for å avvise scroll-gester på iOS Safari; `tr.dataset.fav` settes i `renderTable()` for identifikasjon; `.fav-flashed`-klasse trigger gul glimt-animasjon (`@keyframes fav-flash`) som visuell bekreftelse
 
 ### "↑ Last inn CSV"-knappen
 - Knappen er skjult (`display:none`) — data oppdateres automatisk via GitHub Actions
