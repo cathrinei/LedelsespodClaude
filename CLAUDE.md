@@ -123,6 +123,8 @@ The `data` array in the HTML is populated from the CSV via `embed_csv.py`. Unrat
 - `<select id="podcastFilter">` — placed to the right of the rating filter in the controls bar
 - Options populated dynamically from the `data` array (unique podcast names, alphabetically sorted) on page load
 - Filters table to a single show; `resetFilters()` resets it to `""` (Alle podkaster)
+- Podcast names in table rows are rendered as `<button class="cell-podcast" data-podcast="...">` — clicking filters the table and syncs the dropdown; clicking same name again clears the filter
+- Event delegation on `#tableBody` handles podcast clicks — same pattern as tag clicks; `aria-pressed` reflects active state
 
 ### Øvrige tekniske noter
 - Language column (index 2) is kept in CSV/data array but **not displayed** in the table — all episodes are Norwegian
