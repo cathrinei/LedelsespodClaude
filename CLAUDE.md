@@ -102,7 +102,7 @@ The `data` array in the HTML is populated from the CSV via `embed_csv.py`. Unrat
 - `updateResetBtn()` toggles `.filters-active` class on Nullstill-knappen når søk, rating, podkast, tag eller favoritter er aktivt — grønn kant og tekst som visuelt signal; called from `refresh()`
 - Tom tilstand: når `renderTable()` får `rows.length === 0` vises en rad med melding og snarvei til `resetFilters()`
 - **URL-tilstand**: `filtersToUrl()` oppdaterer URL-parametere (`search`, `rating`, `podcast`, `tag`, `favs`) ved hver filterendring via `history.replaceState` — filtrert visning kan deles som URL; `applyUrlFilters()` leser og gjenoppretter tilstand ved sideinnlasting
-- **Favoritter**: `favorites` er et `Set` lagret i `localStorage` (`ledelsepod_favorites`); stjerne-knapp (`.fav-btn`) per rad i PODKAST-cellen; `favId(row)` bruker `podcast::title` som nøkkel; Favoritter-knapp i kontrollbar toggler `showFavsOnly`-filter; gul stjerne (`#f59e0b`) når aktiv
+- **Favoritter**: `favorites` er et `Set` lagret i `localStorage` (`ledelsepod_favorites`); stjerne-knapp (`.fav-btn`) per rad i EPISODE-cellen (foran tittelen); `favId(row)` bruker `podcast::title` som nøkkel; Favoritter-knapp i kontrollbar toggler `showFavsOnly`-filter; gul stjerne (`#f59e0b`) når aktiv
 
 ### "↑ Last inn CSV"-knappen
 - Knappen er skjult (`display:none`) — data oppdateres automatisk via GitHub Actions
