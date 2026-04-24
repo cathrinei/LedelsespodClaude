@@ -99,8 +99,10 @@ The `data` array in the HTML is populated from the CSV via `embed_csv.py`. Unrat
 - Four stat cards are clickable filter shortcuts (`.stat-btn`): **Episoder** (reset all), **Teamledelse** (tag filter), **Personalledelse** (tag filter), **Toppkarakter 6/6** (rating=6)
 - Active stat card gets green background; clicking again toggles the filter off
 - `updateStatBtns()` syncs active state of stat cards with current filter state; called after every filter action and from `resetFilters()`
-- `updateResetBtn()` toggles `.filters-active` class on Nullstill-knappen når søk, rating, podkast eller tag er aktivt — grønn kant og tekst som visuelt signal; called from `refresh()`
+- `updateResetBtn()` toggles `.filters-active` class on Nullstill-knappen når søk, rating, podkast, tag eller favoritter er aktivt — grønn kant og tekst som visuelt signal; called from `refresh()`
 - Tom tilstand: når `renderTable()` får `rows.length === 0` vises en rad med melding og snarvei til `resetFilters()`
+- **URL-tilstand**: `filtersToUrl()` oppdaterer URL-parametere (`search`, `rating`, `podcast`, `tag`, `favs`) ved hver filterendring via `history.replaceState` — filtrert visning kan deles som URL; `applyUrlFilters()` leser og gjenoppretter tilstand ved sideinnlasting
+- **Favoritter**: `favorites` er et `Set` lagret i `localStorage` (`ledelsepod_favorites`); stjerne-knapp (`.fav-btn`) per rad i PODKAST-cellen; `favId(row)` bruker `podcast::title` som nøkkel; Favoritter-knapp i kontrollbar toggler `showFavsOnly`-filter; gul stjerne (`#f59e0b`) når aktiv
 
 ### "↑ Last inn CSV"-knappen
 - Knappen er skjult (`display:none`) — data oppdateres automatisk via GitHub Actions
