@@ -752,8 +752,8 @@ function renderTable(rows) {
     const tr = document.createElement('tr');
     if (rating > 0) tr.dataset.rating = rating;
     tr.innerHTML = `
-      <td><button class="cell-podcast" data-podcast="${esc(podcast)}" aria-pressed="${document.getElementById('podcastFilter').value === podcast ? 'true' : 'false'}">${esc(podcast)}</button><button class="fav-btn" data-fav="${esc(favId(row))}" aria-label="${favorites.has(favId(row)) ? 'Fjern fra favoritter' : 'Legg til favoritter'}" aria-pressed="${favorites.has(favId(row)) ? 'true' : 'false'}">&#9733;</button></td>
-      <td><a class="cell-title" href="${safeUrl(link)}" target="_blank" rel="noopener noreferrer">${esc(title)}</a></td>
+      <td><button class="cell-podcast" data-podcast="${esc(podcast)}" aria-pressed="${document.getElementById('podcastFilter').value === podcast ? 'true' : 'false'}">${esc(podcast)}</button></td>
+      <td><button class="fav-btn" data-fav="${esc(favId(row))}" aria-label="${favorites.has(favId(row)) ? 'Fjern fra favoritter' : 'Legg til favoritter'}" aria-pressed="${favorites.has(favId(row)) ? 'true' : 'false'}" style="padding:0 0.35rem 0 0; vertical-align:middle">&#9733;</button><a class="cell-title" href="${safeUrl(link)}" target="_blank" rel="noopener noreferrer">${esc(title)}</a></td>
       <td><span class="cell-date">${esc(date)}</span></td>
       <td><span class="cell-person">${esc(hosts)}</span></td>
       <td><span class="cell-person">${esc(guests)}</span></td>
