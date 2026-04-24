@@ -324,7 +324,9 @@ tbody tr:last-child td { border-bottom: none; }
 tbody td:not(:last-child) { border-right: 1px solid var(--table-divider); }
 
 /* CELL CONTENT */
-.cell-podcast { font-weight: 600; font-size: 0.77rem; color: var(--accent); }
+.cell-podcast { font-weight: 600; font-size: 0.77rem; color: var(--accent); background: none; border: none; padding: 0; cursor: pointer; text-align: left; font-family: inherit; }
+.cell-podcast:hover { text-decoration: underline; }
+.cell-podcast[aria-pressed="true"] { outline: 2px solid currentColor; outline-offset: 2px; border-radius: 2px; }
 .cell-title { font-weight: 600; color: var(--text); line-height: 1.35; text-decoration: none; }
 .cell-title:hover { color: var(--accent); text-decoration: underline; }
 .cell-date { color: var(--text-muted); font-size: 0.76rem; white-space: nowrap; font-variant-numeric: tabular-nums; }
@@ -685,7 +687,7 @@ function renderTable(rows) {
     const tr = document.createElement('tr');
     if (rating > 0) tr.dataset.rating = rating;
     tr.innerHTML = `
-      <td><span class="cell-podcast">${esc(podcast)}</span></td>
+      <td><button class="cell-podcast" data-podcast="${esc(podcast)}" aria-pressed="${document.getElementById('podcastFilter').value === podcast ? 'true' : 'false'}">${esc(podcast)}</button></td>
       <td><a class="cell-title" href="${safeUrl(link)}" target="_blank" rel="noopener noreferrer">${esc(title)}</a></td>
       <td><span class="cell-date">${esc(date)}</span></td>
       <td><span class="cell-person">${esc(hosts)}</span></td>
@@ -700,7 +702,7 @@ function renderTable(rows) {
       <td class="card-cell" colspan="10">
         <div class="ep-card">
           <div class="ep-card__header">
-            <span class="cell-podcast">${esc(podcast)}</span>
+            <button class="cell-podcast" data-podcast="${esc(podcast)}" aria-pressed="${document.getElementById('podcastFilter').value === podcast ? 'true' : 'false'}">${esc(podcast)}</button>
             <span class="rating-badge${+rating >= 1 && +rating <= 6 ? ' r'+rating : ''}" aria-label="Karakter ${+rating > 0 ? rating : 'ikke vurdert'}">${+rating > 0 ? rating : 'N/A'}</span>
           </div>
           <a class="cell-title ep-card__title" href="${safeUrl(link)}" target="_blank" rel="noopener noreferrer">${esc(title)}</a>
@@ -932,6 +934,15 @@ document.querySelectorAll('.stat-btn').forEach(btn => {
 });
 // Klikk på tags i tabellen — event delegation på tbody
 document.getElementById('tableBody').addEventListener('click', e => {
+  // Klikk på podkastnavn — oppdater podcastFilter og refresh
+  const podBtn = e.target.closest('button.cell-podcast[data-podcast]');
+  if (podBtn) {
+    const sel = document.getElementById('podcastFilter');
+    sel.value = sel.value === podBtn.dataset.podcast ? '' : podBtn.dataset.podcast;
+    refresh();
+    return;
+  }
+  // Klikk på tag — oppdater tag-pills og refresh
   const btn = e.target.closest('button.tag[data-tag]');
   if (!btn) return;
   const tag = btn.dataset.tag;
