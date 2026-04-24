@@ -266,6 +266,9 @@ body.dark #searchBox:focus { box-shadow: 0 0 0 3px rgba(74,222,128,0.12); }
   color: var(--text);
 }
 .btn-ghost:hover { background: var(--surface2); border-color: var(--text-faint); color: var(--text); }
+.btn-ghost.filters-active { border-color: var(--accent); color: var(--accent); font-weight: 600; }
+.empty-state { text-align: center; padding: 3rem 1rem; color: var(--text-muted); font-size: 0.9rem; }
+.empty-state .empty-reset { background: none; border: none; color: var(--accent); cursor: pointer; font-size: inherit; text-decoration: underline; padding: 0; }
 .btn-primary {
   background: var(--accent);
   border-color: var(--accent);
@@ -679,9 +682,23 @@ function renderTags(tags) {
   }).filter(Boolean).join('');
   return html || '<span class="no-tags">\u2013</span>';
 }
+function updateResetBtn() {
+  const search  = document.getElementById('searchBox').value;
+  const rating  = document.getElementById('ratingFilter').value;
+  const podcast = document.getElementById('podcastFilter').value;
+  const active  = !!(search || rating !== '4' || podcast || activeTag);
+  const btn = document.getElementById('resetBtn');
+  btn.classList.toggle('filters-active', active);
+  btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+}
 function renderTable(rows) {
   const tbody = document.getElementById('tableBody');
   tbody.innerHTML = '';
+  if (rows.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="10" class="empty-state">Ingen episoder matcher filteret — <button class="empty-reset" onclick="resetFilters()">nullstill filtre</button></td></tr>`;
+    document.getElementById('rowCount').textContent = 'Ingen treff';
+    return;
+  }
   rows.forEach(row => {
     const [podcast, title, , date, hosts, guests, topics, rating, note, tags, link] = row;
     const tr = document.createElement('tr');
@@ -779,7 +796,7 @@ function sortTable(col) {
   });
   refresh();
 }
-function refresh() { renderTable(getSorted(getFiltered())); }
+function refresh() { renderTable(getSorted(getFiltered())); updateResetBtn(); }
 function resetFilters() {
   document.getElementById('searchBox').value = '';
   document.getElementById('ratingFilter').value = '4';
