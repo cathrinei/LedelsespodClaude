@@ -99,6 +99,8 @@ The `data` array in the HTML is populated from the CSV via `embed_csv.py`. Unrat
 - Four stat cards are clickable filter shortcuts (`.stat-btn`): **Episoder** (reset all), **Teamledelse** (tag filter), **Personalledelse** (tag filter), **Toppkarakter 6/6** (rating=6)
 - Active stat card gets green background; clicking again toggles the filter off
 - `updateStatBtns()` syncs active state of stat cards with current filter state; called after every filter action and from `resetFilters()`
+- `updateResetBtn()` toggles `.filters-active` class on Nullstill-knappen når søk, rating, podkast eller tag er aktivt — grønn kant og tekst som visuelt signal; called from `refresh()`
+- Tom tilstand: når `renderTable()` får `rows.length === 0` vises en rad med melding og snarvei til `resetFilters()`
 
 ### "↑ Last inn CSV"-knappen
 - Knappen er skjult (`display:none`) — data oppdateres automatisk via GitHub Actions
