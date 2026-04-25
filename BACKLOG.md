@@ -17,9 +17,9 @@
 
 ## Kode
 
-- Inline `style`-attributt på `.fav-btn` i `renderTable()` bør flyttes til CSS
-- `embed_csv.py` mangler feilhåndtering ved ugyldig CSV-input
-- Workflow-validering: sjekk at `data`-arrayen i HTML er gyldig JSON etter at `embed_csv.py` har kjørt
+- ✅ Inline `style`-attributt på `.fav-btn` flyttet til CSS
+- ✅ `embed_csv.py`: feilhåndtering for manglende fil, tom CSV og ugyldig header lagt til
+- ✅ Workflow: valideringssteg som sjekker at `data`-arrayen i HTML er gyldig JSON etter `embed_csv.py`
 
 ## Data
 

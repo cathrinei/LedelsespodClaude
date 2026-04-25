@@ -32,6 +32,24 @@ jobs:
       - name: Oppdater HTML
         run: python embed_csv.py
 
+      - name: Valider data-array i HTML
+        run: |
+          python - << 'EOF'
+          import re, json, sys
+          with open("Ledelsepod.html", encoding="utf-8") as f:
+              html = f.read()
+          m = re.search(r"const data = (\[.*?\]);", html, re.DOTALL)
+          if not m:
+              print("FEIL: fant ikke data-array i HTML")
+              sys.exit(1)
+          try:
+              data = json.loads(m.group(1))
+              print(f"OK: {len(data)} episoder validert i data-array")
+          except json.JSONDecodeError as e:
+              print(f"FEIL: ugyldig JSON i data-array: {e}")
+              sys.exit(1)
+          EOF
+
       - name: Commit og push hvis endringer
         run: |
           git config user.name "github-actions[bot]"
