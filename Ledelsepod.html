@@ -717,7 +717,8 @@ function renderTags(tags) {
   return html ? `<span class="tag-group">${html}</span>` : '<span class="no-tags">\u2013</span>';
 }
 // — Favoritter —
-const FAV_KEY = 'ledelsepod_favorites';
+const FAV_KEY       = 'ledelsepod_favorites';
+const SWIPE_USED_KEY = 'ledelsepod_swipe_used';
 function loadFavs() { try { return new Set(JSON.parse(localStorage.getItem(FAV_KEY) || '[]')); } catch { return new Set(); } }
 function saveFavs() { localStorage.setItem(FAV_KEY, JSON.stringify([...favorites])); }
 function favId(row) { return row[0] + '::' + row[1]; }
@@ -795,7 +796,7 @@ function renderTable(rows) {
     `;
     tr.insertAdjacentHTML('beforeend', `
       <td class="card-cell" colspan="10">
-        <div class="ep-card${idx === 0 ? ' ep-card--hint' : ''}" role="article">
+        <div class="ep-card${idx === 0 && !localStorage.getItem(SWIPE_USED_KEY) ? ' ep-card--hint' : ''}" role="article">
           <div class="ep-card__header">
             <button class="cell-podcast" data-podcast="${esc(podcast)}" aria-pressed="${document.getElementById('podcastFilter').value === podcast ? 'true' : 'false'}">${esc(podcast)}</button>
             <span class="ep-card__header-right">
@@ -1112,6 +1113,7 @@ document.getElementById('tableBody').addEventListener('click', e => {
       // Øyeblikkelig reset — DOM erstattes av refresh()
       card.style.transform = '';
       card.style.removeProperty('--swipe-p');
+      localStorage.setItem(SWIPE_USED_KEY, '1');
       const id = tr.dataset.fav;
       if (favorites.has(id)) { favorites.delete(id); } else { favorites.add(id); }
       saveFavs();
