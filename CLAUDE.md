@@ -122,14 +122,14 @@ The `data` array in the HTML is populated from the CSV via `embed_csv.py`. Unrat
 - `resetFilters()` sets `activeTag = ''` and resets active pill state
 - Tags in the table rows are also clickable (`<button class="tag">`) — clicking filters the table and syncs the tag pills in the controls bar; clicking the same tag again clears the filter
 - Event delegation on `#tableBody` handles tag clicks — avoids re-binding on every `renderTable()` call
-- Active row tag gets `outline: 2px solid currentColor` to signal selected state
+- Active row tag gets `filter: brightness(0.82); font-weight: 700` to signal selected state (no outline)
 
 ### Podcast filter
 - `<select id="podcastFilter">` — placed to the right of the rating filter in the controls bar
 - Options populated dynamically from the `data` array (unique podcast names, alphabetically sorted) on page load
 - Filters table to a single show; `resetFilters()` resets it to `""` (Alle podkaster)
 - Podcast names in table rows are rendered as `<button class="cell-podcast" data-podcast="...">` — clicking filters the table and syncs the dropdown; clicking same name again clears the filter
-- Event delegation on `#tableBody` handles podcast clicks — same pattern as tag clicks; `aria-pressed` reflects active state
+- Event delegation on `#tableBody` handles podcast clicks — same pattern as tag clicks; `aria-pressed` reflects active state; aktiv tilstand vises med `text-decoration: underline` (ikke outline)
 
 ### Øvrige tekniske noter
 - Language column (index 2) is kept in CSV/data array but **not displayed** in the table — all episodes are Norwegian
