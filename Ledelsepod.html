@@ -784,7 +784,7 @@ function renderTable(rows) {
     tr.dataset.fav = favId(row);
     tr.innerHTML = `
       <td><button class="cell-podcast" data-podcast="${esc(podcast)}" aria-pressed="${document.getElementById('podcastFilter').value === podcast ? 'true' : 'false'}">${esc(podcast)}</button></td>
-      <td><button class="fav-btn" data-fav="${esc(favId(row))}" aria-label="${favorites.has(favId(row)) ? 'Fjern fra favoritter' : 'Legg til favoritter'}" aria-pressed="${favorites.has(favId(row)) ? 'true' : 'false'}">&#9733;</button><a class="cell-title" href="${safeUrl(link)}" target="_blank" rel="noopener noreferrer">${esc(title)}</a></td>
+      <td><button class="fav-btn" data-fav="${esc(favId(row))}" aria-label="${favorites.has(favId(row)) ? 'Fjern fra favoritter' : 'Legg til favoritter'}" aria-pressed="${favorites.has(favId(row)) ? 'true' : 'false'}">&#9733;</button><a class="cell-title" href="${safeUrl(link)}" target="_blank" rel="noopener noreferrer" aria-label="${esc(title)} (åpnes i ny fane)">${esc(title)}</a></td>
       <td><span class="cell-date">${esc(date)}</span></td>
       <td><span class="cell-person">${esc(hosts)}</span></td>
       <td><span class="cell-person">${esc(guests)}</span></td>
@@ -792,7 +792,7 @@ function renderTable(rows) {
       <td style="text-align:center"><span class="rating-badge${+rating >= 1 && +rating <= 6 ? ' r'+rating : ''}" aria-label="Karakter ${+rating > 0 ? rating : 'ikke vurdert'}">${+rating > 0 ? rating : 'N/A'}</span></td>
       <td><span class="cell-note">${esc(note)}</span></td>
       <td>${renderTags(tags)}</td>
-      <td><a class="listen-link" href="${safeUrl(link)}" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">&#9654;</span> Lytt</a></td>
+      <td><a class="listen-link" href="${safeUrl(link)}" target="_blank" rel="noopener noreferrer" aria-label="Lytt (åpnes i ny fane)"><span aria-hidden="true">&#9654;</span> Lytt</a></td>
     `;
     tr.insertAdjacentHTML('beforeend', `
       <td class="card-cell" colspan="10">
@@ -804,13 +804,13 @@ function renderTable(rows) {
               <span class="rating-badge${+rating >= 1 && +rating <= 6 ? ' r'+rating : ''}" aria-label="Karakter ${+rating > 0 ? rating : 'ikke vurdert'}">${+rating > 0 ? rating : 'N/A'}</span>
             </span>
           </div>
-          <a class="cell-title ep-card__title" href="${safeUrl(link)}" target="_blank" rel="noopener noreferrer">${esc(title)}</a>
+          <a class="cell-title ep-card__title" href="${safeUrl(link)}" target="_blank" rel="noopener noreferrer" aria-label="${esc(title)} (åpnes i ny fane)">${esc(title)}</a>
           <div class="ep-card__meta">
             <span class="cell-date">${esc(date)}</span>
             <span class="cell-person">${esc(hosts)}</span>
           </div>
           <div class="ep-card__tags">${renderTags(tags)}</div>
-          <a class="listen-link ep-card__listen" href="${safeUrl(link)}" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">&#9654;</span> Lytt</a>
+          <a class="listen-link ep-card__listen" href="${safeUrl(link)}" target="_blank" rel="noopener noreferrer" aria-label="Lytt (åpnes i ny fane)"><span aria-hidden="true">&#9654;</span> Lytt</a>
         </div>
       </td>
     `);
