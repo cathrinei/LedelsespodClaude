@@ -368,6 +368,7 @@ tbody tr[data-rating="5"] td:first-child { border-left: 3px solid #1d4ed8; }
 tbody tr[data-rating="4"] td:first-child { border-left: 3px solid #6d28d9; }
 
 /* TAGS */
+.tag-group { display: inline-flex; flex-wrap: wrap; gap: 0.35rem; }
 .tag {
   display: inline-block;
   border-radius: 4px;
@@ -494,7 +495,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible
   .ep-card__header { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; }
   .ep-card__title { font-size: 0.88rem; line-height: 1.4; display: block; }
   .ep-card__meta { display: flex; flex-wrap: wrap; gap: 0.35rem 0.75rem; align-items: center; }
-  .ep-card__tags { display: flex; flex-wrap: wrap; gap: 0.25rem; }
+  .ep-card__tags { display: flex; flex-wrap: wrap; gap: 0.35rem; }
   .ep-card__listen { margin-top: 0.1rem; }
 
   /* Sveip-indikator — gul venstrekant som vokser med sveipedistansen */
@@ -712,7 +713,7 @@ function renderTags(tags) {
     const meta = tagMeta[key];
     return meta ? `<button class="tag ${meta.cls}" data-tag="${key}" aria-pressed="${activeTag === key ? 'true' : 'false'}">${meta.label}</button>` : '';
   }).filter(Boolean).join('');
-  return html || '<span class="no-tags">\u2013</span>';
+  return html ? `<span class="tag-group">${html}</span>` : '<span class="no-tags">\u2013</span>';
 }
 // — Favoritter —
 const FAV_KEY = 'ledelsepod_favorites';
