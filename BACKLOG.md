@@ -12,7 +12,7 @@
 
 ## UX / mobil
 
-- **Sveip-hint**: vises alltid på første kort — bør skjules permanent etter at brukeren har sveipet én gang (lagre i `localStorage`)
+- ✅ **Sveip-hint**: skjules permanent etter første sveip via `localStorage` (`ledelsepod_swipe_used`)
 - **PWA**: legg til `manifest.json` + `<meta>`-tagger for installerbar app på hjemskjermen (~1 time)
 
 ## Kode

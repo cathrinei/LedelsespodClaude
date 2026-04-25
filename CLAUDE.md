@@ -105,7 +105,7 @@ The `data` array in the HTML is populated from the CSV via `embed_csv.py`. Unrat
 - **Favoritter**: `favorites` er et `Set` lagret i `localStorage` (`ledelsepod_favorites`); stjerne-knapp (`.fav-btn`) per rad i EPISODE-cellen (foran tittelen); `favId(row)` bruker `podcast::title` som nøkkel; Favoritter-knapp i kontrollbar toggler `showFavsOnly`-filter; gul stjerne (`#f59e0b`) når aktiv
 - **Mobil sveip-til-favoritt**: sveip høyre (>60px, horisontal dominans) på et episodekort toggler favoritt — event delegation via `touchstart`/`touchmove`/`touchend`/`touchcancel` på `#tableBody` (passive listeners); Y-koordinat spores for å avvise scroll-gester på iOS Safari; `tr.dataset.fav` settes i `renderTable()` for identifikasjon; `.fav-flashed`-klasse trigger gul glimt-animasjon (`@keyframes fav-flash`) som visuell bekreftelse
 - Under sveip: kort forskyves med `translateX`, gul venstrekant vokser via `--swipe-p` CSS-variabel på `::before`; ved avbrytelse snapper kortet tilbake med `.ep-card--snapping` (0.18s ease); `lastX` trackes i `touchmove` og brukes i `touchend` (mer pålitelig enn `changedTouches` på iOS); diagonal-toleranse 0.75 (ikke 0.5) siden iOS alltid legger litt vertikal bevegelse inn
-- Hint "sveip → for favoritt" vises på første kort via `ep-card--hint::after`, `@media (hover: none) and (pointer: coarse)`
+- Hint "sveip → for favoritt" vises på første kort via `ep-card--hint::after`, `@media (hover: none) and (pointer: coarse)` — skjules permanent etter første vellykkede sveip (`localStorage` nøkkel `ledelsepod_swipe_used`)
 - Favoritt-stjerne (`.fav-btn`) vises i mobilkortets header via `.ep-card__header-right` ved siden av rating-badge
 
 ### "↑ Last inn CSV"-knappen
