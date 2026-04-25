@@ -199,6 +199,12 @@ The `data` array in the HTML is populated from the CSV via `embed_csv.py`. Unrat
 - Ingen N/A-episoder skal bli liggende i CSV etter en vellykket kjøring
 - Output: norske statusmeldinger med `OK`/`FJERNES`-prefixer
 
+## embed_csv.py – tekniske noter
+- Leser `Ledelsepod.csv`, serialiserer hver rad som JSON og erstatter `const data = [...]` i `Ledelsepod.html`
+- Validerer: fil finnes, CSV har minst én daterad, header har ≥ 11 kolonner, JSON-serialisering lykkes — `sys.exit(1)` med tydelig feilmelding ved alle feil
+- Rader med færre enn 11 kolonner paddes med tomme strenger
+- `re.subn` forventer nøyaktig 1 treff på `const data = \[.*?\]` — feiler hvis mønsteret ikke finnes eller matcher flere ganger
+
 ## rate_runner.py – tekniske noter
 - Stabil fil med all kjørelogikk — aldri slettes
 - Eksponerer én funksjon: `run(updates, remove_keywords)`
@@ -226,6 +232,8 @@ The `data` array in the HTML is populated from the CSV via `embed_csv.py`. Unrat
 - Kjører daglig kl 10:15 Oslo-tid
 - Ingen secrets nødvendig — bruker `GITHUB_TOKEN` (automatisk tilgjengelig)
 - Manuell trigger tilgjengelig via Actions-knappen i GitHub
+- Steg: fetch → rate → embed → **valider data-array** → commit/push → kjøringssammendrag
+- Valideringssteget (`Valider data-array i HTML`) parser `const data = [...]` som JSON og feiler jobben hvis arrayen er ugyldig — forhindrer at korrupt HTML pushes
 
 ### Manuelt (lokalt)
 1. `python update_podcasts.py` — henter nye episoder
