@@ -100,7 +100,7 @@ header h1 {
 header .subtitle {
   margin-top: 0.3rem;
   font-size: 0.8rem;
-  color: rgba(255,255,255,0.55);
+  color: rgba(255,255,255,0.8);
   letter-spacing: 0.01em;
 }
 #darkToggle {
@@ -562,7 +562,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible
     <select id="podcastFilter" aria-label="Filtrer på podkast">
       <option value="">Alle podkaster</option>
     </select>
-    <button class="btn btn-ghost" id="favToggle" aria-pressed="false">&#9733; Favoritter</button>
+    <button class="btn btn-ghost" id="favToggle" aria-pressed="false"><span aria-hidden="true">&#9733;</span> Favoritter</button>
     <button class="btn btn-ghost" id="resetBtn">Nullstill</button>
     <button class="btn btn-primary" id="updateBtn" style="display:none"><span aria-hidden="true">&#8593;</span> Last inn CSV</button>
     <input type="file" id="csvFile" accept=".csv" style="display:none">
@@ -582,7 +582,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible
   </div>
 </div>
 
-<div class="row-count" id="rowCount" aria-live="polite" aria-atomic="true"></div>
+<div class="row-count" id="rowCount" role="status" aria-live="polite" aria-atomic="true"></div>
 
 <main>
 <div class="table-wrap">
@@ -795,7 +795,7 @@ function renderTable(rows) {
     `;
     tr.insertAdjacentHTML('beforeend', `
       <td class="card-cell" colspan="10">
-        <div class="ep-card${idx === 0 ? ' ep-card--hint' : ''}">
+        <div class="ep-card${idx === 0 ? ' ep-card--hint' : ''}" role="article">
           <div class="ep-card__header">
             <button class="cell-podcast" data-podcast="${esc(podcast)}" aria-pressed="${document.getElementById('podcastFilter').value === podcast ? 'true' : 'false'}">${esc(podcast)}</button>
             <span class="ep-card__header-right">

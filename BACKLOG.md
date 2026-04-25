@@ -4,11 +4,11 @@
 
 | Element | Forbedring |
 |---|---|
-| `.stat-btn` | Mangler eksplisitt `:focus-visible`-stil |
-| `#rowCount` | Mangler `role="status"` for semantisk klarhet |
-| Stjerne-ikon `★` i kolonneheader | Bør ha `aria-hidden="true"` |
-| `.ep-card` (mobilkort) | Mangler semantisk `role="article"` |
-| `header .subtitle` | Kontrast `rgba(255,255,255,0.55)` er marginal (~4.5:1) på mørk bakgrunn |
+| `.stat-btn` | ✅ Eksplisitt `:focus-visible`-stil finnes |
+| `#rowCount` | ✅ `role="status"` lagt til |
+| Stjerne-ikon `★` i kolonneheader | ✅ Stjerne fjernet fra kolonneheader; `aria-hidden` lagt til i favToggle-knapp |
+| `.ep-card` (mobilkort) | ✅ `role="article"` lagt til |
+| `header .subtitle` | ✅ Kontrast økt til `rgba(255,255,255,0.8)` |
 
 ## UX / mobil
 

@@ -292,9 +292,4 @@ Disse er identifisert men ikke utbedret — kan tas ved anledning:
 
 | Element | Forbedring |
 |---|---|
-| `.stat-btn` (`role="button"`) | Mangler eksplisitt `:focus-visible`-stil — arver ikke fra standard `button`-selector |
-| `#rowCount` | Har `aria-live="polite"` men mangler `role="status"` for semantisk klarhet |
-| Stjerne-ikon `&#9733;` i kolonneheader | Bør ha `aria-hidden="true"` |
-| `header .subtitle` | Kontrast `rgba(255,255,255,0.55)` på mørk bakgrunn er marginal (~4.5:1) |
-| `.ep-card` (mobilkort) | Mangler semantisk `role="article"` eller tilsvarende landmark |
 | `<caption>` i tabell | Bør stå rett etter `<table>` — nå plassert etter `<thead>` |
