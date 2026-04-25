@@ -270,7 +270,8 @@ git branch -d navn-på-branch  # slett branch lokalt
 
 ### Branch protection (Rulesets)
 Branch protection er fjernet — ingen rulesets aktive på `master`.
-Push direkte til master er mulig for alle med skrivetilgang, inkludert `github-actions[bot]`.
+- **Utvikling:** alltid via branch + PR (se branch-workflow over)
+- **GitHub Actions:** pusher direkte til master som unntak — nødvendig for den automatiske daglige oppdateringen (fetch → rate → embed → push)
 7. **Etter HTML-endringer — WCAG AA-sjekk:** verifiser følgende før publisering:
    - **Kontrast:** all brødtekst ≥ 4.5:1, stor tekst (18pt / 14pt bold) ≥ 3:1 — sjekk både lys og mørk modus
    - **Nye interaktive elementer:** knapper og lenker må ha synlig tekst eller `aria-label`; skjemafelt må ha tilknyttet `<label>` eller `aria-label`
