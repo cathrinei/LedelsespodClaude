@@ -103,7 +103,10 @@ The `data` array in the HTML is populated from the CSV via `embed_csv.py`. Unrat
 - Tom tilstand: når `renderTable()` får `rows.length === 0` vises en rad med melding og snarvei til `resetFilters()`
 - **URL-tilstand**: `filtersToUrl()` oppdaterer URL-parametere (`search`, `rating`, `podcast`, `tag`, `favs`) ved hver filterendring via `history.replaceState` — filtrert visning kan deles som URL; `applyUrlFilters()` leser og gjenoppretter tilstand ved sideinnlasting
 - **Favoritter**: `favorites` er et `Set` lagret i `localStorage` (`ledelsepod_favorites`); stjerne-knapp (`.fav-btn`) per rad i EPISODE-cellen (foran tittelen); `favId(row)` bruker `podcast::title` som nøkkel; Favoritter-knapp i kontrollbar toggler `showFavsOnly`-filter; gul stjerne (`#f59e0b`) når aktiv
-- **Mobil sveip-til-favoritt**: sveip høyre (>60px, horisontal dominans) på et episodekort toggler favoritt — event delegation via `touchstart`/`touchend` på `#tableBody` (passive listeners); Y-koordinat spores for å avvise scroll-gester på iOS Safari; `tr.dataset.fav` settes i `renderTable()` for identifikasjon; `.fav-flashed`-klasse trigger gul glimt-animasjon (`@keyframes fav-flash`) som visuell bekreftelse
+- **Mobil sveip-til-favoritt**: sveip høyre (>60px, horisontal dominans) på et episodekort toggler favoritt — event delegation via `touchstart`/`touchmove`/`touchend`/`touchcancel` på `#tableBody` (passive listeners); Y-koordinat spores for å avvise scroll-gester på iOS Safari; `tr.dataset.fav` settes i `renderTable()` for identifikasjon; `.fav-flashed`-klasse trigger gul glimt-animasjon (`@keyframes fav-flash`) som visuell bekreftelse
+- Under sveip: kort forskyves med `translateX`, gul venstrekant vokser via `--swipe-p` CSS-variabel på `::before`; ved avbrytelse snapper kortet tilbake med `.ep-card--snapping` (0.18s ease); `lastX` trackes i `touchmove` og brukes i `touchend` (mer pålitelig enn `changedTouches` på iOS); diagonal-toleranse 0.75 (ikke 0.5) siden iOS alltid legger litt vertikal bevegelse inn
+- Hint "sveip → for favoritt" vises på første kort via `ep-card--hint::after`, `@media (hover: none) and (pointer: coarse)`
+- Favoritt-stjerne (`.fav-btn`) vises i mobilkortets header via `.ep-card__header-right` ved siden av rating-badge
 
 ### "↑ Last inn CSV"-knappen
 - Knappen er skjult (`display:none`) — data oppdateres automatisk via GitHub Actions
@@ -121,6 +124,7 @@ The `data` array in the HTML is populated from the CSV via `embed_csv.py`. Unrat
 - Active tag stored in JS module-level variable `let activeTag = ''` — pills set it directly, `getFiltered()` reads it
 - `resetFilters()` sets `activeTag = ''` and resets active pill state
 - Tags in the table rows are also clickable (`<button class="tag">`) — clicking filters the table and syncs the tag pills in the controls bar; clicking the same tag again clears the filter
+- `renderTags()` wraps tags i `<span class="tag-group">` (`.tag-group { display: inline-flex; gap: 0.35rem }`) for konsistent avstand mellom tags i både tabell og mobilkort
 - Event delegation on `#tableBody` handles tag clicks — avoids re-binding on every `renderTable()` call
 - Active row tag gets `filter: brightness(0.82); font-weight: 700` to signal selected state (no outline)
 
