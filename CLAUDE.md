@@ -269,10 +269,8 @@ git branch -d navn-på-branch  # slett branch lokalt
 ```
 
 ### Branch protection (Rulesets)
-Repoet har en ruleset på `master` satt opp via Settings → Rules → Rulesets:
-- **Bypass:** Repository admin (cathrinei) — kan pushe direkte og overstyre regler
-- **Rule:** Restrict deletions — ingen kan slette master-branchen
-- `github-actions[bot]` er ikke tilgjengelig som bypass-aktør på gratis plan; boten kan pushe fordi kun `Restrict deletions` er aktivert (ikke push-restriksjoner)
+Branch protection er fjernet — ingen rulesets aktive på `master`.
+Push direkte til master er mulig for alle med skrivetilgang, inkludert `github-actions[bot]`.
 7. **Etter HTML-endringer — WCAG AA-sjekk:** verifiser følgende før publisering:
    - **Kontrast:** all brødtekst ≥ 4.5:1, stor tekst (18pt / 14pt bold) ≥ 3:1 — sjekk både lys og mørk modus
    - **Nye interaktive elementer:** knapper og lenker må ha synlig tekst eller `aria-label`; skjemafelt må ha tilknyttet `<label>` eller `aria-label`
