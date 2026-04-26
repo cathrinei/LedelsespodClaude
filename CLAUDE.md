@@ -18,6 +18,7 @@ This project collects and curates Norwegian-language podcast episodes on **teaml
 - `rate_episodes.py` — data-only (UPDATES + REMOVE_KEYWORDS); skrives per raterunde, slettes etter bruk
 - `embed_csv.py` — skriver CSV-innholdet inn i HTML-filens `data`-array; kjøres etter hver raterunde
 - `rejected_episodes.csv` — denylist; episodes here are never re-fetched by `update_podcasts.py`
+- `failed_attempts.csv` — teller mislykkede API-forsøk per episode; etter `MAX_ATTEMPTS=3` forsøk sendes episoden automatisk til `rejected_episodes.csv`
 - `.github/workflows/update_podcasts.yml` — GitHub Actions workflow; kjører daglig kl 10:15, manuell trigger tilgjengelig
 - `.gitignore` — ekskluderer `__pycache__/`, `*.pyc`, `*.pyo`, `.env`
 
@@ -195,9 +196,11 @@ The `data` array in the HTML is populated from the CSV via `embed_csv.py`. Unrat
 - `host`-feltet fra modellen brukes kun hvis RSS-hentet vertsnavn mangler (RSS har prioritet)
 - Rating 4–6: beholdes i CSV med utfylte felt
 - Rating 1–3: fjernes fra CSV og skrives til `rejected_episodes.csv` (med deduplicering via `normalize()`)
-- Ingen gyldig respons / ugyldig rating: fjernes midlertidig fra CSV, legges **ikke** i `rejected_episodes.csv` — re-hentes og re-prøves neste kjøring
+- Ingen gyldig respons / ugyldig rating: telles i `failed_attempts.csv` — fjernes fra CSV og re-prøves neste kjøring; etter `MAX_ATTEMPTS=3` forsøk sendes episoden til `rejected_episodes.csv`
+- `load_failed_attempts()` / `save_failed_attempts()` — laster/lagrer `failed_attempts.csv` som `{(podcast_lower, title_lower): attempts}`
+- Nøkkel fjernes fra `failed_attempts` når episode får gyldig rating (uansett om den beholdes eller forkastes)
 - Ingen N/A-episoder skal bli liggende i CSV etter en vellykket kjøring
-- Output: norske statusmeldinger med `OK`/`FJERNES`-prefixer
+- Output: norske statusmeldinger med `OK`/`FJERNES`/`FORKASTES`-prefixer
 
 ## embed_csv.py – tekniske noter
 - Leser `Ledelsepod.csv`, serialiserer hver rad som JSON og erstatter `const data = [...]` i `Ledelsepod.html`
