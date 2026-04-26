@@ -23,4 +23,5 @@
 
 ## Data
 
+- ✅ **Auto-reject etter 3 mislykkede forsøk**: `failed_attempts.csv` teller API-feil per episode; etter `MAX_ATTEMPTS=3` sendes episoden til `rejected_episodes.csv` automatisk
 - Vurdere å legge til flere podcast-kilder i `FEEDS`-dicten i `update_podcasts.py`
