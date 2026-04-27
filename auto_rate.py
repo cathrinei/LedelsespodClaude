@@ -23,14 +23,14 @@ import os
 import sys
 
 from openai import OpenAI
+from rate_runner import append_rejected, normalize
 
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
-BASE_DIR      = os.path.dirname(os.path.abspath(__file__))
-CSV_PATH      = os.path.join(BASE_DIR, "Ledelsepod.csv")
-REJECTED_PATH = os.path.join(BASE_DIR, "rejected_episodes.csv")
-FAILED_PATH   = os.path.join(BASE_DIR, "failed_attempts.csv")
-MAX_ATTEMPTS  = 3
+BASE_DIR    = os.path.dirname(os.path.abspath(__file__))
+CSV_PATH    = os.path.join(BASE_DIR, "Ledelsepod.csv")
+FAILED_PATH = os.path.join(BASE_DIR, "failed_attempts.csv")
+MAX_ATTEMPTS = 3
 
 SYSTEM_PROMPT = """Du er en ekspert på norske ledelsespodcaster. Din oppgave er å vurdere om en podkastepisode er relevant for temaene **teamledelse** eller **personalledelse**, og gi den en rating.
 
@@ -74,10 +74,6 @@ Svar alltid med gyldig JSON og ingen annen tekst:
 }"""
 
 
-def normalize(s: str) -> str:
-    return s.strip().lower()
-
-
 def load_failed_attempts() -> dict[tuple[str, str], int]:
     """Leser failed_attempts.csv og returnerer {(podcast_lower, title_lower): attempts}."""
     if not os.path.exists(FAILED_PATH):
@@ -102,28 +98,22 @@ def save_failed_attempts(attempts: dict[tuple[str, str], int]) -> None:
             w.writerow([podcast, title, count])
 
 
-def append_rejected(removed_rows: list[list]) -> None:
-    """Legger forkastede episoder til rejected_episodes.csv (unngår duplikater)."""
-    existing: set[tuple[str, str]] = set()
-    file_exists = os.path.exists(REJECTED_PATH)
-    if file_exists:
-        with open(REJECTED_PATH, encoding="utf-8", newline="") as f:
-            for r in csv.reader(f):
-                if len(r) >= 2 and r[0] != "Podcast Name":
-                    existing.add((normalize(r[0]), normalize(r[1])))
-
-    write_header = not file_exists or os.path.getsize(REJECTED_PATH) == 0
-    new_entries = [r for r in removed_rows
-                   if (normalize(r[0]), normalize(r[1])) not in existing]
-    if not new_entries:
-        return
-
-    with open(REJECTED_PATH, "a", encoding="utf-8", newline="") as f:
-        w = csv.writer(f)
-        if write_header:
-            w.writerow(["Podcast Name", "Episode Title"])
-        for row in new_entries:
-            w.writerow([row[0], row[1]])
+def _handle_failure(
+    failed_attempts: dict, key: tuple, row: list, i: int,
+    reason: str, removed_rows: list, rows_to_remove: set
+) -> bool:
+    """Teller opp feil for en episode. Returnerer True hvis episoden nå auto-forkastes."""
+    attempts = failed_attempts.get(key, 0) + 1
+    if attempts >= MAX_ATTEMPTS:
+        print(f"    FORKASTES  {reason}, {attempts} forsøk — sendes til rejected_episodes.csv\n")
+        removed_rows.append(row)
+        rows_to_remove.add(i)
+        failed_attempts.pop(key, None)
+        return True
+    print(f"    FJERNES  {reason} — forsøk {attempts}/{MAX_ATTEMPTS}, re-prøves neste kjøring\n")
+    rows_to_remove.add(i)
+    failed_attempts[key] = attempts
+    return False
 
 
 def rate_episode(client: OpenAI, podcast: str, title: str,
@@ -192,6 +182,7 @@ def main() -> None:
     removed_rows = []
     rows_to_remove = set()
     failed_attempts = load_failed_attempts()
+    failed_attempts_initial = dict(failed_attempts)
     auto_rejected = 0
 
     for i, row in unrated:
@@ -208,17 +199,8 @@ def main() -> None:
 
         result = rate_episode(client, podcast, title, pub_date, link)
         if result is None:
-            attempts = failed_attempts.get(key, 0) + 1
-            if attempts >= MAX_ATTEMPTS:
-                print(f"    FORKASTES  {attempts} mislykkede forsøk — sendes til rejected_episodes.csv\n")
-                removed_rows.append(row)
-                rows_to_remove.add(i)
-                failed_attempts.pop(key, None)
+            if _handle_failure(failed_attempts, key, row, i, "Ingen gyldig respons", removed_rows, rows_to_remove):
                 auto_rejected += 1
-            else:
-                print(f"    FJERNES  Ingen gyldig respons — forsøk {attempts}/{MAX_ATTEMPTS}, re-prøves neste kjøring\n")
-                rows_to_remove.add(i)
-                failed_attempts[key] = attempts
             continue
 
         rating_raw = result.get("rating", 0)
@@ -228,20 +210,10 @@ def main() -> None:
             rating = 0
 
         if rating <= 0 or rating > 6:
-            attempts = failed_attempts.get(key, 0) + 1
-            if attempts >= MAX_ATTEMPTS:
-                print(f"    FORKASTES  Ugyldig rating ({rating_raw}), {attempts} forsøk — sendes til rejected_episodes.csv\n")
-                removed_rows.append(row)
-                rows_to_remove.add(i)
-                failed_attempts.pop(key, None)
+            if _handle_failure(failed_attempts, key, row, i, f"Ugyldig rating ({rating_raw})", removed_rows, rows_to_remove):
                 auto_rejected += 1
-            else:
-                print(f"    FJERNES  Ugyldig rating ({rating_raw}) — forsøk {attempts}/{MAX_ATTEMPTS}, re-prøves neste kjøring\n")
-                rows_to_remove.add(i)
-                failed_attempts[key] = attempts
             continue
 
-        # Gyldig rating — rydd opp i failed_attempts om episoden var der
         failed_attempts.pop(key, None)
 
         if rating <= 3:
@@ -266,7 +238,8 @@ def main() -> None:
     with open(CSV_PATH, "w", encoding="utf-8", newline="") as f:
         csv.writer(f).writerows([header] + kept)
 
-    save_failed_attempts(failed_attempts)
+    if failed_attempts != failed_attempts_initial:
+        save_failed_attempts(failed_attempts)
 
     if removed_rows:
         append_rejected(removed_rows)

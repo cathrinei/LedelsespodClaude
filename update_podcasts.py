@@ -214,7 +214,7 @@ def main():
     month = now.month - 6
     year = now.year + (month - 1) // 12
     month = ((month - 1) % 12) + 1
-    default_from  = now.replace(year=year, month=month)
+    default_from  = now.replace(year=year, month=month, day=1)
 
     all_new = []
     print(f"\nSjekker {len(FEEDS)} podcast-feeder...\n")
