@@ -32,17 +32,15 @@ def _should_remove(remove_keywords, podcast, title):
     return any(p == kpod and kword in t for kpod, kword in remove_keywords)
 
 
-def _append_rejected(removed_rows):
+def append_rejected(removed_rows):
     """Skriver forkastede episoder til rejected_episodes.csv (unngår duplikater)."""
     existing = set()
-    file_exists = os.path.exists(REJECTED_PATH)
-    if file_exists:
+    if os.path.exists(REJECTED_PATH):
         with open(REJECTED_PATH, encoding="utf-8", newline="") as f:
             for r in csv.reader(f):
                 if len(r) >= 2 and r[0] != "Podcast Name":
                     existing.add((normalize(r[0]), normalize(r[1])))
 
-    write_header = not file_exists or os.path.getsize(REJECTED_PATH) == 0
     new_entries = [r for r in removed_rows
                    if (normalize(r[0]), normalize(r[1])) not in existing]
     if not new_entries:
@@ -50,7 +48,7 @@ def _append_rejected(removed_rows):
 
     with open(REJECTED_PATH, "a", encoding="utf-8", newline="") as f:
         w = csv.writer(f)
-        if write_header:
+        if not existing:
             w.writerow(["Podcast Name", "Episode Title"])
         for row in new_entries:
             w.writerow([row[0], row[1]])
@@ -97,7 +95,7 @@ def run(updates, remove_keywords):
         csv.writer(f).writerows([header] + kept)
 
     if removed_rows:
-        _append_rejected(removed_rows)
+        append_rejected(removed_rows)
 
     print(f"\nOK {updated} episoder oppdatert med rating/noter/tags")
     print(f"OK {len(removed_rows)} episoder fjernet (rating 1-3) og lagt til rejected_episodes.csv")
