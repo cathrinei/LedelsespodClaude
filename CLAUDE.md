@@ -19,7 +19,7 @@ This project collects and curates Norwegian-language podcast episodes on **teaml
 - `embed_csv.py` — skriver CSV-innholdet inn i HTML-filens `data`-array; kjøres etter hver raterunde
 - `rejected_episodes.csv` — denylist; episodes here are never re-fetched by `update_podcasts.py`
 - `failed_attempts.csv` — teller mislykkede API-forsøk per episode; etter `MAX_ATTEMPTS=3` forsøk sendes episoden automatisk til `rejected_episodes.csv`
-- `.github/workflows/update_podcasts.yml` — GitHub Actions workflow; kjører daglig kl 10:15, manuell trigger tilgjengelig
+- `.github/workflows/update_podcasts.yml` — GitHub Actions workflow; kjører daglig kl 23:05, manuell trigger tilgjengelig
 - `.gitignore` — ekskluderer `__pycache__/`, `*.pyc`, `*.pyo`, `.env`
 
 ## CSV columns
