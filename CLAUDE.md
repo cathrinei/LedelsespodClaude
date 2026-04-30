@@ -21,6 +21,8 @@ This project collects and curates Norwegian-language podcast episodes on **teaml
 - `failed_attempts.csv` — teller mislykkede API-forsøk per episode; etter `MAX_ATTEMPTS=3` forsøk sendes episoden automatisk til `rejected_episodes.csv`
 - `.github/workflows/update_podcasts.yml` — GitHub Actions workflow; kjører onsdag og fredag kl 23:05, manuell trigger tilgjengelig
 - `.gitignore` — ekskluderer `__pycache__/`, `*.pyc`, `*.pyo`, `.env`
+- `docs/HTML_NOTES.md` — tekniske detaljer om Ledelsepod.html (stats, filter, mobil, dark mode osv.)
+- `docs/SCRIPTS.md` — tekniske detaljer om alle Python-skript og CSV-filer
 
 ## CSV columns
 
@@ -89,150 +91,10 @@ Two layers — combine with comma (e.g. `teamledelse,feedback`):
 | Smidigpodden | https://feeds.acast.com/public/shows/62b2e41c423bc40013892e2d |
 | Psykologkameratene | https://feed.podbean.com/psykologkameratene/feed.xml |
 
-## HTML – tekniske noter
-
-### Data array
-The `data` array in the HTML is populated from the CSV via `embed_csv.py`. Unrated episodes (Rating=0) display as **N/A** and always pass through the rating filter.
-
-### Stats
-`updateStats()` computes all stats from the `data` array:
-- Total episodes, shows, teamledelse-tagged count, personalledelse-tagged count, top-rated (6/6), unrated (N/A)
-- Four stat cards are clickable filter shortcuts (`.stat-btn`): **Episoder** (reset all), **Teamledelse** (tag filter), **Personalledelse** (tag filter), **Toppkarakter 6/6** (rating=6)
-- Active stat card gets green background; clicking again toggles the filter off
-- `updateStatBtns()` syncs active state of stat cards with current filter state; called after every filter action and from `resetFilters()`
-- `updateResetBtn()` toggles `.filters-active` class on Nullstill-knappen når søk, rating, podkast, tag eller favoritter er aktivt — grønn kant og tekst som visuelt signal; called from `refresh()`
-- Tom tilstand: når `renderTable()` får `rows.length === 0` vises en rad med melding og snarvei til `resetFilters()`
-- **URL-tilstand**: `filtersToUrl()` oppdaterer URL-parametere (`search`, `rating`, `podcast`, `tag`, `favs`) ved hver filterendring via `history.replaceState` — filtrert visning kan deles som URL; `applyUrlFilters()` leser og gjenoppretter tilstand ved sideinnlasting
-- **Favoritter**: `favorites` er et `Set` lagret i `localStorage` (`ledelsepod_favorites`); stjerne-knapp (`.fav-btn`) per rad i EPISODE-cellen (foran tittelen); `favId(row)` bruker `podcast::title` som nøkkel; Favoritter-knapp i kontrollbar toggler `showFavsOnly`-filter; gul stjerne (`#f59e0b`) når aktiv
-- **Mobil sveip-til-favoritt**: sveip høyre (>60px, horisontal dominans) på et episodekort toggler favoritt — event delegation via `touchstart`/`touchmove`/`touchend`/`touchcancel` på `#tableBody` (passive listeners); Y-koordinat spores for å avvise scroll-gester på iOS Safari; `tr.dataset.fav` settes i `renderTable()` for identifikasjon; `.fav-flashed`-klasse trigger gul glimt-animasjon (`@keyframes fav-flash`) som visuell bekreftelse
-- Under sveip: kort forskyves med `translateX`, gul venstrekant vokser via `--swipe-p` CSS-variabel på `::before`; ved avbrytelse snapper kortet tilbake med `.ep-card--snapping` (0.18s ease); `lastX` trackes i `touchmove` og brukes i `touchend` (mer pålitelig enn `changedTouches` på iOS); diagonal-toleranse 0.75 (ikke 0.5) siden iOS alltid legger litt vertikal bevegelse inn
-- Hint "sveip → for favoritt" vises på første kort via `ep-card--hint::after`, `@media (hover: none) and (pointer: coarse)` — skjules permanent etter første vellykkede sveip (`localStorage` nøkkel `ledelsepod_swipe_used`)
-- Favoritt-stjerne (`.fav-btn`) vises i mobilkortets header via `.ep-card__header-right` ved siden av rating-badge
-
-### "↑ Last inn CSV"-knappen
-- Knappen er skjult (`display:none`) — data oppdateres automatisk via GitHub Actions
-- Funksjonaliteten er beholdt i koden (kan vises igjen ved å fjerne `style="display:none"`)
-- Logikk: åpner fil-picker, leser med `FileReader` (UTF-8, maks 5 MB), `parseCSV()` → `data`-array → `updateStats()` + `refresh()`
-
-### Dark mode
-- Toggle button (☾ Mørk / ☀ Lys) in top-right of header
-- Preference persisted in `localStorage` (`darkMode` key)
-- Deep forest green gradient header (`#0b1f10 → #1e4a30`) — distinguishes from the AI project's blue theme
-- Dark mode uses deep black-green background (`#080d08`) with bright green accent (`#4ade80`)
-
-### Tag filter
-- Rendered as clickable **pill buttons** (not a `<select>`) — IDs: `.tag-pill` with `data-tag` attribute
-- Active tag stored in JS module-level variable `let activeTag = ''` — pills set it directly, `getFiltered()` reads it
-- `resetFilters()` sets `activeTag = ''` and resets active pill state
-- Tags in the table rows are also clickable (`<button class="tag">`) — clicking filters the table and syncs the tag pills in the controls bar; clicking the same tag again clears the filter
-- `renderTags()` wraps tags i `<span class="tag-group">` (`.tag-group { display: inline-flex; gap: 0.35rem }`) for konsistent avstand mellom tags i både tabell og mobilkort
-- Event delegation on `#tableBody` handles tag clicks — avoids re-binding on every `renderTable()` call
-- Active row tag gets `filter: brightness(0.82); font-weight: 700` to signal selected state (no outline)
-
-### Podcast filter
-- `<select id="podcastFilter">` — placed to the right of the rating filter in the controls bar
-- Options populated dynamically from the `data` array (unique podcast names, alphabetically sorted) on page load
-- Filters table to a single show; `resetFilters()` resets it to `""` (Alle podkaster)
-- Podcast names in table rows are rendered as `<button class="cell-podcast" data-podcast="...">` — clicking filters the table and syncs the dropdown; clicking same name again clears the filter
-- Event delegation on `#tableBody` handles podcast clicks — same pattern as tag clicks; `aria-pressed` reflects active state; aktiv tilstand vises med `text-decoration: underline` (ikke outline)
-
-### Øvrige tekniske noter
-- Language column (index 2) is kept in CSV/data array but **not displayed** in the table — all episodes are Norwegian
-- Sort: `sort` object (`col`, `asc`); `RATING_COL = 7`, `DATE_COL = 3` — default sort is date descending (newest first)
-- `data-col` in table headers refers to **data array indices** (col 2 is skipped in table display — so `data-col="3"` = date, `data-col="4"` = hosts, etc.)
-- Tags whitelisted via `tagMeta` — 7 tags: `teamledelse`, `personalledelse`, `feedback`, `kultur`, `rekruttering`, `motivasjon`, `coaching`
-- Tags can be combined (comma-separated); `tagsOf(row)` helper used for all tag checks
-- Episode titles are rendered as `<a class="cell-title">` links — clicking opens the episode URL in a new tab; styled to look like plain text (no underline until hover)
-- `safeUrl()` blocks non-HTTP(S) URLs to prevent `javascript:` injection
-- CSP: `default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; connect-src 'self'`
-- Default filter on load: rating 4+; N/A episodes always shown regardless of filter
-- CSV upload capped at 5 MB
-- Controls bar is **sticky** (`position: sticky; top: 0`) — stays visible while scrolling
-- Rating badges use solid colors (no gradient): green `#166534` (6), blue `#1d4ed8` (5), purple `#6d28d9` (4) — with subtle `box-shadow` ring
-- Rows get `data-rating` attribute in `renderTable()` — used for CSS left-border accent per rating level (`td:first-child`)
-- Thin vertical column dividers: `rgba(255,255,255,0.08)` on `thead th:not(:last-child)`, `var(--table-divider)` on `tbody td:not(:last-child)`
-- Horizontal row dividers: `border-bottom: 1px solid var(--table-divider)` on `tbody tr` — begge bruker `--table-divider` (`#7a9c7e` lyst / `#4a6e4c` mørkt) for tydelig og konsistent rutenett
-- Column header and cell horizontal padding: `1.1rem`
-- `--text-faint` darkened to `#526b55` (light) / `#5a9060` (dark) — passes WCAG AA (≥4.5:1)
-- Rating badge class applied with `+rating >= 1` (not array `.includes()`) to handle string values from data array
-- `getFiltered()` uses `+rating` for numeric coercion — handles both string (pre-populated) and int (CSV-loaded) rating values
-- `updateStats()` runs a single pass over `data` to compute all six stats
-- `data` array is **pre-populated** in the HTML via `embed_csv.py` — no manual CSV import needed
-
-### Mobilvisning (≤600px)
-- Breakpoint `@media (max-width: 600px)` bytter fra tabell til kortlayout
-- `renderTable()` injiserer en `<td class="card-cell" colspan="10">` per rad via `insertAdjacentHTML` — skjult på desktop, synlig på mobil
-- Kortet viser: podcastnavn, rating-badge, klikkbar tittel, dato, vert, tags, Lytt-knapp. Gjester, emner og begrunnelse utelates
-- Tabell og `<thead>` skjules med `display:none` på mobil; `tbody tr` blir `display:block` med kortutseende
-- Rating-fargekant (`border-left`) bevares på `<tr>` også i kortvisning
-- Header stables vertikalt, stats vises i 2-kolonners grid, kontroller full bredde på mobil
-- Dark mode fungerer automatisk via CSS-variabler
-
-## update_podcasts.py – tekniske noter
-- `FEEDS` dict: add new podcasts with name (must match CSV) and RSS URL — 8 feeds currently
-- Fetches only episodes newer than last known date per podcast (`latest_date_per_podcast`)
-- `User-Agent` set to `LedelsepodCrawler/1.0 (privat bruk)` — honest identifier, not browser spoofing
-- Language hardcoded to `"Norwegian"` for all fetched episodes (Norwegian-only project)
-- New episodes get `Rating=0` — automatically rated by `auto_rate.py` in the next step
-- Episodes older than 6 months are pruned from the CSV on every run (rullerende vindu)
-- `default_from` beregnes dynamisk som `today - 6 months` — ikke lenger hardkodet til 2026
-- `pending_review()` runs at end of every execution using pruned rows — flags unrated episodes older than 5 days
-- `REVIEW_AFTER_DAYS = 2` constant controls the threshold
-- Errors distinguish between HTTP errors and network errors
-- `REJECTED_PATH` points to `rejected_episodes.csv` — loaded via `load_rejected()` at startup
-- `existing_keys` built from current CSV rows — prevents re-adding duplicates within CSV
-- New episodes filtered against both `rejected` and `existing_keys` before being appended
-- Per-feed output shows: `+ N ny(e)`, `N hoppet over (forkastet)`, `N duplikat(er)` as relevant
-- `_extract_host(podcast_name, item, channel)` henter vertsnavn direkte fra RSS — prioriteringsrekkefølge: `itunes:author` (item) → `dc:creator` (item) → `HOST_OVERRIDES` → `itunes:author` (channel) → `managingEditor` (channel)
-- `HOST_OVERRIDES` dict: manuell overstyring for podcaster der RSS kun inneholder forkortet navn eller organisasjonsnavn — aktive oppføringer: Lederskap (NHH) → "Therese Egeland, Joel W. Berge", Lederliv → "Ole Christian Apeland"
-
-## auto_rate.py – tekniske noter
-- Krever `pip install openai` og miljøvariabel `GITHUB_TOKEN`
-- `GITHUB_TOKEN` er alltid tilgjengelig i GitHub Actions — ingen secrets å sette opp
-- Bruker GitHub Models via OpenAI-kompatibelt API: `https://models.inference.ai.azure.com`
-- Modell: `gpt-4o-mini` (gratis for offentlige repos, 150 req/dag)
-- Leser CSV, finner alle rader med `Rating=0`, kaller API for hver episode
-- Svarformat: JSON med feltene `host`, `guest`, `main_topics`, `rating`, `rating_notes`, `tags`
-- `host`-feltet fra modellen brukes kun hvis RSS-hentet vertsnavn mangler (RSS har prioritet)
-- Rating 4–6: beholdes i CSV med utfylte felt
-- Rating 1–3: fjernes fra CSV og skrives til `rejected_episodes.csv` (med deduplicering via `normalize()`)
-- Ingen gyldig respons / ugyldig rating: telles i `failed_attempts.csv` — fjernes fra CSV og re-prøves neste kjøring; etter `MAX_ATTEMPTS=3` forsøk sendes episoden til `rejected_episodes.csv`
-- `load_failed_attempts()` / `save_failed_attempts()` — laster/lagrer `failed_attempts.csv` som `{(podcast_lower, title_lower): attempts}`
-- Nøkkel fjernes fra `failed_attempts` når episode får gyldig rating (uansett om den beholdes eller forkastes)
-- Ingen N/A-episoder skal bli liggende i CSV etter en vellykket kjøring
-- Output: norske statusmeldinger med `OK`/`FJERNES`/`FORKASTES`-prefixer
-
-## embed_csv.py – tekniske noter
-- Leser `Ledelsepod.csv`, serialiserer hver rad som JSON og erstatter `const data = [...]` i `Ledelsepod.html`
-- Validerer: fil finnes, CSV har minst én daterad, header har ≥ 11 kolonner, JSON-serialisering lykkes — `sys.exit(1)` med tydelig feilmelding ved alle feil
-- Rader med færre enn 11 kolonner paddes med tomme strenger
-- `re.subn` forventer nøyaktig 1 treff på `const data = \[.*?\]` — feiler hvis mønsteret ikke finnes eller matcher flere ganger
-
-## rate_runner.py – tekniske noter
-- Stabil fil med all kjørelogikk — aldri slettes
-- Eksponerer én funksjon: `run(updates, remove_keywords)`
-- Internt: `_find_update()`, `_should_remove()`, `_append_rejected()` — alle prefixet `_` (ikke ment for direkte bruk)
-- `WARN`-output viser kun episoder med `Rating=0` uten treff i `UPDATES` — allerede ratede episoder vises ikke
-- `sys.stdout.reconfigure(encoding="utf-8", errors="replace")` sikrer korrekt output i Windows-terminal (emojis i titler)
-
-## rate_episodes.py – tekniske noter
-- Skrives på nytt for hver raterunde — kun data, ~10–15 linjer
-- Inneholder `UPDATES`-dict og `REMOVE_KEYWORDS`-liste, importerer og kaller `run()` fra `rate_runner.py`
-- `UPDATES`: nøkkel `(podcast_name_lower, title_keyword_lower)` → `(host, guest, topics, rating, notes, tags)` — substring-matching mot tittel
-- `REMOVE_KEYWORDS`: episoder som fjernes fra CSV og skrives til `rejected_episodes.csv`
-- Kjøres én gang og slettes etter bruk
-
-## rejected_episodes.csv – tekniske noter
-- Two columns: `Podcast Name`, `Episode Title` (case-insensitive matching)
-- Episodes here are **never re-added** by `update_podcasts.py`, regardless of date
-- Auto-populated by `rate_episodes.py` when episodes are removed (rated 1–3)
-- Can also be edited manually to block specific episodes permanently
-- `_append_rejected()` in `rate_runner.py` deduplicates before writing — safe to run multiple times; uses `normalize()` for consistent casing and a single `os.path.exists` check
-
 ## Workflow
 
 ### Automatisk (GitHub Actions — aktiv)
-- Kjører daglig kl 10:15 Oslo-tid
+- Kjører onsdag og fredag kl 23:05 Oslo-tid
 - Ingen secrets nødvendig — bruker `GITHUB_TOKEN` (automatisk tilgjengelig)
 - Manuell trigger tilgjengelig via Actions-knappen i GitHub
 - Steg: fetch → rate → embed → **valider data-array** → commit/push → kjøringssammendrag
@@ -254,34 +116,16 @@ The `data` array in the HTML is populated from the CSV via `embed_csv.py`. Unrat
 
 **CLAUDE.md skal alltid committes i samme commit som kodeendringene den dokumenterer** — ikke i en separat PR etterpå.
 
-```
-git checkout -b 2026-04-23
-git push -u origin 2026-04-23
+```bash
+git checkout -b 2026-04-30
+git push -u origin 2026-04-30
 ```
 
 All utvikling skjer på datobranchen. Merge til master via PR når sesjonen er ferdig.
 
-```
-# Start ny branch
-git checkout -b navn-på-branch
-
-# Jobb normalt, commit og push
-git add .
-git commit -m "Beskrivelse"
-git push -u origin navn-på-branch
-```
-
 **Merge via GitHub (anbefalt):**
 - GitHub foreslår automatisk en Pull Request når du pusher en ny branch
 - Review endringene, merge, og slett branchen i GitHub-grensesnittet
-
-**Merge via terminal:**
-```
-git checkout master
-git merge navn-på-branch
-git push
-git branch -d navn-på-branch  # slett branch lokalt
-```
 
 ### Opprydding av branches og PRer
 **Påminnelse hver 14. dag:** slett gamle branches og lukkede PRer.
@@ -299,19 +143,19 @@ git branch | grep -v "master" | xargs git branch -d
 Branch protection er fjernet — ingen rulesets aktive på `master`.
 - **Utvikling:** alltid via branch + PR (se branch-workflow over)
 - **GitHub Actions:** pusher direkte til master som unntak — nødvendig for den automatiske daglige oppdateringen (fetch → rate → embed → push)
-7. **Etter HTML-endringer — WCAG AA-sjekk:** verifiser følgende før publisering:
-   - **Kontrast:** all brødtekst ≥ 4.5:1, stor tekst (18pt / 14pt bold) ≥ 3:1 — sjekk både lys og mørk modus
-   - **Nye interaktive elementer:** knapper og lenker må ha synlig tekst eller `aria-label`; skjemafelt må ha tilknyttet `<label>` eller `aria-label`
-   - **Tabellhoder:** nye `<th>`-elementer må ha `scope="col"` eller `scope="row"`
-   - **Dekorative ikoner:** unicode-tegn og SVG-ikoner som ikke er meningsbærende skal ha `aria-hidden="true"`
-   - **Tilstandsknapper (toggle/filter):** bruk `aria-pressed` for av/på-knapper, `aria-sort` for sorterbare kolonner
-   - **Fokus:** alle interaktive elementer skal ha synlig `:focus-visible`-stil
-   - **Farge som eneste signal:** ny informasjon som bare formidles via farge er ikke tillatt — legg til tekst, ikon eller mønster
-   - **Live-regioner:** dynamisk innhold (f.eks. radteller, statusmeldinger) skal ha `aria-live="polite"`
+
+## Etter HTML-endringer — WCAG AA-sjekk
+Verifiser følgende før publisering:
+- **Kontrast:** all brødtekst ≥ 4.5:1, stor tekst (18pt / 14pt bold) ≥ 3:1 — sjekk både lys og mørk modus
+- **Nye interaktive elementer:** knapper og lenker må ha synlig tekst eller `aria-label`; skjemafelt må ha tilknyttet `<label>` eller `aria-label`
+- **Tabellhoder:** nye `<th>`-elementer må ha `scope="col"` eller `scope="row"`
+- **Dekorative ikoner:** unicode-tegn og SVG-ikoner som ikke er meningsbærende skal ha `aria-hidden="true"`
+- **Tilstandsknapper (toggle/filter):** bruk `aria-pressed` for av/på-knapper, `aria-sort` for sorterbare kolonner
+- **Fokus:** alle interaktive elementer skal ha synlig `:focus-visible`-stil
+- **Farge som eneste signal:** ny informasjon som bare formidles via farge er ikke tillatt — legg til tekst, ikon eller mønster
+- **Live-regioner:** dynamisk innhold (f.eks. radteller, statusmeldinger) skal ha `aria-live="polite"`
 
 ## WCAG AA — kjente anbefalte forbedringer (ikke kritiske)
-
-Disse er identifisert men ikke utbedret — kan tas ved anledning:
 
 | Element | Forbedring |
 |---|---|
