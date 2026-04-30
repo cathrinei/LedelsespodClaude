@@ -283,6 +283,18 @@ git push
 git branch -d navn-på-branch  # slett branch lokalt
 ```
 
+### Opprydding av branches og PRer
+**Påminnelse hver 14. dag:** slett gamle branches og lukkede PRer.
+
+```bash
+# Slett alle remote branches unntatt master
+git branch -r | grep -v "HEAD\|master" | sed 's/origin\///' | xargs -I{} git push origin --delete {}
+
+# Rydd opp lokale tracking-refs og slett lokale branches
+git fetch --prune
+git branch | grep -v "master" | xargs git branch -d
+```
+
 ### Branch protection (Rulesets)
 Branch protection er fjernet — ingen rulesets aktive på `master`.
 - **Utvikling:** alltid via branch + PR (se branch-workflow over)
