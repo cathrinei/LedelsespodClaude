@@ -1,7 +1,7 @@
 # LedelsepodClaude – Project Context
 
 ## Purpose
-This project collects and curates Norwegian-language podcast episodes on **teamledelse** (team leadership) and **personalledelse** (people management / HR) — always the rolling last 6 months. Dataset starts from January 2026 (Oct–Dec 2025 episodes unavailable from RSS feeds).
+This project collects and curates Norwegian-language podcast episodes on **teamledelse** (team leadership) and **personalledelse** (people management / HR) — rolling last 3 months in the main view; episodes 3–12 months old are archived in `Ledelsepod_arkiv.csv`. Dataset starts from January 2026 (Oct–Dec 2025 episodes unavailable from RSS feeds).
 
 ## Repository & publisering
 - **GitHub:** https://github.com/cathrinei/LedelsespodClaude
@@ -9,14 +9,15 @@ This project collects and curates Norwegian-language podcast episodes on **teaml
 - Branch: `master` — push til master oppdaterer GitHub Pages automatisk
 
 ## Files
-- `Ledelsepod.csv` — master data, one row per episode (rullerende 6 måneder)
+- `Ledelsepod.csv` — master data, one row per episode (rullerende 3 måneder)
+- `Ledelsepod_arkiv.csv` — arkivdata, episoder 3–12 måneder gamle (rullerende); eldre fjernes helt
 - `Ledelsepod.html` — interactive table with filtering, sorting, stats (CSV import button hidden)
 - `README.md` — prosjektbeskrivelse med lenke til GitHub Pages
 - `update_podcasts.py` — RSS fetcher; adds new episodes (Rating=0) since last known date per podcast
 - `auto_rate.py` — automatisk vurdering av Rating=0-episoder via GitHub Models (gpt-4o-mini, gratis)
 - `rate_runner.py` — stabil kjørelogikk for manuell episodeevaluering; importeres av `rate_episodes.py`
 - `rate_episodes.py` — data-only (UPDATES + REMOVE_KEYWORDS); skrives per raterunde, slettes etter bruk
-- `embed_csv.py` — skriver CSV-innholdet inn i HTML-filens `data`-array; kjøres etter hver raterunde
+- `embed_csv.py` — skriver CSV-innholdet inn i HTML-filens `data`- og `archiveData`-array; kjøres etter hver raterunde
 - `rejected_episodes.csv` — denylist; episodes here are never re-fetched by `update_podcasts.py`
 - `failed_attempts.csv` — teller mislykkede API-forsøk per episode; etter `MAX_ATTEMPTS=3` forsøk sendes episoden automatisk til `rejected_episodes.csv`
 - `.github/workflows/update_podcasts.yml` — GitHub Actions workflow; kjører onsdag og fredag kl 23:05, manuell trigger tilgjengelig
@@ -43,6 +44,7 @@ This project collects and curates Norwegian-language podcast episodes on **teaml
 ## CSV policy
 - **Only episodes rated 4–6 are kept.** Episodes rated 1–3 are removed entirely.
 - **Unrated episodes (Rating=0 / N/A)** are rated automatically by `auto_rate.py` — no manual review needed.
+- **3-month main window:** `Ledelsepod.csv` holds only the last 3 months. Older episodes move automatically to `Ledelsepod_arkiv.csv` (kept up to 12 months, then deleted).
 - Always update the CSV **before** the HTML when making data changes. CSV is the source of truth.
 - Do not add short videos, teasers, trailers, or highlight compilations — full-length episodes only.
 

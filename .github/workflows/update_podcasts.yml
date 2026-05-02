@@ -32,7 +32,7 @@ jobs:
       - name: Oppdater HTML
         run: python embed_csv.py
 
-      - name: Valider data-array i HTML
+      - name: Valider data-array og archiveData i HTML
         run: |
           python - << 'EOF'
           import re, json, sys
@@ -48,13 +48,23 @@ jobs:
           except json.JSONDecodeError as e:
               print(f"FEIL: ugyldig JSON i data-array: {e}")
               sys.exit(1)
+          m2 = re.search(r"const archiveData = (\[.*?\]);", html, re.DOTALL)
+          if not m2:
+              print("FEIL: fant ikke archiveData-array i HTML")
+              sys.exit(1)
+          try:
+              archive = json.loads(m2.group(1))
+              print(f"OK: {len(archive)} episoder validert i archiveData-array")
+          except json.JSONDecodeError as e:
+              print(f"FEIL: ugyldig JSON i archiveData-array: {e}")
+              sys.exit(1)
           EOF
 
       - name: Commit og push hvis endringer
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add Ledelsepod.csv Ledelsepod.html rejected_episodes.csv failed_attempts.csv
+          git add Ledelsepod.csv Ledelsepod_arkiv.csv Ledelsepod.html rejected_episodes.csv failed_attempts.csv
           git diff --cached --quiet || git commit -m "Auto-oppdater episoder $(date +'%Y-%m-%d')"
           git push
 
@@ -71,4 +81,16 @@ jobs:
           echo "### Vurdering" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
           cat /tmp/rate_output.txt >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Arkiv" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          python - << 'PYEOF'
+          import re, json
+          with open("Ledelsepod.html", encoding="utf-8") as f:
+              html = f.read()
+          m = re.search(r"const archiveData = (\[.*?\]);", html, re.DOTALL)
+          n = len(json.loads(m.group(1))) if m else 0
+          print(f"Arkiverte episoder (3–12 mnd): {n}")
+          PYEOF
           echo '```' >> $GITHUB_STEP_SUMMARY
