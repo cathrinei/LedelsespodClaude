@@ -480,7 +480,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible
   #searchBox { border-bottom-left-radius: 0; border-bottom-right-radius: 0; border-bottom: none; padding-left: 0.75rem; }
   #ratingFilter { border-top-left-radius: 0; border-top-right-radius: 0; margin-bottom: 0.5rem; }
   #ratingFilter, #podcastFilter { width: 100%; }
-  .btn { width: 100%; text-align: center; }
+  .btn, #archiveToggle { width: 100%; text-align: center; }
   /* Skjul tag-pills på mobil — stat-kortene håndterer tag-filtrering */
   #tagPills { display: none; }
 
@@ -536,7 +536,34 @@ button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible
   }
   .ep-card.fav-flashed { animation: fav-flash 0.45s ease-out forwards; }
 
+  #mainTable tbody tr.archive-divider { display: block; border-radius: 0; margin-bottom: 0; }
+  #mainTable tbody tr.archive-divider td { display: block; }
+  #mainTable tbody tr.archive-row td.card-cell { background: #fffbeb; }
+  body.dark #mainTable tbody tr.archive-row td.card-cell { background: #1c150a; }
 }
+/* ARCHIVE TOGGLE */
+#archiveToggle {
+  padding: 0.47rem 0.95rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1px solid var(--input-border);
+  background: transparent;
+  color: var(--text-muted);
+  white-space: nowrap;
+  transition: background 0.12s, color 0.12s, border-color 0.12s;
+}
+#archiveToggle:hover { background: var(--surface2); border-color: var(--text-faint); color: var(--text); }
+#archiveToggle[aria-pressed="true"] { background: #451a03; border-color: #92400e; color: #fcd34d; font-weight: 600; }
+body.dark #archiveToggle[aria-pressed="true"] { background: #1c0d00; border-color: #b45309; color: #fbbf24; }
+#archiveToggle:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2px; }
+tbody tr.archive-row td { background: #fffbeb; }
+body.dark tbody tr.archive-row td { background: #1c150a; }
+tbody tr.archive-row:hover td { background: #fef3c7; }
+body.dark tbody tr.archive-row:hover td { background: #27200f; }
+tr.archive-divider td { background: #78350f; color: #fef3c7; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; padding: 0.4rem 0.65rem; }
+body.dark tr.archive-divider td { background: #451a03; color: #fcd34d; }
 </style>
 </head>
 <body>
@@ -544,7 +571,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible
 <header>
   <div class="header-text">
     <h1>Teamledelse &amp; Personalledelse</h1>
-    <p class="subtitle">Norske podkast-episoder &bull; Siste 6 m&aring;neder</p>
+    <p class="subtitle">Norske podkast-episoder &bull; Siste 3 m&aring;neder</p>
   </div>
   <button id="darkToggle" aria-label="Bytt mellom lys og mørk visning">&#9790; Mørk</button>
 </header>
@@ -573,6 +600,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible
       <option value="">Alle podkaster</option>
     </select>
     <button class="btn btn-ghost" id="favToggle" aria-pressed="false"><span aria-hidden="true">&#9733;</span> Favoritter</button>
+    <button id="archiveToggle" aria-pressed="false" aria-label="Vis eller skjul arkiverte episoder (3–12 måneder gamle)">Vis arkiv</button>
     <button class="btn btn-ghost" id="resetBtn">Nullstill</button>
     <button class="btn btn-primary" id="updateBtn" style="display:none"><span aria-hidden="true">&#8593;</span> Last inn CSV</button>
     <input type="file" id="csvFile" accept=".csv" style="display:none">
@@ -619,11 +647,6 @@ button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible
 
 <script>
 const data = [
-["Lederpodden", "🚀 Slik bygger du kultur med fart – med Mette Hopsdal", "Norwegian", "2026-01-01", "Tor Åge Skagestad Eikerapen", "Mette Hopsdal", "Kulturbygging, endringsledelse, ledelse i fart", "5", "Kulturbygging og endringsledelse med ekspertgjest — solid og praksisnær episode", "teamledelse,kultur", "https://www.execu.no/lederpodden/294"],
-["Lederpodden", "🦉 Hvordan få autoritet uten å heve stemmen – med Per Nordahl", "Norwegian", "2026-01-09", "Tor Åge Skagestad Eikerapen", "Per Nordahl", "Autoritet, kommunikasjon, ledelsesstil", "5", "Kommunikasjon og autoritet i lederrollen — verdifull for ledere på alle nivåer", "personalledelse,coaching", "https://www.execu.no/lederpodden/295"],
-["Lederpodden", "💬 Når gode råd gjør deg til en dårligere leder", "Norwegian", "2026-01-15", "Tor Åge Skagestad Eikerapen", "—", "Rådgiving, coachende ledelse, lederadferd", "5", "Motintuitivt og innsiktsfullt om rådgiving kontra coachende tilnærming i ledelse", "coaching", "https://www.execu.no/lederpodden/296"],
-["Lederpodden", "🧠 Psykisk helse er blitt et lederansvar – kan KI hjelpe? Med Sondre Liverød og Espen Veierød", "Norwegian", "2026-01-22", "Tor Åge Skagestad Eikerapen", "Sondre Liverød, Espen Veierød", "Psykisk helse, lederansvar, medarbeideromsorg", "5", "Lederansvar for medarbeideres psykiske helse — viktig og aktuelt tema for 2026", "personalledelse", "https://www.lederpodden.no"],
-["Lederpodden", "💡Kan empati gjøre deg til en bedre leder? – Med KG Stave", "Norwegian", "2026-01-30", "Tor Åge Skagestad Eikerapen", "KG Stave", "Empati, emosjonell intelligens, lederstil", "5", "Empati som lederverktøy — forskningstilknyttet og balansert fremstilling", "coaching", "https://www.lederpodden.no"],
 ["Lederpodden", "😷 Hva er sykefraværsparadokset? Med Unn Therese Omdal", "Norwegian", "2026-02-06", "Tor Åge Skagestad Eikerapen", "Unn Therese Omdal", "Sykefravær, lederansvar, arbeidsmiljø", "5", "Sykefraværsekspert med paradoks-tilnærming — direkte relevant for personalledere", "personalledelse", "https://www.lederpodden.no"],
 ["Lederpodden", "💪 Effektive ledergrupper 3.0 – med Thomas Midelfart og Henning Bang", "Norwegian", "2026-02-12", "Tor Åge Skagestad Eikerapen", "Thomas Midelfart, Henning Bang", "Ledergrupper, teameffektivitet, beslutningsprosesser", "6", "Norges fremste eksperter på ledergrupper — eksepsjonell dybde og forskningstyngde", "teamledelse", "https://www.lederpodden.no"],
 ["Lederpodden", "🔋 Historien om Easee – og hva som egentlig gikk galt – med Thomas Ramstad", "Norwegian", "2026-02-19", "Tor Åge Skagestad Eikerapen", "Thomas Ramstad", "Ledelsessvikt, organisasjonskultur, styring", "4", "Easee-saken som ledelsescase — nyttig indirekte lærdom om kultur- og styringssvikt", "teamledelse", "https://www.lederpodden.no"],
@@ -634,17 +657,11 @@ const data = [
 ["Lederpodden", "🎯 Rekruttering som faktisk fungerer – fra magefølelse til metode – med Elin Ørjasæter og Maria Molvær Nesseth", "Norwegian", "2026-03-27", "Tor Åge Skagestad Eikerapen", "Elin Ørjasæter, Maria Molvær Nesseth", "Rekruttering, seleksjon, ansettelsesprosess", "5", "To rekrutteringseksperter — solid forskningstilnærming fra magefølelse til metode", "personalledelse,rekruttering", "https://www.execu.no/lederpodden/306"],
 ["Lederpodden", "🔁 Fra gründer til CEO – slik får du lederskiftet til å fungere. Med Nadir Nalbant og Petter Kildal Forseth fra Homely", "Norwegian", "2026-04-01", "Tor Åge Skagestad Eikerapen", "Nadir Nalbant, Petter Kildal Forseth", "Lederskifte, rolleovergang, organisasjonsutvikling", "5", "Gründer-til-CEO-overgangen med to reelle casepersoner — praksisnær og innsiktsfull", "personalledelse", "https://www.execu.no/lederpodden/307"],
 ["Lederpodden", "🧠 Du er dømt til å bli misforstått - her er hvorfor", "Norwegian", "2026-04-10", "Tor Åge Skagestad Eikerapen", "—", "Kommunikasjon, kognitiv psykologi, misforståelser", "5", "Kognitiv forklaring på kommunikasjonssvikt i ledelse — solid solo-episode", "feedback", "https://www.execu.no/lederpodden/308"],
-["Lederskap (NHH)", "Google, Innovasjon, og Psykologisk Trygghet, med Alexander Mossin", "Norwegian", "2026-01-07", "Therese Egeland, Joel W. Berge", "Alexander Mossin", "Psykologisk trygghet, innovasjon, Google", "6", "Google-forsker på psykologisk trygghet — NHH-akademisk tyngde, essensiell for teamledelse", "teamledelse,kultur", "https://shows.acast.com/lederskap/episodes/google-innovasjon-og-psykologisk-trygghet-med-alexander-moss"],
 ["Lederskap (NHH)", "Moderne Askeladden, med Martin Schütt", "Norwegian", "2026-02-04", "Therese Egeland, Joel W. Berge", "Martin Schütt", "Innovasjon, gründerledelse, suksesshistorie", "4", "Gründerperspektiv på ledelse og innovasjon — interessant men bredere enn ledelsestema", "personalledelse", "https://www.askeladden.co"],
 ["Lederskap (NHH)", "Aldersmangfold og ledelse", "Norwegian", "2026-02-04", "Therese Egeland, Joel W. Berge", "—", "Aldersmangfold, generasjonsledelse, inkludering", "5", "Forskningstungt og aktuelt om aldersmangfold og generasjonsledelse i arbeidslivet", "personalledelse", "https://shows.acast.com/lederskap/episodes/aldersmangfold-og-ledelse"],
 ["Lederskap (NHH)", "Når KI blir mer enn et verktøy, med Alexander Lundervold", "Norwegian", "2026-02-27", "Therese Egeland, Joel W. Berge", "Alexander Lundervold", "KI som medarbeider, agentisk KI, fremtidens ledelse", "4", "KI som organisasjonsmedlem — relevant fremtidsperspektiv for ledelse, KI er hovemotiv", "personalledelse", "https://shows.acast.com/lederskap/episodes/nar-ki-blir-mer-enn-et-verkty"],
 ["Lederskap (NHH)", "KI‑entusiasme versus risiko, med Tellef Raabe", "Norwegian", "2026-03-13", "Therese Egeland, Joel W. Berge", "Tellef Raabe", "KI-risiko, nasjonal sikkerhet, organisasjonsrisiko", "4", "KI-risikoperspektiv fra sikkerhetsekspert — ledelse tangentielt berørt", "", "https://shows.acast.com/lederskap/episodes/kientusiasme-versus-risiko-med-tellef-raabe"],
 ["Lederskap (NHH)", "Start Smart 2.0, med Anna Måsender og Veronica Heltne", "Norwegian", "2026-03-27", "Therese Egeland, Joel W. Berge", "Anna Måsender, Veronica Heltne", "Teamoppstart, Start Smart, Telenor, teamutvikling", "6", "Telenors implementering av NHH Start Smart — eksepsjonell kombinasjon av forskning og praksis", "teamledelse", "https://shows.acast.com/lederskap/episodes/start-smart-20-med-anna-masender-og-veronica-heltne"],
-["Lederliv", "Øyvind Westby Brekke, Stø", "Norwegian", "2026-01-02", "Ole Christian Apeland", "Øyvind Westby Brekke", "Ledelse, strategi, navigering", "4", "Ledersamtale med Stø-direktøren — interessant men overflatenivå", "personalledelse", "https://shows.acast.com/lederliv/episodes/yvind-westby-brekke-st"],
-["Lederliv", "Egil Hogna, Norconsult", "Norwegian", "2026-01-09", "Ole Christian Apeland", "Egil Hogna", "Ledelse, ingeniørbransje, strategi", "4", "Ledersamtale med Norconsult-sjef — solid men generisk", "personalledelse", "https://shows.acast.com/lederliv/episodes/egil-hogna-norconsult"],
-["Lederliv", "Aina Lemoen Lunde, ANFO", "Norwegian", "2026-01-16", "Ole Christian Apeland", "Aina Lemoen Lunde", "Ledelse, markedsføring, organisasjon", "4", "Ledersamtale med ANFO-direktør — interessant bransjevinkel", "personalledelse", "https://shows.acast.com/lederliv/episodes/aina-lemoen-lunde-anfo"],
-["Lederliv", "Birgitte Ringstad Vartdal, Statkraft", "Norwegian", "2026-01-23", "Ole Christian Apeland", "Birgitte Ringstad Vartdal", "Ledelse, energibransjen, strategi", "5", "Statkraft-CEO om ledelse av stor energiorganisasjon — innsiktsfull og substansiell", "personalledelse", "https://shows.acast.com/lederliv/episodes/birgitte-ringstad-vartdal-statkraft"],
-["Lederliv", "Nina Hjellegjerde, Bellona", "Norwegian", "2026-01-30", "Ole Christian Apeland", "Nina Hjellegjerde", "Ledelse, miljøorganisasjon, motivasjon", "4", "Bellona-leder om ledelse i ideell sektor — nyttig perspektiv", "personalledelse", "https://shows.acast.com/lederliv/episodes/nina-hjellegjerde-bellona"],
 ["Lederliv", "Geir Holmgren, Gjensidige", "Norwegian", "2026-02-06", "Ole Christian Apeland", "Geir Holmgren", "Ledelse, finans, organisasjon", "5", "Gjensidige-CEO om ledelse i finansbransjen — solid og substansiell samtale", "personalledelse", "https://shows.acast.com/lederliv/episodes/geir-holmgren-gjensidige"],
 ["Lederliv", "Ida Aall Gram, Aspelin Reitan", "Norwegian", "2026-02-13", "Ole Christian Apeland", "Ida Aall Gram", "Ledelse, eiendomsbransje", "4", "Aspelin Reitan-leder om eiendomsledelse — overflatenivå", "personalledelse", "https://shows.acast.com/lederliv/episodes/ida-aall-gram-aspelin-reitan"],
 ["Lederliv", "Jan Hjelle, Husbanken", "Norwegian", "2026-02-20", "Ole Christian Apeland", "Jan Hjelle", "Ledelse, offentlig sektor, bolig", "4", "Husbanken-direktør om ledelse i statsforetak — interessant sektorperspektiv", "personalledelse", "https://shows.acast.com/lederliv/episodes/jan-hjelle-husbanken"],
@@ -655,11 +672,6 @@ const data = [
 ["Lederliv", "Mudassar Mehmood, Mortensrud Fellesskap", "Norwegian", "2026-03-27", "Ole Christian Apeland", "Mudassar Mehmood", "Ledelse, inkludering, frivillighet, lokalsamfunn", "5", "Årets ledestjerne 2025 (DN) — sterk ledelses-case med inspirerende bakgrunn", "personalledelse", "https://shows.acast.com/lederliv/episodes/mudassar-mehmood-mortensrud-fellesskap"],
 ["Lederliv", "Trine Skei Grande, Forleggerforeningen", "Norwegian", "2026-04-03", "Ole Christian Apeland", "Trine Skei Grande", "Ledelse, organisasjon, politikk, kommunikasjon", "4", "Forleggerforening-direktør og eks-statsråd om ledelse i org. vs. bedrift — noe dybde", "personalledelse", "https://shows.acast.com/lederliv/episodes/trine-skei-grande-den-norske-forleggerforening"],
 ["Lederliv", "Pål Lønseth, Økokrim", "Norwegian", "2026-04-10", "Ole Christian Apeland", "Pål Lønseth", "Ledelse, etterforskning, offentlig etat", "4", "Økokrim-sjef — etterforskning og jus dominerer, ledelsesperspektiv tangentielt", "personalledelse", "https://shows.acast.com/lederliv/episodes/pal-lnseth-kokrim"],
-["HR-podden", "222: Slik lykkes du med rekruttering i 2026, med Hanne Revholt og Sondre Julsrud", "Norwegian", "2026-01-07", "Anne Lise Heide", "Hanne Revholt, Sondre Julsrud", "Rekruttering, talentakkvisisjon, ansettelse", "5", "Rekrutteringseksperter med konkrete råd for 2026 — høy praktisk verdi", "personalledelse,rekruttering", "https://www.buzzsprout.com/1929646/episodes/18454127-222-slik-lykkes-du-med-rekruttering-i-2026-med-hanne-revholt-og-sondre-julsrud.mp3"],
-["HR-podden", "223: Myter og fakta om generasjoner i arbeidslivet, med Kristin Westreng Aas", "Norwegian", "2026-01-14", "Anne Lise Heide", "Kristin Westreng Aas", "Generasjonsledelse, aldersmangfold, arbeidsmiljø", "5", "Generasjonsforskning og ledelse av aldersmangfold — solid og aktuelt", "personalledelse", "https://www.buzzsprout.com/1929646/episodes/18371769-223-myter-og-fakta-om-generasjoner-i-arbeidslivet-med-kristin-westreng-aas.mp3"],
-["HR-podden", "224: Nytt og nyttig om ledergruppeutvikling med Henning Bang og Thomas Nesset Midelfart", "Norwegian", "2026-01-21", "Anne Lise Heide", "Henning Bang, Thomas Nesset Midelfart", "Ledergrupper, effektivitet, teamdynamikk", "6", "Norges fremste ledergruppe-eksperter — eksepsjonell for teamledelse, forskningstung", "teamledelse", "https://www.buzzsprout.com/1929646/episodes/18495292-224-nytt-og-nyttig-om-ledergruppeutvikling-med-henning-bang-og-thomas-nesset-midelfart.mp3"],
-["HR-podden", "225: Psykologisk trygghet i arbeidslivet, boklansering og HR-podden live - DEL 1", "Norwegian", "2026-01-28", "Anne Lise Heide", "Bård Fyhn, Birgitte Lange, Lars Erik Lund", "Psykologisk trygghet, boklansering, HR live", "6", "Boklansering med forsker Bård Fyhn og live-panel — essensiell episode om psykologisk trygghet", "teamledelse,kultur", "https://www.buzzsprout.com/1929646/episodes/18558642-225-psykologisk-trygghet-i-arbeidslivet-boklansering-og-hr-podden-live-del-1.mp3"],
-["HR-podden", "226: Psykologisk trygghet i arbeidslivet, boklansering og HR-podden live - DEL 2", "Norwegian", "2026-01-29", "Anne Lise Heide", "Bård Fyhn, Birgitte Lange, Lars Erik Lund", "Psykologisk trygghet, Q&A, ledelse i praksis", "6", "Del 2 med publikumsspørsmål om psykologisk trygghet i praksis — rik og anvendbar", "teamledelse,kultur", "https://www.buzzsprout.com/1929646/episodes/18558659-226-psykologisk-trygghet-i-arbeidslivet-boklansering-og-hr-podden-live-del-2.mp3"],
 ["HR-podden", "227: Nye regler til psykososialt arbeidsmiljø med Avesta Gåskjønli", "Norwegian", "2026-02-04", "Anne Lise Heide", "Avesta Gåskjønli", "Psykososialt arbeidsmiljø, lovkrav, HR", "5", "Nye lovkrav til psykososialt arbeidsmiljø forklart — viktig og praktisk for HR og ledere", "personalledelse", "https://www.buzzsprout.com/1929646/episodes/18584274-227-nye-regler-til-psykososialt-arbeidsmiljo-med-avesta-gaskjonli.mp3"],
 ["HR-podden", "228: Hva du bør vite om KI i 2026 med Alexander Haneng", "Norwegian", "2026-02-11", "Anne Lise Heide", "Alexander Haneng", "KI i HR, kompetanseutvikling, organisasjonsendring", "4", "KI fra HR-perspektiv — relevant men KI er hovemotiv fremfor ledelse", "personalledelse", "https://www.buzzsprout.com/1929646/episodes/18610789-228-hva-du-bor-vite-om-ki-i-2026-med-alexander-haneng.mp3"],
 ["HR-podden", "229:  Den stille styrken, om høysensitivitet i arbeidslivet med Runar Heggen", "Norwegian", "2026-02-18", "Anne Lise Heide", "Runar Heggen", "Høysensitivitet, mangfold, arbeidsmiljø", "5", "Høysensitivitet som styrke i arbeidslivet — nyansert og verdifullt for personalledere", "personalledelse", "https://www.buzzsprout.com/1929646/episodes/18648881-229-den-stille-styrken-om-hoysensitivitet-i-arbeidslivet-med-runar-heggen.mp3"],
@@ -674,8 +686,6 @@ const data = [
 ["Topplederpodcast (MeyerHaugen)", "Topplederpodcast med Birger Steen, CEO i NORSAR", "Norwegian", "2026-02-23", "Siv Jensen, Petter Meyer", "Birger Steen", "Ledelse, teknologi, nasjonal sikkerhet", "4", "NORSAR-sjef om ledelse i sikkerhetsorganisasjon — interessant men fagfokus dominerer", "personalledelse", "https://meyerhaugen.no/topplederpodcast/"],
 ["Topplederpodcast (MeyerHaugen)", "Topplederpodcast med Espen Swartling, CEO i Allianz Trade Norge", "Norwegian", "2026-04-10", "Siv Jensen, Petter Meyer", "Espen Swartling", "Ledelse, handel, risiko, internasjonal business", "4", "Allianz Trade-CEO om handel og risiko i usikker verden — ledelse tangentielt berørt", "personalledelse", "https://meyerhaugen.no/topplederpodcast/"],
 ["Smidigpodden", "Hvordan få ledergruppen din til å bli et team", "Norwegian", "2026-02-18", "Tobias Falkberger, Ida Kjær", "—", "Ledergrupper, teamutvikling, organisasjonsutvikling", "6", "Direkte om å gjøre ledergruppen til et ekte team — eksepsjonelt relevant og konkret", "teamledelse", "https://shows.acast.com/smidigpodden/episodes/lederepisode"],
-["Psykologkameratene", "Psykologisk førstehjelp i kriser: Hvordan hjelpe selv om du ikke er psykolog", "Norwegian", "2026-01-12", "Magnus Odeen, Sivert Straume", "—", "Krisehåndtering, psykologisk støtte, lederansvar", "4", "Krisehåndtering uten psykologutdanning — nyttig for ledere som møter medarbeidere i krise", "personalledelse", "https://psykologkameratene.podbean.com/e/nar-viking-vinner-og-du-trenger-psykologisk-f%c3%b8rstehjelp/"],
-["Psykologkameratene", "Psykemelding: Når psykiske lidelser går ut over arbeidsevnen", "Norwegian", "2026-01-27", "Magnus Odeen, Sivert Straume", "—", "Psykisk sykefravær, arbeid og helse, lederansvar", "5", "Psykisk sykemelding og leders rolle — direkte relevant for personalledere", "personalledelse", "https://psykologkameratene.podbean.com/e/sykemelding-eller-asyl-hvordan-psykisk-helse-og-jobb-henger-sammen/"],
 ["Psykologkameratene", "Imposter fenomenet: Blir jeg avslørt nå?", "Norwegian", "2026-02-03", "Magnus Odeen, Sivert Straume", "—", "Impostorsyndrom, selvtillit, lederutvikling", "4", "Impostorsyndrom hos ledere og høytpresterende — relevant for coaching og personalledelse", "coaching", "https://psykologkameratene.podbean.com/e/det-er-en-bedrager-blant-oss-%e2%80%94-hvem-er-ekte-og-hvem-er-impostor/"],
 ["Psykologkameratene", "Lær å si nei — for deg som er alt for grei", "Norwegian", "2026-02-10", "Magnus Odeen, Sivert Straume", "—", "Grensesetting, kommunikasjon, selvhevdelse", "4", "Grensesetting i lederrollen — relevant for medarbeiderrelasjon og coaching", "personalledelse,coaching", "https://psykologkameratene.podbean.com/e/l%c3%a6r-a-si-nei-%e2%80%94-uten-darlig-samvittighet/"],
 ["Psykologkameratene", "Moralsk frakobling: Når gode mennesker gjør gale ting", "Norwegian", "2026-02-17", "Magnus Odeen, Sivert Straume", "—", "Etikk, organisasjonsadferd, moralsk ansvar", "4", "Moralsk frakobling i organisasjoner — relevant for lederansvar og kulturarbeid", "kultur", "https://psykologkameratene.podbean.com/e/nar-gode-mennesker-gj%c3%b8r-gale-ting-psykologien-bak-moralsk-frakobling/"],
@@ -692,6 +702,26 @@ const data = [
 ["HR-podden", "239: Hva du må vite om AI akkurat nå, med Sverre Haugen", "Norwegian", "2026-04-29", "Anne Lise Heide", "Sverre Haugen", "AI, personalledelse, teknologi", "4", "Episoden berører hvordan AI påvirker HR og personalledelse, men kan også inkludere andre temaer. Den gir relevant innsikt i moderne personalpraksis og teknologi.", "personalledelse", "https://www.buzzsprout.com/1929646/episodes/19083395-239-hva-du-ma-vite-om-ai-akkurat-na-med-sverre-haugen.mp3"],
 ["Lederpodden", "🎯 Derfor virker ikke målene dine – med Bård Kuvaas", "Norwegian", "2026-04-30", "Tor Åge Skagestad Eikerapen", "Bård Kuvaas", "målsetting, ledelse", "5", "Episoden fokuserer på hvordan målsetting kan påvirke teamets prestasjon og individuelle motivasjon, og gir nyttig innsikt i ledelse. Bård Kuvaas er en anerkjent ekspert, noe som styrker innholdets verdi.", "teamledelse,motivasjon", "https://www.execu.no/lederpodden/311-derfor-virker-ikke-malene-dine"],
 ["Lederliv", "Morten Borgersen, Anton Sport", "Norwegian", "2026-05-01", "Ole Christian Apeland", "Morten Borgersen", "teamledelse, personalledelse", "5", "Episoden gir nyttige innsikter i ledelse innen sportsbransjen, spesielt med fokus på team og ansatte. Morten Borgersen deler erfaringer som er relevante for både teamledelse og personalledelse.", "teamledelse, personalledelse", "https://shows.acast.com/lederliv/episodes/morten-borgersen-anton-sport"]
+];
+const archiveData = [
+["Lederpodden", "🚀 Slik bygger du kultur med fart – med Mette Hopsdal", "Norwegian", "2026-01-01", "Tor Åge Skagestad Eikerapen", "Mette Hopsdal", "Kulturbygging, endringsledelse, ledelse i fart", "5", "Kulturbygging og endringsledelse med ekspertgjest — solid og praksisnær episode", "teamledelse,kultur", "https://www.execu.no/lederpodden/294"],
+["Lederpodden", "🦉 Hvordan få autoritet uten å heve stemmen – med Per Nordahl", "Norwegian", "2026-01-09", "Tor Åge Skagestad Eikerapen", "Per Nordahl", "Autoritet, kommunikasjon, ledelsesstil", "5", "Kommunikasjon og autoritet i lederrollen — verdifull for ledere på alle nivåer", "personalledelse,coaching", "https://www.execu.no/lederpodden/295"],
+["Lederpodden", "💬 Når gode råd gjør deg til en dårligere leder", "Norwegian", "2026-01-15", "Tor Åge Skagestad Eikerapen", "—", "Rådgiving, coachende ledelse, lederadferd", "5", "Motintuitivt og innsiktsfullt om rådgiving kontra coachende tilnærming i ledelse", "coaching", "https://www.execu.no/lederpodden/296"],
+["Lederpodden", "🧠 Psykisk helse er blitt et lederansvar – kan KI hjelpe? Med Sondre Liverød og Espen Veierød", "Norwegian", "2026-01-22", "Tor Åge Skagestad Eikerapen", "Sondre Liverød, Espen Veierød", "Psykisk helse, lederansvar, medarbeideromsorg", "5", "Lederansvar for medarbeideres psykiske helse — viktig og aktuelt tema for 2026", "personalledelse", "https://www.lederpodden.no"],
+["Lederpodden", "💡Kan empati gjøre deg til en bedre leder? – Med KG Stave", "Norwegian", "2026-01-30", "Tor Åge Skagestad Eikerapen", "KG Stave", "Empati, emosjonell intelligens, lederstil", "5", "Empati som lederverktøy — forskningstilknyttet og balansert fremstilling", "coaching", "https://www.lederpodden.no"],
+["Lederskap (NHH)", "Google, Innovasjon, og Psykologisk Trygghet, med Alexander Mossin", "Norwegian", "2026-01-07", "Therese Egeland, Joel W. Berge", "Alexander Mossin", "Psykologisk trygghet, innovasjon, Google", "6", "Google-forsker på psykologisk trygghet — NHH-akademisk tyngde, essensiell for teamledelse", "teamledelse,kultur", "https://shows.acast.com/lederskap/episodes/google-innovasjon-og-psykologisk-trygghet-med-alexander-moss"],
+["Lederliv", "Øyvind Westby Brekke, Stø", "Norwegian", "2026-01-02", "Ole Christian Apeland", "Øyvind Westby Brekke", "Ledelse, strategi, navigering", "4", "Ledersamtale med Stø-direktøren — interessant men overflatenivå", "personalledelse", "https://shows.acast.com/lederliv/episodes/yvind-westby-brekke-st"],
+["Lederliv", "Egil Hogna, Norconsult", "Norwegian", "2026-01-09", "Ole Christian Apeland", "Egil Hogna", "Ledelse, ingeniørbransje, strategi", "4", "Ledersamtale med Norconsult-sjef — solid men generisk", "personalledelse", "https://shows.acast.com/lederliv/episodes/egil-hogna-norconsult"],
+["Lederliv", "Aina Lemoen Lunde, ANFO", "Norwegian", "2026-01-16", "Ole Christian Apeland", "Aina Lemoen Lunde", "Ledelse, markedsføring, organisasjon", "4", "Ledersamtale med ANFO-direktør — interessant bransjevinkel", "personalledelse", "https://shows.acast.com/lederliv/episodes/aina-lemoen-lunde-anfo"],
+["Lederliv", "Birgitte Ringstad Vartdal, Statkraft", "Norwegian", "2026-01-23", "Ole Christian Apeland", "Birgitte Ringstad Vartdal", "Ledelse, energibransjen, strategi", "5", "Statkraft-CEO om ledelse av stor energiorganisasjon — innsiktsfull og substansiell", "personalledelse", "https://shows.acast.com/lederliv/episodes/birgitte-ringstad-vartdal-statkraft"],
+["Lederliv", "Nina Hjellegjerde, Bellona", "Norwegian", "2026-01-30", "Ole Christian Apeland", "Nina Hjellegjerde", "Ledelse, miljøorganisasjon, motivasjon", "4", "Bellona-leder om ledelse i ideell sektor — nyttig perspektiv", "personalledelse", "https://shows.acast.com/lederliv/episodes/nina-hjellegjerde-bellona"],
+["HR-podden", "222: Slik lykkes du med rekruttering i 2026, med Hanne Revholt og Sondre Julsrud", "Norwegian", "2026-01-07", "Anne Lise Heide", "Hanne Revholt, Sondre Julsrud", "Rekruttering, talentakkvisisjon, ansettelse", "5", "Rekrutteringseksperter med konkrete råd for 2026 — høy praktisk verdi", "personalledelse,rekruttering", "https://www.buzzsprout.com/1929646/episodes/18454127-222-slik-lykkes-du-med-rekruttering-i-2026-med-hanne-revholt-og-sondre-julsrud.mp3"],
+["HR-podden", "223: Myter og fakta om generasjoner i arbeidslivet, med Kristin Westreng Aas", "Norwegian", "2026-01-14", "Anne Lise Heide", "Kristin Westreng Aas", "Generasjonsledelse, aldersmangfold, arbeidsmiljø", "5", "Generasjonsforskning og ledelse av aldersmangfold — solid og aktuelt", "personalledelse", "https://www.buzzsprout.com/1929646/episodes/18371769-223-myter-og-fakta-om-generasjoner-i-arbeidslivet-med-kristin-westreng-aas.mp3"],
+["HR-podden", "224: Nytt og nyttig om ledergruppeutvikling med Henning Bang og Thomas Nesset Midelfart", "Norwegian", "2026-01-21", "Anne Lise Heide", "Henning Bang, Thomas Nesset Midelfart", "Ledergrupper, effektivitet, teamdynamikk", "6", "Norges fremste ledergruppe-eksperter — eksepsjonell for teamledelse, forskningstung", "teamledelse", "https://www.buzzsprout.com/1929646/episodes/18495292-224-nytt-og-nyttig-om-ledergruppeutvikling-med-henning-bang-og-thomas-nesset-midelfart.mp3"],
+["HR-podden", "225: Psykologisk trygghet i arbeidslivet, boklansering og HR-podden live - DEL 1", "Norwegian", "2026-01-28", "Anne Lise Heide", "Bård Fyhn, Birgitte Lange, Lars Erik Lund", "Psykologisk trygghet, boklansering, HR live", "6", "Boklansering med forsker Bård Fyhn og live-panel — essensiell episode om psykologisk trygghet", "teamledelse,kultur", "https://www.buzzsprout.com/1929646/episodes/18558642-225-psykologisk-trygghet-i-arbeidslivet-boklansering-og-hr-podden-live-del-1.mp3"],
+["HR-podden", "226: Psykologisk trygghet i arbeidslivet, boklansering og HR-podden live - DEL 2", "Norwegian", "2026-01-29", "Anne Lise Heide", "Bård Fyhn, Birgitte Lange, Lars Erik Lund", "Psykologisk trygghet, Q&A, ledelse i praksis", "6", "Del 2 med publikumsspørsmål om psykologisk trygghet i praksis — rik og anvendbar", "teamledelse,kultur", "https://www.buzzsprout.com/1929646/episodes/18558659-226-psykologisk-trygghet-i-arbeidslivet-boklansering-og-hr-podden-live-del-2.mp3"],
+["Psykologkameratene", "Psykologisk førstehjelp i kriser: Hvordan hjelpe selv om du ikke er psykolog", "Norwegian", "2026-01-12", "Magnus Odeen, Sivert Straume", "—", "Krisehåndtering, psykologisk støtte, lederansvar", "4", "Krisehåndtering uten psykologutdanning — nyttig for ledere som møter medarbeidere i krise", "personalledelse", "https://psykologkameratene.podbean.com/e/nar-viking-vinner-og-du-trenger-psykologisk-f%c3%b8rstehjelp/"],
+["Psykologkameratene", "Psykemelding: Når psykiske lidelser går ut over arbeidsevnen", "Norwegian", "2026-01-27", "Magnus Odeen, Sivert Straume", "—", "Psykisk sykefravær, arbeid og helse, lederansvar", "5", "Psykisk sykemelding og leders rolle — direkte relevant for personalledere", "personalledelse", "https://psykologkameratene.podbean.com/e/sykemelding-eller-asyl-hvordan-psykisk-helse-og-jobb-henger-sammen/"]
 ];
 
 const RATING_COL = 7;
@@ -737,6 +767,7 @@ function saveFavs() { localStorage.setItem(FAV_KEY, JSON.stringify([...favorites
 function favId(row) { return row[0] + '::' + row[1]; }
 let favorites = loadFavs();
 let showFavsOnly = false;
+let showArchive = false;
 
 // — URL-tilstand —
 function filtersToUrl() {
@@ -749,6 +780,7 @@ function filtersToUrl() {
   if (podcast)         params.set('podcast', podcast);
   if (activeTag)       params.set('tag',     activeTag);
   if (showFavsOnly)    params.set('favs',    '1');
+  if (showArchive)     params.set('archive', '1');
   const qs = params.toString();
   history.replaceState(null, '', qs ? '?' + qs : location.pathname);
 }
@@ -771,6 +803,10 @@ function applyUrlFilters() {
     document.getElementById('favToggle').classList.add('filters-active');
     document.getElementById('favToggle').setAttribute('aria-pressed', 'true');
   }
+  if (params.get('archive') === '1') {
+    showArchive = true;
+    document.getElementById('archiveToggle').setAttribute('aria-pressed', 'true');
+  }
 }
 
 function updateResetBtn() {
@@ -782,17 +818,28 @@ function updateResetBtn() {
   btn.classList.toggle('filters-active', active);
   btn.setAttribute('aria-pressed', active ? 'true' : 'false');
 }
-function renderTable(rows) {
+function renderTable(items) {
   const tbody = document.getElementById('tableBody');
   tbody.innerHTML = '';
-  if (rows.length === 0) {
+  if (items.length === 0) {
     tbody.innerHTML = `<tr><td colspan="10" class="empty-state">Ingen episoder matcher filteret — <button class="empty-reset" onclick="resetFilters()">nullstill filtre</button></td></tr>`;
     document.getElementById('rowCount').textContent = 'Ingen treff';
     return;
   }
-  rows.forEach((row, idx) => {
+  let dividerInserted = false;
+  let mainShown = 0;
+  items.forEach(({ row, isArchive }, idx) => {
+    if (isArchive && !dividerInserted) {
+      dividerInserted = true;
+      const divTr = document.createElement('tr');
+      divTr.className = 'archive-divider';
+      divTr.innerHTML = `<td colspan="10">Arkiv — episoder 3–12 måneder gamle</td>`;
+      tbody.appendChild(divTr);
+    }
+    if (!isArchive) mainShown++;
     const [podcast, title, , date, hosts, guests, topics, rating, note, tags, link] = row;
     const tr = document.createElement('tr');
+    if (isArchive) tr.classList.add('archive-row');
     if (rating > 0) tr.dataset.rating = rating;
     tr.dataset.fav = favId(row);
     tr.innerHTML = `
@@ -829,7 +876,12 @@ function renderTable(rows) {
     `);
     tbody.appendChild(tr);
   });
-  document.getElementById('rowCount').textContent = `Viser ${rows.length} av ${data.length} episoder`;
+  const archiveShown = items.length - mainShown;
+  if (showArchive && archiveShown > 0) {
+    document.getElementById('rowCount').textContent = `Viser ${mainShown} av ${data.length} episoder + ${archiveShown} arkiverte`;
+  } else {
+    document.getElementById('rowCount').textContent = `Viser ${mainShown} av ${data.length} episoder`;
+  }
 }
 function tagsOf(row) { return (row[9] || '').split(',').map(t => t.trim()); }
 function updateStats() {
@@ -857,8 +909,8 @@ function getFiltered() {
   const search        = document.getElementById('searchBox').value.toLowerCase().trim();
   const minRating     = parseInt(document.getElementById('ratingFilter').value);
   const podcastFilter = document.getElementById('podcastFilter').value;
-  return data.filter(row => {
-    const [podcast, title, , , hosts, guests, topics, rating, note, tags] = row;
+  const filterRow = row => {
+    const [podcast, title, , , hosts, guests, topics, rating, note] = row;
     if (activeTag && !tagsOf(row).includes(activeTag)) return false;
     if (+rating > 0 && +rating < minRating) return false;
     if (podcastFilter && podcast !== podcastFilter) return false;
@@ -868,11 +920,14 @@ function getFiltered() {
       if (!fuzzyMatch(search, haystack)) return false;
     }
     return true;
-  });
+  };
+  const mainItems    = data.filter(filterRow).map(row => ({ row, isArchive: false }));
+  const archiveItems = showArchive ? archiveData.filter(filterRow).map(row => ({ row, isArchive: true })) : [];
+  return mainItems.concat(archiveItems);
 }
-function getSorted(rows) {
-  return [...rows].sort((a, b) => {
-    const va = a[sort.col], vb = b[sort.col];
+function getSorted(items) {
+  return [...items].sort((a, b) => {
+    const va = a.row[sort.col], vb = b.row[sort.col];
     if (typeof va === 'number') return sort.asc ? va - vb : vb - va;
     return sort.asc
       ? String(va).toLowerCase().localeCompare(String(vb).toLowerCase())
@@ -899,8 +954,10 @@ function resetFilters() {
   document.getElementById('podcastFilter').value = '';
   activeTag = '';
   showFavsOnly = false;
+  showArchive = false;
   document.getElementById('favToggle').classList.remove('filters-active');
   document.getElementById('favToggle').setAttribute('aria-pressed', 'false');
+  document.getElementById('archiveToggle').setAttribute('aria-pressed', 'false');
   document.querySelectorAll('.tag-pill').forEach(b => {
     const isAll = b.dataset.tag === '';
     b.classList.toggle('active', isAll);
@@ -949,9 +1006,9 @@ document.querySelectorAll('.tag-pill').forEach(btn => {
   });
 });
 
-// Populate podcast dropdown from data
+// Populate podcast dropdown from data + archiveData
 const podcastSel = document.getElementById('podcastFilter');
-[...new Set(data.map(r => r[0]))].sort().forEach(name => {
+[...new Set([...data, ...archiveData].map(r => r[0]))].sort().forEach(name => {
   const opt = document.createElement('option');
   opt.value = name; opt.textContent = name;
   podcastSel.appendChild(opt);
@@ -1160,6 +1217,11 @@ document.getElementById('favToggle').addEventListener('click', () => {
   showFavsOnly = !showFavsOnly;
   document.getElementById('favToggle').classList.toggle('filters-active', showFavsOnly);
   document.getElementById('favToggle').setAttribute('aria-pressed', showFavsOnly ? 'true' : 'false');
+  refresh();
+});
+document.getElementById('archiveToggle').addEventListener('click', () => {
+  showArchive = !showArchive;
+  document.getElementById('archiveToggle').setAttribute('aria-pressed', showArchive ? 'true' : 'false');
   refresh();
 });
 

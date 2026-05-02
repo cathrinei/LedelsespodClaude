@@ -8,8 +8,9 @@ Skriptet:
   1. Leser Ledelsepod.csv og finner siste kjente dato per podcast.
   2. Henter RSS-feed for hver kjent podcast.
   3. Legger til nye episoder (nyere enn siste kjente dato) med Rating=0 og tomme felt.
-  4. Fjerner episoder eldre enn 6 måneder fra CSV.
-  5. Skriver oppdatert CSV.
+  4. Fjerner episoder eldre enn 3 måneder fra hovedvinduet og flytter dem til Ledelsepod_arkiv.csv.
+  5. Episoder eldre enn 12 måneder fjernes helt fra arkivet.
+  6. Skriver oppdatert CSV og arkiv-CSV.
 """
 
 import csv
@@ -25,6 +26,7 @@ import sys
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
 CSV_PATH      = os.path.join(os.path.dirname(__file__), "Ledelsepod.csv")
+ARCHIVE_PATH  = os.path.join(os.path.dirname(__file__), "Ledelsepod_arkiv.csv")
 REJECTED_PATH = os.path.join(os.path.dirname(__file__), "rejected_episodes.csv")
 
 UNRATED = "0"  # Markør for episoder som mangler manuell vurdering
@@ -63,6 +65,17 @@ def read_csv():
         rows = list(csv.reader(f))
     if not rows:
         sys.exit("FEIL: CSV-filen er tom.")
+    return rows[0], rows[1:]
+
+
+def read_archive():
+    """Returnerer (header, rows) for arkivfilen, eller (None, []) hvis den ikke finnes."""
+    if not os.path.exists(ARCHIVE_PATH):
+        return None, []
+    with open(ARCHIVE_PATH, encoding="utf-8", newline="") as f:
+        rows = list(csv.reader(f))
+    if not rows:
+        return None, []
     return rows[0], rows[1:]
 
 
@@ -209,12 +222,19 @@ def main():
     rejected      = load_rejected()
     existing_keys = {(r[0].strip().lower(), r[1].strip().lower()) for r in existing_rows if len(r) >= 2}
     latest        = latest_date_per_podcast(existing_rows)
-    # Rullerende 6-månedersvindu — henter ikke episoder eldre enn dette
+
+    # Rullerende 3-månedersvindu — henter ikke episoder eldre enn dette
     now = datetime.now(timezone.utc)
-    month = now.month - 6
+    month = now.month - 3
     year = now.year + (month - 1) // 12
     month = ((month - 1) % 12) + 1
-    default_from  = now.replace(year=year, month=month, day=1)
+    default_from = now.replace(year=year, month=month, day=1)
+
+    # 12-månedersgrense — episoder eldre enn dette fjernes fra arkivet
+    month12 = now.month - 12
+    year12 = now.year + (month12 - 1) // 12
+    month12 = ((month12 - 1) % 12) + 1
+    archive_cutoff = now.replace(year=year12, month=month12, day=1)
 
     all_new = []
     print(f"\nSjekker {len(FEEDS)} podcast-feeder...\n")
@@ -243,13 +263,37 @@ def main():
 
         all_new.extend(filtered)
 
-    # Beskjær til siste 6 måneder
     all_rows = existing_rows + all_new
-    pruned = [r for r in all_rows if len(r) >= 4 and r[3].strip() >= default_from.strftime("%Y-%m-%d")]
-    n_pruned = len(all_rows) - len(pruned)
+    cutoff_str  = default_from.strftime("%Y-%m-%d")
+    archive_str = archive_cutoff.strftime("%Y-%m-%d")
 
+    # Hovedvindu: kun episoder innen siste 3 måneder
+    main_rows  = [r for r in all_rows if len(r) >= 4 and r[3].strip() >= cutoff_str]
+
+    # Episoder 3–12 måneder gamle flyttes til arkiv
+    moved_rows = [r for r in all_rows
+                  if len(r) >= 4 and archive_str <= r[3].strip() < cutoff_str]
+
+    # Slå sammen med eksisterende arkiv (deduplisering på podcast+tittel)
+    arch_header, arch_existing = read_archive()
+    if arch_header is None:
+        arch_header = header
+    arch_keys = {(r[0].strip().lower(), r[1].strip().lower())
+                 for r in arch_existing if len(r) >= 2}
+    new_to_archive = [r for r in moved_rows
+                      if (r[0].strip().lower(), r[1].strip().lower()) not in arch_keys]
+    arch_all  = arch_existing + new_to_archive
+
+    # Beskjær arkivet: fjern episoder eldre enn 12 måneder
+    arch_kept = [r for r in arch_all if len(r) >= 4 and r[3].strip() >= archive_str]
+    n_arch_pruned = len(arch_all) - len(arch_kept)
+
+    # Skriv begge filer
+    n_pruned = len(all_rows) - len(main_rows)
     with open(CSV_PATH, "w", encoding="utf-8", newline="") as f:
-        csv.writer(f).writerows([header] + pruned)
+        csv.writer(f).writerows([header] + main_rows)
+    with open(ARCHIVE_PATH, "w", encoding="utf-8", newline="") as f:
+        csv.writer(f).writerows([arch_header] + arch_kept)
 
     if not all_new:
         print("\nIngen nye episoder funnet.")
@@ -258,10 +302,14 @@ def main():
         print(f"NB: Nye episoder har Rating={UNRATED} og vurderes automatisk av auto_rate.py.")
 
     if n_pruned:
-        print(f"{n_pruned} episode(r) eldre enn 6 måneder fjernet fra CSV.")
+        print(f"{n_pruned} episode(r) eldre enn 3 måneder flyttet til arkiv.")
+    if new_to_archive:
+        print(f"{len(new_to_archive)} episode(r) lagt til i Ledelsepod_arkiv.csv.")
+    if n_arch_pruned:
+        print(f"{n_arch_pruned} arkiverte episode(r) eldre enn 12 måneder fjernet helt.")
     print()
 
-    pending = pending_review(pruned)
+    pending = pending_review(main_rows)
     if pending:
         print(f"⚠  {len(pending)} episode(r) ikke vurdert etter {REVIEW_AFTER_DAYS}+ dager:\n")
         for row in pending:
