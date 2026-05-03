@@ -11,7 +11,7 @@ This project collects and curates Norwegian-language podcast episodes on **teaml
 ## Files
 - `Ledelsepod.csv` — master data, one row per episode (rullerende 3 måneder)
 - `Ledelsepod_arkiv.csv` — arkivdata, episoder 3–12 måneder gamle (rullerende); eldre fjernes helt
-- `Ledelsepod.html` — interactive table with filtering, sorting, stats (CSV import button hidden)
+- `Ledelsepod.html` — interactive table with filtering, sorting, stats (CSV import button hidden); stats-bar viser «+ N arkiverte»-knapp som toggles arkivvisning (3–12 mnd)
 - `README.md` — prosjektbeskrivelse med lenke til GitHub Pages
 - `update_podcasts.py` — RSS fetcher; adds new episodes (Rating=0) since last known date per podcast
 - `auto_rate.py` — automatisk vurdering av Rating=0-episoder via GitHub Models (gpt-4o-mini, gratis)
