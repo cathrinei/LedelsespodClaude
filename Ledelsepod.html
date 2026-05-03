@@ -3,7 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; connect-src 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; connect-src 'self'; img-src 'self' data:">
+<meta name="description" content="Norske ledelsespodcaster om teamledelse og personalledelse – siste 3 måneder rangert, filtrert og arkivert">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎙️</text></svg>">
 <title>Teamledelse &amp; Personalledelse</title>
 <style>
 :root {
@@ -614,7 +616,7 @@ body.dark tr.archive-divider td { background: #451a03; color: #fcd34d; }
   <div class="stat stat-btn" role="button" tabindex="0" data-filter="tag:personalledelse" aria-pressed="false"><span class="stat-n" id="statPers">–</span><span class="stat-label">Personalledelse</span></div>
   <div class="stat stat-btn" role="button" tabindex="0" data-filter="rating:6" aria-pressed="false"><span class="stat-n" id="statTop">–</span><span class="stat-label">Toppkarakter 6/6</span></div>
   <div class="archive-hint" id="archiveHint" style="display:none">
-    <button id="archiveHintBtn" aria-label="Vis arkiverte episoder">+ <span id="archiveHintCount">0</span> arkiverte &#8594;</button>
+    <button id="archiveHintBtn">+ <span id="archiveHintCount">0</span> arkiverte &#8594;</button>
   </div>
 </div>
 
@@ -799,7 +801,7 @@ const SWIPE_USED_KEY = 'ledelsepod_swipe_used';
 function loadFavs() { try { return new Set(JSON.parse(localStorage.getItem(FAV_KEY) || '[]')); } catch { return new Set(); } }
 function saveFavs() { localStorage.setItem(FAV_KEY, JSON.stringify([...favorites])); }
 function favId(row) { return row[0] + '::' + row[1]; }
-let favorites = loadFavs();
+const favorites = loadFavs();
 let showFavsOnly = false;
 let showArchive = false;
 
@@ -927,9 +929,13 @@ function updateArchiveHint() {
   if (archiveData.length === 0) { hint.style.display = 'none'; return; }
   hint.style.display = '';
   btn.setAttribute('aria-pressed', showArchive ? 'true' : 'false');
+  const label = showArchive
+    ? 'Skjul arkiv ×'
+    : `+ ${archiveData.length} arkiverte →`;
   btn.innerHTML = showArchive
     ? 'Skjul arkiv &#215;'
     : `+ ${archiveData.length} arkiverte &#8594;`;
+  btn.setAttribute('aria-label', label);
 }
 function updateStats() {
   let team = 0, pers = 0, top = 0;
@@ -1299,14 +1305,15 @@ updateStats();
 applyUrlFilters();
 refresh();
 
-// Tilbake til toppen
-(function () {
+// Tilbake til toppen — knappen er definert etter </script>, så vi venter på DOMContentLoaded
+document.addEventListener('DOMContentLoaded', () => {
   const btn = document.getElementById('backToTop');
+  if (!btn) return;
   window.addEventListener('scroll', () => {
     btn.classList.toggle('visible', window.scrollY > 300);
   }, { passive: true });
   btn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
-}());
+});
 
 </script>
 <button id="backToTop" aria-label="Tilbake til toppen" title="Tilbake til toppen">&#8679;</button>

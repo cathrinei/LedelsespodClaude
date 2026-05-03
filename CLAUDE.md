@@ -146,6 +146,22 @@ Branch protection er fjernet — ingen rulesets aktive på `master`.
 - **Utvikling:** alltid via branch + PR (se branch-workflow over)
 - **GitHub Actions:** pusher direkte til master som unntak — nødvendig for den automatiske daglige oppdateringen (fetch → rate → embed → push)
 
+## Etter HTML-endringer — kvalitetskontroll
+Kjør HTMLHint og ESLint ved endringer i `Ledelsepod.html`:
+```bash
+npx htmlhint Ledelsepod.html
+# Trekk ut JS og lint (se under for ESLint-oppsett)
+node -e "const fs=require('fs'),h=fs.readFileSync('Ledelsepod.html','utf8'),m=h.match(/<script>([\s\S]*?)<\/script>/g);fs.writeFileSync('_temp_lint.js',m.map((s,i)=>'// block '+(i+1)+'\n'+s.replace(/<\/?script[^>]*>/g,'')).join('\n'));"
+npx eslint _temp_lint.js && rm _temp_lint.js
+```
+
+Kjør Lighthouse for helhetlig kvalitetssjekk (Performance, Accessibility, Best Practices, SEO):
+```bash
+python -m http.server 7731 --bind 127.0.0.1 &
+npx lighthouse http://127.0.0.1:7731/Ledelsepod.html --output=json,html --output-path=./lighthouse-report --chrome-flags="--headless --no-sandbox --disable-gpu --user-data-dir=C:/Temp/lighthouse-chrome" --only-categories=performance,accessibility,best-practices,seo
+```
+Mål: Performance ≥ 90, Accessibility = 100, Best Practices ≥ 95, SEO ≥ 90.
+
 ## Etter HTML-endringer — WCAG AA-sjekk
 Verifiser følgende før publisering:
 - **Kontrast:** all brødtekst ≥ 4.5:1, stor tekst (18pt / 14pt bold) ≥ 3:1 — sjekk både lys og mørk modus
