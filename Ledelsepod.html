@@ -862,7 +862,7 @@ function updateResetBtn() {
   const search  = document.getElementById('searchBox').value;
   const rating  = document.getElementById('ratingFilter').value;
   const podcast = document.getElementById('podcastFilter').value;
-  const active  = !!(search || rating !== '4' || podcast || activeTag);
+  const active  = !!(search || rating !== '4' || podcast || activeTag || showArchive);
   const btn = document.getElementById('resetBtn');
   btn.classList.toggle('filters-active', active);
   btn.setAttribute('aria-pressed', active ? 'true' : 'false');
