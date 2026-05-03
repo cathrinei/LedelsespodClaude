@@ -1305,7 +1305,7 @@ updateStats();
 applyUrlFilters();
 refresh();
 
-// Tilbake til toppen — knappen er definert etter </script>, så vi venter på DOMContentLoaded
+// Tilbake til toppen — knappen er definert etter script-blokken, så vi venter på DOMContentLoaded
 document.addEventListener('DOMContentLoaded', () => {
   const btn = document.getElementById('backToTop');
   if (!btn) return;
