@@ -199,6 +199,15 @@ def fetch_new_episodes(podcast_name, feed_url, after_dt):
     return new_eps, None
 
 
+def months_ago(n):
+    """Returnerer datetime for starten av måneden som var n måneder siden."""
+    now = datetime.now(timezone.utc)
+    month = now.month - n
+    year  = now.year + (month - 1) // 12
+    month = ((month - 1) % 12) + 1
+    return now.replace(year=year, month=month, day=1, hour=0, minute=0, second=0, microsecond=0)
+
+
 def pending_review(rows):
     """Returnerer urangerte episoder publisert for mer enn REVIEW_AFTER_DAYS siden."""
     cutoff = datetime.now(tz=timezone.utc) - timedelta(days=REVIEW_AFTER_DAYS)
@@ -224,17 +233,9 @@ def main():
     latest        = latest_date_per_podcast(existing_rows)
 
     # Rullerende 3-månedersvindu — henter ikke episoder eldre enn dette
-    now = datetime.now(timezone.utc)
-    month = now.month - 3
-    year = now.year + (month - 1) // 12
-    month = ((month - 1) % 12) + 1
-    default_from = now.replace(year=year, month=month, day=1)
-
+    default_from   = months_ago(3)
     # 12-månedersgrense — episoder eldre enn dette fjernes fra arkivet
-    month12 = now.month - 12
-    year12 = now.year + (month12 - 1) // 12
-    month12 = ((month12 - 1) % 12) + 1
-    archive_cutoff = now.replace(year=year12, month=month12, day=1)
+    archive_cutoff = months_ago(12)
 
     all_new = []
     print(f"\nSjekker {len(FEEDS)} podcast-feeder...\n")
