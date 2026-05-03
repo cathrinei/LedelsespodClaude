@@ -541,6 +541,52 @@ button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible
   #mainTable tbody tr.archive-row td.card-cell { background: #fffbeb; }
   body.dark #mainTable tbody tr.archive-row td.card-cell { background: #1c150a; }
 }
+/* COPY BUTTON */
+.copy-btn {
+  background: none;
+  border: 1px solid var(--input-border);
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 0.72rem;
+  padding: 0.18rem 0.45rem;
+  margin-left: 0.4rem;
+  transition: background 0.12s, color 0.12s, border-color 0.12s;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+.copy-btn:hover { background: var(--surface2); color: var(--text); border-color: var(--text-faint); }
+.copy-btn.copied { color: #16a34a; border-color: #16a34a; background: #f0fdf4; }
+body.dark .copy-btn.copied { color: #4ade80; border-color: #4ade80; background: #052e16; }
+.copy-btn:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2px; }
+.ep-card__listen-row { display: flex; align-items: center; gap: 0.5rem; margin-top: 0.1rem; }
+
+/* ARCHIVE HINT */
+.archive-hint {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+.archive-hint button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #92400e;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 0.2rem 0.5rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid #d97706;
+  transition: background 0.12s;
+}
+.archive-hint button:hover { background: #fef3c7; }
+body.dark .archive-hint button { color: #fbbf24; border-color: #b45309; }
+body.dark .archive-hint button:hover { background: #1c150a; }
+.archive-hint button:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2px; }
+
 /* ARCHIVE TOGGLE */
 #archiveToggle {
   padding: 0.47rem 0.95rem;
@@ -581,6 +627,9 @@ body.dark tr.archive-divider td { background: #451a03; color: #fcd34d; }
   <div class="stat stat-btn" role="button" tabindex="0" data-filter="tag:teamledelse" aria-pressed="false"><span class="stat-n" id="statTeam">–</span><span class="stat-label">Teamledelse</span></div>
   <div class="stat stat-btn" role="button" tabindex="0" data-filter="tag:personalledelse" aria-pressed="false"><span class="stat-n" id="statPers">–</span><span class="stat-label">Personalledelse</span></div>
   <div class="stat stat-btn" role="button" tabindex="0" data-filter="rating:6" aria-pressed="false"><span class="stat-n" id="statTop">–</span><span class="stat-label">Toppkarakter 6/6</span></div>
+  <div class="archive-hint" id="archiveHint" style="display:none">
+    <button id="archiveHintBtn" aria-label="Vis arkiverte episoder">+ <span id="archiveHintCount">0</span> arkiverte &#8594;</button>
+  </div>
 </div>
 
 <div class="controls">
@@ -852,7 +901,7 @@ function renderTable(items) {
       <td style="text-align:center"><span class="rating-badge${+rating >= 1 && +rating <= 6 ? ' r'+rating : ''}" aria-label="Karakter ${+rating > 0 ? rating : 'ikke vurdert'}">${+rating > 0 ? rating : 'N/A'}</span></td>
       <td><span class="cell-note">${esc(note)}</span></td>
       <td>${renderTags(tags)}</td>
-      <td><a class="listen-link" href="${safeUrl(link)}" target="_blank" rel="noopener noreferrer" aria-label="Lytt (åpnes i ny fane)"><span aria-hidden="true">&#9654;</span> Lytt</a></td>
+      <td><a class="listen-link" href="${safeUrl(link)}" target="_blank" rel="noopener noreferrer" aria-label="Lytt (åpnes i ny fane)"><span aria-hidden="true">&#9654;</span> Lytt</a><button class="copy-btn" data-copy-url="${safeUrl(link)}" aria-label="Kopier episodelenke til utklippstavle">Kopier</button></td>
     `;
     tr.insertAdjacentHTML('beforeend', `
       <td class="card-cell" colspan="10">
@@ -870,7 +919,10 @@ function renderTable(items) {
             <span class="cell-person">${esc(hosts)}</span>
           </div>
           <div class="ep-card__tags">${renderTags(tags)}</div>
-          <a class="listen-link ep-card__listen" href="${safeUrl(link)}" target="_blank" rel="noopener noreferrer" aria-label="Lytt (åpnes i ny fane)"><span aria-hidden="true">&#9654;</span> Lytt</a>
+          <div class="ep-card__listen-row">
+            <a class="listen-link ep-card__listen" href="${safeUrl(link)}" target="_blank" rel="noopener noreferrer" aria-label="Lytt (åpnes i ny fane)"><span aria-hidden="true">&#9654;</span> Lytt</a>
+            <button class="copy-btn" data-copy-url="${safeUrl(link)}" aria-label="Kopier episodelenke til utklippstavle">Kopier</button>
+          </div>
         </div>
       </td>
     `);
@@ -896,6 +948,13 @@ function updateStats() {
   document.getElementById('statTeam').textContent  = team;
   document.getElementById('statPers').textContent  = pers;
   document.getElementById('statTop').textContent   = top;
+  const archiveHint = document.getElementById('archiveHint');
+  if (archiveData.length > 0) {
+    document.getElementById('archiveHintCount').textContent = archiveData.length;
+    archiveHint.style.display = '';
+  } else {
+    archiveHint.style.display = 'none';
+  }
 }
 function fuzzyMatch(query, haystack) {
   if (haystack.includes(query)) return true;
@@ -1105,8 +1164,33 @@ document.querySelectorAll('.stat-btn').forEach(btn => {
   btn.addEventListener('click', activate);
   btn.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); activate(); } });
 });
+// Arkivhint-knapp — vis arkiv og scroll dit
+document.getElementById('archiveHintBtn').addEventListener('click', () => {
+  showArchive = true;
+  document.getElementById('archiveToggle').setAttribute('aria-pressed', 'true');
+  refresh();
+  setTimeout(() => {
+    const divider = document.querySelector('tr.archive-divider');
+    if (divider) divider.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 50);
+});
+
 // Klikk på tags i tabellen — event delegation på tbody
 document.getElementById('tableBody').addEventListener('click', e => {
+  // Klikk på kopieringsknapp
+  const copyBtn = e.target.closest('button.copy-btn[data-copy-url]');
+  if (copyBtn) {
+    const url = copyBtn.dataset.copyUrl;
+    navigator.clipboard.writeText(url).then(() => {
+      copyBtn.classList.add('copied');
+      copyBtn.textContent = '✓ Kopiert';
+      setTimeout(() => { copyBtn.classList.remove('copied'); copyBtn.textContent = 'Kopier'; }, 1500);
+    }).catch(() => {
+      copyBtn.textContent = '!';
+      setTimeout(() => { copyBtn.textContent = 'Kopier'; }, 1500);
+    });
+    return;
+  }
   // Klikk på favoritt-stjerne
   const favBtn = e.target.closest('button.fav-btn[data-fav]');
   if (favBtn) {
