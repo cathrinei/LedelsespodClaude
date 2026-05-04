@@ -60,6 +60,14 @@ Du skal alltid inkludere én kategorietag og eventuelt relevante tematagger.
 - `motivasjon` — Motivasjon, engasjement, trivsel
 - `coaching` — Coaching, mentoring, individuelle utviklingssamtaler
 
+## Språkkrav
+
+Skriv alltid korrekt bokmål. Unngå anglisismer og konstruerte ord:
+- Bruk **«hovedmotiv»**, ikke «hovemotiv»
+- Bruk **«perifert berørt»** eller **«tangerer temaet»**, ikke «tangentielt»
+- Bruk **«overflatenivå»** sparsomt — foretrekk «ikke særlig dyptgående» eller «begrenset dybde»
+- Bruk naturlige norske uttrykk fremfor direkte oversettelser fra engelsk
+
 ## Svarformat
 
 Svar alltid med gyldig JSON og ingen annen tekst:
