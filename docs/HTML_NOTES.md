@@ -16,7 +16,7 @@ The `data` array in the HTML is populated from the CSV via `embed_csv.py`. Unrat
 - **Mobil sveip-til-favoritt**: sveip høyre (>60px, horisontal dominans) på et episodekort toggler favoritt — event delegation via `touchstart`/`touchmove`/`touchend`/`touchcancel` på `#tableBody` (passive listeners); Y-koordinat spores for å avvise scroll-gester på iOS Safari; `tr.dataset.fav` settes i `renderTable()` for identifikasjon; `.fav-flashed`-klasse trigger gul glimt-animasjon (`@keyframes fav-flash`) som visuell bekreftelse
 - Under sveip: kort forskyves med `translateX`, gul venstrekant vokser via `--swipe-p` CSS-variabel på `::before`; ved avbrytelse snapper kortet tilbake med `.ep-card--snapping` (0.18s ease); `lastX` trackes i `touchmove` og brukes i `touchend` (mer pålitelig enn `changedTouches` på iOS); diagonal-toleranse 0.75 (ikke 0.5) siden iOS alltid legger litt vertikal bevegelse inn
 - Hint "sveip → for favoritt" vises på første kort via `ep-card--hint::after`, `@media (hover: none) and (pointer: coarse)` — skjules permanent etter første vellykkede sveip (`localStorage` nøkkel `ledelsepod_swipe_used`)
-- Favoritt-stjerne (`.fav-btn`) vises i mobilkortets header via `.ep-card__header-right` ved siden av rating-badge
+- Favoritt-stjerne (`.fav-btn`) vises i mobilkortets header via `.ep-card__header-right` ved siden av Lytt-lenke og 🔗-knapp
 
 ## "↑ Last inn CSV"-knappen
 - Knappen er skjult (`display:none`) — data oppdateres automatisk via GitHub Actions
@@ -71,7 +71,9 @@ The `data` array in the HTML is populated from the CSV via `embed_csv.py`. Unrat
 ## Mobilvisning (≤600px)
 - Breakpoint `@media (max-width: 600px)` bytter fra tabell til kortlayout
 - `renderTable()` injiserer en `<td class="card-cell" colspan="10">` per rad via `insertAdjacentHTML` — skjult på desktop, synlig på mobil
-- Kortet viser: podcastnavn, rating-badge, klikkbar tittel, dato, vert, tags, Lytt-knapp. Gjester, emner og begrunnelse utelates
+- Kortstruktur: **header-left** (liten rating-badge 24px + dato) · **header-right** (► Lytt + 🔗 + ★) · tittel · meta (podkastnavn + vert) · tags. Gjester, emner og begrunnelse utelates
+- 🔗-knappen (copy-btn) er grensefri ikon på desktop (episodekolonnen); på mobil er den del av kortets header-right uten border
+- Desktop LYTT-kolonne: kun `► Lytt`-lenke; 🔗-kopieringsikon ligger i episodekolonnen etter tittelen
 - Tabell og `<thead>` skjules med `display:none` på mobil; `tbody tr` blir `display:block` med kortutseende
 - Rating-fargekant (`border-left`) bevares på `<tr>` også i kortvisning
 - Header stables vertikalt, stats vises i 2-kolonners grid, kontroller full bredde på mobil
