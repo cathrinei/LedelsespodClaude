@@ -200,12 +200,14 @@ def fetch_new_episodes(podcast_name, feed_url, after_dt):
 
 
 def months_ago(n):
-    """Returnerer datetime for starten av måneden som var n måneder siden."""
+    """Returnerer dato-til-dato n måneder tilbake (samme dag, forrige måned(er))."""
     now = datetime.now(timezone.utc)
     month = now.month - n
     year  = now.year + (month - 1) // 12
     month = ((month - 1) % 12) + 1
-    return now.replace(year=year, month=month, day=1, hour=0, minute=0, second=0, microsecond=0)
+    import calendar
+    day = min(now.day, calendar.monthrange(year, month)[1])
+    return now.replace(year=year, month=month, day=day, hour=0, minute=0, second=0, microsecond=0)
 
 
 def pending_review(rows):
