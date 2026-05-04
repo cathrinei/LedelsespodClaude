@@ -2,3 +2,6 @@ __pycache__/
 *.pyc
 *.pyo
 .env
+lighthouse-report*
+_temp_lint.js
+.claude/settings.local.json
