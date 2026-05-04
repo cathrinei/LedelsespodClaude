@@ -506,7 +506,8 @@ button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible
   .ep-card { padding: 0.85rem 1rem; display: flex; flex-direction: column; gap: 0.45rem;
              position: relative; will-change: transform; overflow: hidden; }
   .ep-card__header { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; }
-  .ep-card__header-right { display: flex; align-items: center; gap: 0.4rem; flex-shrink: 0; }
+  .ep-card__header-left { display: flex; align-items: center; gap: 0.4rem; min-width: 0; }
+  .ep-card__header-right { display: flex; align-items: center; gap: 0.2rem; flex-shrink: 0; }
   .ep-card__title { font-size: 0.88rem; line-height: 1.4; display: block; }
   .ep-card__meta { display: flex; flex-wrap: wrap; gap: 0.35rem 0.75rem; align-items: center; }
   .ep-card__tags { display: flex; flex-wrap: wrap; gap: 0.35rem; }
@@ -546,20 +547,20 @@ button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible
 /* COPY BUTTON */
 .copy-btn {
   background: none;
-  border: 1px solid var(--input-border);
+  border: none;
   border-radius: var(--radius-sm);
   color: var(--text-muted);
   cursor: pointer;
   font-size: 1rem;
-  padding: 0.18rem 0.35rem;
-  margin-left: 0.4rem;
-  transition: background 0.12s, color 0.12s, border-color 0.12s;
+  padding: 0.18rem 0.2rem;
+  margin-left: 0.3rem;
+  transition: background 0.12s, color 0.12s;
   white-space: nowrap;
   vertical-align: middle;
 }
-.copy-btn:hover { background: var(--surface2); color: var(--text); border-color: var(--text-faint); }
-.copy-btn.copied { color: #16a34a; border-color: #16a34a; background: #f0fdf4; }
-body.dark .copy-btn.copied { color: #4ade80; border-color: #4ade80; background: #052e16; }
+.copy-btn:hover { color: var(--text); }
+.copy-btn.copied { color: #16a34a; }
+body.dark .copy-btn.copied { color: #4ade80; }
 .copy-btn:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2px; }
 .ep-card__listen-row { display: flex; align-items: center; gap: 0.5rem; margin-top: 0.1rem; }
 
@@ -894,13 +895,16 @@ function renderTable(items) {
       <td class="card-cell" colspan="10">
         <div class="ep-card${idx === 0 && !localStorage.getItem(SWIPE_USED_KEY) ? ' ep-card--hint' : ''}" role="article">
           <div class="ep-card__header">
-            <button class="cell-podcast" data-podcast="${esc(podcast)}" aria-pressed="${document.getElementById('podcastFilter').value === podcast ? 'true' : 'false'}">${esc(podcast)}</button>
-            <span class="ep-card__header-right">
-              <button class="fav-btn" data-fav="${esc(favId(row))}" aria-label="${favorites.has(favId(row)) ? 'Fjern fra favoritter' : 'Legg til favoritter'}" aria-pressed="${favorites.has(favId(row)) ? 'true' : 'false'}">&#9733;</button>
+            <span class="ep-card__header-left">
               <span class="rating-badge${+rating >= 1 && +rating <= 6 ? ' r'+rating : ''}" aria-label="Karakter ${+rating > 0 ? rating : 'ikke vurdert'}">${+rating > 0 ? rating : 'N/A'}</span>
+              <button class="cell-podcast" data-podcast="${esc(podcast)}" aria-pressed="${document.getElementById('podcastFilter').value === podcast ? 'true' : 'false'}">${esc(podcast)}</button>
+            </span>
+            <span class="ep-card__header-right">
+              <button class="copy-btn" data-copy-url="${safeUrl(link)}" aria-label="Kopier episodelenke til utklippstavle">🔗</button>
+              <button class="fav-btn" data-fav="${esc(favId(row))}" aria-label="${favorites.has(favId(row)) ? 'Fjern fra favoritter' : 'Legg til favoritter'}" aria-pressed="${favorites.has(favId(row)) ? 'true' : 'false'}">&#9733;</button>
             </span>
           </div>
-          <a class="cell-title ep-card__title" href="${safeUrl(link)}" target="_blank" rel="noopener noreferrer" aria-label="${esc(title)} (åpnes i ny fane)">${esc(title)}</a><button class="copy-btn" data-copy-url="${safeUrl(link)}" aria-label="Kopier episodelenke til utklippstavle">🔗</button>
+          <a class="cell-title ep-card__title" href="${safeUrl(link)}" target="_blank" rel="noopener noreferrer" aria-label="${esc(title)} (åpnes i ny fane)">${esc(title)}</a>
           <div class="ep-card__meta">
             <span class="cell-date">${esc(date)}</span>
             <span class="cell-person">${esc(hosts)}</span>
