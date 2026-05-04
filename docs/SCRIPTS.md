@@ -27,6 +27,7 @@
 - Modell: `gpt-4o-mini` (gratis for offentlige repos, 150 req/dag)
 - Leser CSV, finner alle rader med `Rating=0`, kaller API for hver episode
 - Svarformat: JSON med feltene `host`, `guest`, `main_topics`, `rating`, `rating_notes`, `tags`
+- `SYSTEM_PROMPT` inneholder eksplisitte språkkrav: korrekt bokmål, unngå anglisismer («tangentielt» → «perifert berørt», «hovemotiv» → «hovedmotiv»)
 - `host`-feltet fra modellen brukes kun hvis RSS-hentet vertsnavn mangler (RSS har prioritet)
 - Rating 4–6: beholdes i CSV med utfylte felt
 - Rating 1–3: fjernes fra CSV og skrives til `rejected_episodes.csv` (med deduplicering via `normalize()`)
