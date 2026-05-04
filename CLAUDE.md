@@ -116,6 +116,8 @@ Two layers — combine with comma (e.g. `teamledelse,feedback`):
 ### Branch-workflow
 **Alltid opprett en ny branch når datoen er ny** — bruk dato som branchnavn (`YYYY-MM-DD`):
 
+**Unntak — direkte til master:** rene dataoppdateringer (hente nye episoder, arkivere gamle) committes direkte til master uten branch og PR. GitHub Actions gjør dette automatisk; ved manuell kjøring gjelder samme regel.
+
 **CLAUDE.md skal alltid committes i samme commit som kodeendringene den dokumenterer** — ikke i en separat PR etterpå.
 
 ```bash
