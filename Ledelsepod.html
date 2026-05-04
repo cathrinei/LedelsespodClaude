@@ -550,8 +550,8 @@ button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible
   border-radius: var(--radius-sm);
   color: var(--text-muted);
   cursor: pointer;
-  font-size: 0.72rem;
-  padding: 0.18rem 0.45rem;
+  font-size: 1rem;
+  padding: 0.18rem 0.35rem;
   margin-left: 0.4rem;
   transition: background 0.12s, color 0.12s, border-color 0.12s;
   white-space: nowrap;
@@ -888,7 +888,7 @@ function renderTable(items) {
       <td style="text-align:center"><span class="rating-badge${+rating >= 1 && +rating <= 6 ? ' r'+rating : ''}" aria-label="Karakter ${+rating > 0 ? rating : 'ikke vurdert'}">${+rating > 0 ? rating : 'N/A'}</span></td>
       <td><span class="cell-note">${esc(note)}</span></td>
       <td>${renderTags(tags)}</td>
-      <td><a class="listen-link" href="${safeUrl(link)}" target="_blank" rel="noopener noreferrer" aria-label="Lytt (åpnes i ny fane)"><span aria-hidden="true">&#9654;</span> Lytt</a><button class="copy-btn" data-copy-url="${safeUrl(link)}" aria-label="Kopier episodelenke til utklippstavle">Kopier</button></td>
+      <td><a class="listen-link" href="${safeUrl(link)}" target="_blank" rel="noopener noreferrer" aria-label="Lytt (åpnes i ny fane)"><span aria-hidden="true">&#9654;</span> Lytt</a><button class="copy-btn" data-copy-url="${safeUrl(link)}" aria-label="Kopier episodelenke til utklippstavle">🔗</button></td>
     `;
     tr.insertAdjacentHTML('beforeend', `
       <td class="card-cell" colspan="10">
@@ -908,7 +908,7 @@ function renderTable(items) {
           <div class="ep-card__tags">${renderTags(tags)}</div>
           <div class="ep-card__listen-row">
             <a class="listen-link ep-card__listen" href="${safeUrl(link)}" target="_blank" rel="noopener noreferrer" aria-label="Lytt (åpnes i ny fane)"><span aria-hidden="true">&#9654;</span> Lytt</a>
-            <button class="copy-btn" data-copy-url="${safeUrl(link)}" aria-label="Kopier episodelenke til utklippstavle">Kopier</button>
+            <button class="copy-btn" data-copy-url="${safeUrl(link)}" aria-label="Kopier episodelenke til utklippstavle">🔗</button>
           </div>
         </div>
       </td>
@@ -1180,11 +1180,11 @@ document.getElementById('tableBody').addEventListener('click', e => {
     const url = copyBtn.dataset.copyUrl;
     navigator.clipboard.writeText(url).then(() => {
       copyBtn.classList.add('copied');
-      copyBtn.textContent = '✓ Kopiert';
-      setTimeout(() => { copyBtn.classList.remove('copied'); copyBtn.textContent = 'Kopier'; }, 1500);
+      copyBtn.textContent = '✓';
+      setTimeout(() => { copyBtn.classList.remove('copied'); copyBtn.textContent = '🔗'; }, 1500);
     }).catch(() => {
       copyBtn.textContent = '!';
-      setTimeout(() => { copyBtn.textContent = 'Kopier'; }, 1500);
+      setTimeout(() => { copyBtn.textContent = '🔗'; }, 1500);
     });
     return;
   }
