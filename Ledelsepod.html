@@ -126,6 +126,11 @@ body.dark header { background: linear-gradient(150deg, #040a04 0%, #0b180c 60%, 
 body.dark #darkToggle { border-color: rgba(255,255,255,0.15); color: rgba(255,255,255,0.7); }
 
 /* STATS BAR */
+.sticky-ui {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
 .stats-bar {
   display: flex;
   flex-wrap: wrap;
@@ -169,8 +174,7 @@ body.dark #darkToggle { border-color: rgba(255,255,255,0.15); color: rgba(255,25
 
 /* CONTROLS */
 .controls {
-  position: sticky;
-  top: 0;
+  position: static;
   z-index: 10;
   background: var(--surface);
   border-bottom: 1px solid var(--border);
@@ -452,6 +456,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible
 /* RESPONSIVE */
 @media (max-width: 720px) {
   header, .stats-bar, .controls, .row-count { padding-left: 1rem; padding-right: 1rem; }
+  .sticky-ui { position: static; }
   .table-wrap { padding: 0.5rem 0 2rem; }
   header h1 { font-size: 1.1rem; }
   .search-wrap { max-width: 100%; }
@@ -612,6 +617,7 @@ body.dark tr.archive-divider td { background: #451a03; color: #fcd34d; }
   <button id="darkToggle" aria-label="Bytt mellom lys og mørk visning">&#9790; Mørk</button>
 </header>
 
+<div class="sticky-ui">
 <div class="stats-bar">
   <div class="stat stat-btn" role="button" tabindex="0" data-filter="reset" aria-pressed="false"><span class="stat-n" id="statTotal">–</span><span class="stat-label">Episoder</span></div>
   <div class="stat stat-btn" role="button" tabindex="0" data-filter="tag:teamledelse" aria-pressed="false"><span class="stat-n" id="statTeam">–</span><span class="stat-label">Teamledelse</span></div>
@@ -657,6 +663,7 @@ body.dark tr.archive-divider td { background: #451a03; color: #fcd34d; }
     </div>
   </div>
 </div>
+</div><!-- /sticky-ui -->
 
 <div class="row-count" id="rowCount" role="status" aria-live="polite" aria-atomic="true"></div>
 
