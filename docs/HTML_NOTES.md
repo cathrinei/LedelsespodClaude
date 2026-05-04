@@ -56,7 +56,7 @@ The `data` array in the HTML is populated from the CSV via `embed_csv.py`. Unrat
 - CSP: `default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; connect-src 'self'`
 - Default filter on load: rating 4+; N/A episodes always shown regardless of filter
 - CSV upload capped at 5 MB
-- Controls bar is **sticky** (`position: sticky; top: 0`) — stays visible while scrolling
+- `.sticky-ui` wrapper er **sticky** (`position: sticky; top: 0; z-index: 10`) på desktop — inneholder både `.stats-bar` og `.controls`, begge følger med ved scrolling; på mobil (`≤600px`) er wrapperen `static`
 - Rating badges use solid colors (no gradient): green `#166534` (6), blue `#1d4ed8` (5), purple `#6d28d9` (4) — with subtle `box-shadow` ring
 - Rows get `data-rating` attribute in `renderTable()` — used for CSS left-border accent per rating level (`td:first-child`)
 - Thin vertical column dividers: `rgba(255,255,255,0.08)` on `thead th:not(:last-child)`, `var(--table-divider)` on `tbody td:not(:last-child)`
