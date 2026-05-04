@@ -73,7 +73,8 @@ The `data` array in the HTML is populated from the CSV via `embed_csv.py`. Unrat
 - `renderTable()` injiserer en `<td class="card-cell" colspan="10">` per rad via `insertAdjacentHTML` — skjult på desktop, synlig på mobil
 - Kortstruktur: **header-left** (liten rating-badge 24px + dato) · **header-right** (► Lytt + 🔗 + ★) · tittel · meta (podkastnavn + vert) · tags. Gjester, emner og begrunnelse utelates
 - 🔗-knappen (copy-btn) er grensefri ikon på desktop (episodekolonnen); på mobil er den del av kortets header-right uten border
-- Desktop LYTT-kolonne: kun `► Lytt`-lenke; 🔗-kopieringsikon ligger i episodekolonnen etter tittelen
+- Desktop EPISODE-kolonne: `★ 🔗 [tittel]` — favoritt og kopieringsikon gruppert til venstre før tittelen
+- Desktop LYTT-kolonne: kun `► Lytt`-lenke
 - Tabell og `<thead>` skjules med `display:none` på mobil; `tbody tr` blir `display:block` med kortutseende
 - Rating-fargekant (`border-left`) bevares på `<tr>` også i kortvisning
 - Header stables vertikalt, stats vises i 2-kolonners grid, kontroller full bredde på mobil
