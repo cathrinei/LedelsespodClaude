@@ -6,8 +6,11 @@
 - `User-Agent` set to `LedelsepodCrawler/1.0 (privat bruk)` — honest identifier, not browser spoofing
 - Language hardcoded to `"Norwegian"` for all fetched episodes (Norwegian-only project)
 - New episodes get `Rating=0` — automatically rated by `auto_rate.py` in the next step
-- Episodes older than 6 months are pruned from the CSV on every run (rullerende vindu)
-- `default_from` beregnes dynamisk som `today - 6 months` med `day=1` clamp for å unngå ValueError på dag 29–31
+- **Rullerende 3-månedersvindu:** episoder eldre enn 3 måneder flyttes fra `Ledelsepod.csv` til `Ledelsepod_arkiv.csv` på hver kjøring
+- **Arkiv 3–12 måneder:** `Ledelsepod_arkiv.csv` beholder episoder mellom 3 og 12 måneder gamle; eldre fjernes helt
+- `months_ago(n)` beregner eksakt dato-til-dato n måneder tilbake (f.eks. 2026-05-04 → 2026-02-04); bruker `calendar.monthrange` for å håndtere kanttilfeller som 31. jan → 28. feb
+- `default_from` = `months_ago(3)` — brukes som fallback hente-grense per podcast hvis ingen kjent dato finnes
+- Arkivering og opprydding skjer alltid basert på `datetime.now()` — uavhengig av siste hentingsdato
 - `pending_review()` runs at end of every execution — flags unrated episodes older than `REVIEW_AFTER_DAYS = 2` days
 - Errors distinguish between HTTP errors and network errors
 - `REJECTED_PATH` points to `rejected_episodes.csv` — loaded via `load_rejected()` at startup
