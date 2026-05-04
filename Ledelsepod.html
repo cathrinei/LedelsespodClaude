@@ -554,7 +554,8 @@ button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible
   cursor: pointer;
   font-size: 1rem;
   padding: 0.18rem 0.2rem;
-  margin-left: 0.3rem;
+  margin-left: 0;
+  margin-right: 0.3rem;
   transition: background 0.12s, color 0.12s;
   white-space: nowrap;
   vertical-align: middle;
@@ -881,7 +882,7 @@ function renderTable(items) {
     tr.dataset.fav = favId(row);
     tr.innerHTML = `
       <td><button class="cell-podcast" data-podcast="${esc(podcast)}" aria-pressed="${document.getElementById('podcastFilter').value === podcast ? 'true' : 'false'}">${esc(podcast)}</button></td>
-      <td><button class="fav-btn" data-fav="${esc(favId(row))}" aria-label="${favorites.has(favId(row)) ? 'Fjern fra favoritter' : 'Legg til favoritter'}" aria-pressed="${favorites.has(favId(row)) ? 'true' : 'false'}">&#9733;</button><a class="cell-title" href="${safeUrl(link)}" target="_blank" rel="noopener noreferrer" aria-label="${esc(title)} (åpnes i ny fane)">${esc(title)}</a><button class="copy-btn" data-copy-url="${safeUrl(link)}" aria-label="Kopier episodelenke til utklippstavle">🔗</button></td>
+      <td><button class="fav-btn" data-fav="${esc(favId(row))}" aria-label="${favorites.has(favId(row)) ? 'Fjern fra favoritter' : 'Legg til favoritter'}" aria-pressed="${favorites.has(favId(row)) ? 'true' : 'false'}">&#9733;</button><button class="copy-btn" data-copy-url="${safeUrl(link)}" aria-label="Kopier episodelenke til utklippstavle">🔗</button><a class="cell-title" href="${safeUrl(link)}" target="_blank" rel="noopener noreferrer" aria-label="${esc(title)} (åpnes i ny fane)">${esc(title)}</a></td>
       <td><span class="cell-date">${esc(date)}</span></td>
       <td><span class="cell-person">${esc(hosts)}</span></td>
       <td><span class="cell-person">${esc(guests)}</span></td>
