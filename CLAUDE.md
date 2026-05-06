@@ -93,6 +93,7 @@ Two layers — combine with comma (e.g. `teamledelse,feedback`):
 | The Office – Ledelse, jobb og juss | https://anchor.fm/s/110039498/podcast/rss |
 | Smidigpodden | https://feeds.acast.com/public/shows/62b2e41c423bc40013892e2d |
 | Psykologkameratene | https://feed.podbean.com/psykologkameratene/feed.xml |
+| Åpen kilde | https://feeds.acast.com/public/shows/apen-kilde |
 
 ## Workflow
 

@@ -1,7 +1,7 @@
 # Script-tekniske noter
 
 ## update_podcasts.py
-- `FEEDS` dict: add new podcasts with name (must match CSV) and RSS URL — 8 feeds currently
+- `FEEDS` dict: add new podcasts with name (must match CSV) and RSS URL — 9 feeds currently
 - Fetches only episodes newer than last known date per podcast (`latest_date_per_podcast`)
 - `User-Agent` set to `LedelsepodCrawler/1.0 (privat bruk)` — honest identifier, not browser spoofing
 - Language hardcoded to `"Norwegian"` for all fetched episodes (Norwegian-only project)
