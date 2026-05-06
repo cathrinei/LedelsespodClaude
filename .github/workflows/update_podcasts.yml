@@ -85,15 +85,3 @@ jobs:
           echo '```' >> $GITHUB_STEP_SUMMARY
           cat /tmp/rate_output.txt >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### Arkiv" >> $GITHUB_STEP_SUMMARY
-          echo '```' >> $GITHUB_STEP_SUMMARY
-          python - << 'PYEOF'
-          import re, json
-          with open("Ledelsepod.html", encoding="utf-8") as f:
-              html = f.read()
-          m = re.search(r"const archiveData = (\[.*?\]);", html, re.DOTALL)
-          n = len(json.loads(m.group(1))) if m else 0
-          print(f"Arkiverte episoder (3–12 mnd): {n}")
-          PYEOF
-          echo '```' >> $GITHUB_STEP_SUMMARY
