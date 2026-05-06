@@ -960,16 +960,17 @@ function updateStats() {
   document.getElementById('statTop').textContent   = top;
   updateArchiveHint();
 }
-function fuzzyMatch(query, haystack) {
-  if (haystack.includes(query)) return true;
-  let qi = 0;
-  for (let i = 0; i < haystack.length && qi < query.length; i++) {
-    if (haystack[i] === query[qi]) qi++;
-  }
-  return qi === query.length;
+function searchScore(row, terms) {
+  // Returnerer 2 = titteltreff, 1 = emnetreff, 0 = treff i andre felt
+  const [, title, , , , , topics] = row;
+  const t = title.toLowerCase(), tp = topics.toLowerCase();
+  if (terms.every(w => t.includes(w)))  return 2;
+  if (terms.every(w => tp.includes(w))) return 1;
+  return 0;
 }
 function getFiltered() {
   const search        = document.getElementById('searchBox').value.toLowerCase().trim();
+  const terms         = search ? search.split(/\s+/).filter(Boolean) : [];
   const minRating     = parseInt(document.getElementById('ratingFilter').value);
   const podcastFilter = document.getElementById('podcastFilter').value;
   const filterRow = row => {
@@ -978,14 +979,20 @@ function getFiltered() {
     if (+rating > 0 && +rating < minRating) return false;
     if (podcastFilter && podcast !== podcastFilter) return false;
     if (showFavsOnly && !favorites.has(favId(row))) return false;
-    if (search) {
+    if (terms.length) {
       const haystack = [podcast, title, hosts, guests, topics, note].join(' ').toLowerCase();
-      if (!fuzzyMatch(search, haystack)) return false;
+      if (terms.some(w => !haystack.includes(w))) return false;
     }
     return true;
   };
-  const mainItems    = data.filter(filterRow).map(row => ({ row, isArchive: false }));
-  const archiveItems = showArchive ? archiveData.filter(filterRow).map(row => ({ row, isArchive: true })) : [];
+  const toItem = isArchive => row => ({ row, isArchive });
+  let mainItems    = data.filter(filterRow).map(toItem(false));
+  let archiveItems = showArchive ? archiveData.filter(filterRow).map(toItem(true)) : [];
+  if (terms.length) {
+    const score = item => searchScore(item.row, terms);
+    mainItems    = mainItems.sort((a, b) => score(b) - score(a));
+    archiveItems = archiveItems.sort((a, b) => score(b) - score(a));
+  }
   return mainItems.concat(archiveItems);
 }
 function getSorted(items) {
