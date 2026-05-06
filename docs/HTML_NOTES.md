@@ -6,7 +6,7 @@ The `data` array in the HTML is populated from the CSV via `embed_csv.py`. Unrat
 ## Stats
 `updateStats()` computes all stats from the `data` array:
 - Total episodes, shows, teamledelse-tagged count, personalledelse-tagged count, top-rated (6/6), unrated (N/A)
-- Four stat cards are clickable filter shortcuts (`.stat-btn`): **Episoder** (reset all), **Teamledelse** (tag filter), **Personalledelse** (tag filter), **Toppkarakter 6/6** (rating=6)
+- Four stat cards are clickable filter shortcuts (`.stat-btn`): **Episoder** (reset all), **Teamledelse** (tag filter), **Personalledelse** (tag filter), **Produktledelse** (tag filter), **Toppkarakter 6/6** (rating=6)
 - Active stat card gets green background; clicking again toggles the filter off
 - `updateStatBtns()` syncs active state of stat cards with current filter state; called after every filter action and from `resetFilters()`
 - `updateResetBtn()` toggles `.filters-active` class on Nullstill-knappen når søk, rating, podkast, tag eller favoritter er aktivt — grønn kant og tekst som visuelt signal; called from `refresh()`
@@ -49,7 +49,7 @@ The `data` array in the HTML is populated from the CSV via `embed_csv.py`. Unrat
 - Language column (index 2) is kept in CSV/data array but **not displayed** in the table — all episodes are Norwegian
 - Sort: `sort` object (`col`, `asc`); `RATING_COL = 7`, `DATE_COL = 3` — default sort is date descending (newest first)
 - `data-col` in table headers refers to **data array indices** (col 2 is skipped in table display — so `data-col="3"` = date, `data-col="4"` = hosts, etc.)
-- Tags whitelisted via `tagMeta` — 7 tags: `teamledelse`, `personalledelse`, `feedback`, `kultur`, `rekruttering`, `motivasjon`, `coaching`
+- Tags whitelisted via `tagMeta` — 8 tags: `teamledelse`, `personalledelse`, `produktledelse`, `feedback`, `kultur`, `rekruttering`, `motivasjon`, `coaching`
 - Tags can be combined (comma-separated); `tagsOf(row)` helper used for all tag checks
 - Episode titles are rendered as `<a class="cell-title">` links — clicking opens the episode URL in a new tab; styled to look like plain text (no underline until hover)
 - `safeUrl()` blocks non-HTTP(S) URLs to prevent `javascript:` injection

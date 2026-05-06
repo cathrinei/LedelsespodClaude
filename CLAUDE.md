@@ -52,12 +52,13 @@ This project collects and curates Norwegian-language podcast episodes on **teaml
 
 Two layers — combine with comma (e.g. `teamledelse,feedback`):
 
-**Kategorier** (bruk for episoder som er klart innenfor ett av de to temaene):
+**Kategorier** (bruk for episoder som er klart innenfor ett av de tre temaene):
 
 | Tag | Når det brukes |
 |---|---|
 | `teamledelse` | Episoden handler primært om å lede team, teamdynamikk, samarbeid, kollektiv prestasjon |
 | `personalledelse` | Episoden handler primært om personalarbeid, HR, individuell medarbeiderutvikling, ansettelse |
+| `produktledelse` | Episoden handler primært om produktledelse, produktstrategi, produkteierskap, roadmap-prioritering eller digital produktutvikling |
 
 **Temataggs** (valgfrie, ved sterk tilknytning til et undertema):
 

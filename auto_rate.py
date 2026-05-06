@@ -52,6 +52,7 @@ Du skal alltid inkludere én kategorietag og eventuelt relevante tematagger.
 **Kategorietagger (velg én):**
 - `teamledelse` — Episoden handler primært om å lede team, teamdynamikk, samarbeid, kollektiv prestasjon
 - `personalledelse` — Episoden handler primært om personalarbeid, HR, individuell medarbeiderutvikling, ansettelse
+- `produktledelse` — Episoden handler primært om produktledelse, produktstrategi, produkteierskap, roadmap-prioritering eller digital produktutvikling
 
 **Tematagger (valgfrie, ved sterk tilknytning):**
 - `feedback` — Feedback-kultur, tilbakemeldingssamtaler, åpenhet
