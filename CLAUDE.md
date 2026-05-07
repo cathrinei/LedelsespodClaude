@@ -35,9 +35,9 @@ This project collects and curates Norwegian-language podcast episodes on **teaml
 | Published Date | YYYY-MM-DD |
 | Host(s) | Host names |
 | Guest(s) | Guest names (if notable) |
-| Main Topic(s) | Key subjects covered |
+| Main Topic(s) | 2–4 konkrete emneord, kommaseparert — **ikke** kategorietagger (`teamledelse`, `personalledelse`) |
 | Rating (1–6) | See rubric below |
-| Rating Notes | 1–2 sentence justification |
+| Rating Notes | Konsist norsk — fraser, ikke hele setninger. Ikke start med «Episoden...». Eksempel: `NHH-forsker med dyp innsikt om målstyring — høy faglig verdi` |
 | Tags | Comma-separated — see tag schema below |
 | Platform / Link | URL to episode or show |
 
