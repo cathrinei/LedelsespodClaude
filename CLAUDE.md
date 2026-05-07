@@ -134,7 +134,7 @@ All utvikling skjer på datobranchen. Merge til master via PR når sesjonen er f
 - Review endringene, merge, og slett branchen i GitHub-grensesnittet
 
 ### Opprydding av branches og PRer
-**Påminnelse hver 14. dag:** slett gamle branches og lukkede PRer.
+**Påminnelse hver 7. dag:** slett gamle branches og lukkede PRer.
 
 ```bash
 # Slett alle remote branches unntatt master
