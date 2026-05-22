@@ -177,6 +177,10 @@ def fetch_new_episodes(podcast_name, feed_url, after_dt):
         link_el = item.find("link")
         link = link_el.text.strip() if link_el is not None and link_el.text else ""
         if not link:
+            # <guid> er stabilt selv om utgiver endrer episodetittel (f.eks. Buzzsprout)
+            guid_el = item.find("guid")
+            link = guid_el.text.strip() if guid_el is not None and guid_el.text else ""
+        if not link:
             enclosure = item.find("enclosure")
             link = enclosure.attrib.get("url", "") if enclosure is not None else ""
 
@@ -231,14 +235,24 @@ def pending_review(rows):
 
 def main():
     header, existing_rows = read_csv()
+    arch_header, arch_existing = read_archive()
     rejected      = load_rejected()
     existing_keys = {(r[0].strip().lower(), r[1].strip().lower()) for r in existing_rows if len(r) >= 2}
+    # Lenke-basert dedup: fanger opp episoder der utgiver har endret tittel mellom to hentinger
+    existing_links = {
+        r[10].strip().lower()
+        for r in existing_rows + arch_existing
+        if len(r) >= 11 and r[10].strip()
+    }
     latest        = latest_date_per_podcast(existing_rows)
 
     # Rullerende 3-månedersvindu — henter ikke episoder eldre enn dette
     default_from   = months_ago(3)
     # 12-månedersgrense — episoder eldre enn dette fjernes fra arkivet
     archive_cutoff = months_ago(12)
+
+    if arch_header is None:
+        arch_header = header
 
     all_new = []
     print(f"\nSjekker {len(FEEDS)} podcast-feeder...\n")
@@ -254,7 +268,12 @@ def main():
             continue
 
         ep_keys    = [(ep, (ep[0].lower(), ep[1].lower())) for ep in episodes]
-        filtered   = [ep for ep, k in ep_keys if k not in rejected and k not in existing_keys]
+        filtered   = [
+            ep for ep, k in ep_keys
+            if k not in rejected
+            and k not in existing_keys
+            and ep[10].lower() not in existing_links  # lenke-basert dedup
+        ]
         n_rejected = sum(1 for _, k in ep_keys if k in rejected)
         n_dup      = len(episodes) - len(filtered) - n_rejected
 
@@ -279,9 +298,6 @@ def main():
                   if len(r) >= 4 and archive_str <= r[3].strip() < cutoff_str]
 
     # Slå sammen med eksisterende arkiv (deduplisering på podcast+tittel)
-    arch_header, arch_existing = read_archive()
-    if arch_header is None:
-        arch_header = header
     arch_keys = {(r[0].strip().lower(), r[1].strip().lower())
                  for r in arch_existing if len(r) >= 2}
     new_to_archive = [r for r in moved_rows
