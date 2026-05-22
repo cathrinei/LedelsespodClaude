@@ -52,8 +52,14 @@ def main():
         print(f"FEIL: CSV-header har {len(header)} kolonner, forventet minst 11")
         sys.exit(1)
 
+    # Filtrer ut uraterte episoder (Rating=0) — vises ikke i HTML før de er vurdert
+    rated_rows = [r for r in rows if len(r) > 7 and r[7].strip() not in ("0", "")]
+    n_unrated = len(rows) - len(rated_rows)
+    if n_unrated:
+        print(f"NB: {n_unrated} uraterte episode(r) (Rating=0) utelatt fra HTML")
+
     # Bygg hoved-array
-    new_data_array = csv_to_js_array(rows, "data")
+    new_data_array = csv_to_js_array(rated_rows, "data")
 
     # Bygg arkiv-array — graceful hvis filen mangler eller er tom
     archive_rows = []
@@ -84,7 +90,7 @@ def main():
     with open(HTML_PATH, "w", encoding="utf-8") as f:
         f.write(new_html)
 
-    print(f"OK: {len(rows)} episoder + {len(archive_rows)} arkiverte skrevet inn i HTML")
+    print(f"OK: {len(rated_rows)} episoder + {len(archive_rows)} arkiverte skrevet inn i HTML")
 
 
 if __name__ == "__main__":

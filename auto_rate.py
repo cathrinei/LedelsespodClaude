@@ -108,21 +108,16 @@ def save_failed_attempts(attempts: dict[tuple[str, str], int]) -> None:
 
 
 def _handle_failure(
-    failed_attempts: dict, key: tuple, row: list, i: int,
-    reason: str, removed_rows: list, rows_to_remove: set
-) -> bool:
-    """Teller opp feil for en episode. Returnerer True hvis episoden nå auto-forkastes."""
+    failed_attempts: dict, key: tuple, reason: str
+) -> None:
+    """Teller opp tekniske feil for en episode.
+    Episode forblir i CSV med Rating=0 og re-prøves neste kjøring.
+    Tekniske feil sendes aldri til rejected_episodes.csv — kun rating 1–3 gjør det.
+    """
     attempts = failed_attempts.get(key, 0) + 1
-    if attempts >= MAX_ATTEMPTS:
-        print(f"    FORKASTES  {reason}, {attempts} forsøk — sendes til rejected_episodes.csv\n")
-        removed_rows.append(row)
-        rows_to_remove.add(i)
-        failed_attempts.pop(key, None)
-        return True
-    print(f"    FJERNES  {reason} — forsøk {attempts}/{MAX_ATTEMPTS}, re-prøves neste kjøring\n")
-    rows_to_remove.add(i)
     failed_attempts[key] = attempts
-    return False
+    suffix = f" ({attempts}. forsøk)" if attempts > 1 else ""
+    print(f"    TEKNISK FEIL{suffix}  {reason} — re-prøves neste kjøring\n")
 
 
 def rate_episode(client: OpenAI, podcast: str, title: str,
@@ -133,7 +128,7 @@ def rate_episode(client: OpenAI, podcast: str, title: str,
         f"Tittel: {title}\n"
         f"Publisert: {pub_date}\n"
         f"Lenke: {link}\n\n"
-        "Vurder denne episoden og svar med JSON som beskrevet i systemprompten."
+        "Vurder denne episoden og svar med JSON."
     )
 
     try:
@@ -188,11 +183,10 @@ def main() -> None:
     print(f"OK Fant {len(unrated)} uraterte episode(r) — starter vurdering...\n")
 
     updated = 0
-    removed_rows = []
+    removed_rows = []   # rating 1–3 → rejected_episodes.csv
     rows_to_remove = set()
     failed_attempts = load_failed_attempts()
     failed_attempts_initial = dict(failed_attempts)
-    auto_rejected = 0
 
     for i, row in unrated:
         while len(row) < 11:
@@ -208,8 +202,9 @@ def main() -> None:
 
         result = rate_episode(client, podcast, title, pub_date, link)
         if result is None:
-            if _handle_failure(failed_attempts, key, row, i, "Ingen gyldig respons", removed_rows, rows_to_remove):
-                auto_rejected += 1
+            # Teknisk feil (API-feil, content filter, timeout) — episode beholdes i CSV
+            # med Rating=0 og re-prøves neste kjøring. Sendes aldri til rejected_episodes.csv.
+            _handle_failure(failed_attempts, key, "Ingen gyldig respons")
             continue
 
         rating_raw = result.get("rating", 0)
@@ -219,8 +214,7 @@ def main() -> None:
             rating = 0
 
         if rating <= 0 or rating > 6:
-            if _handle_failure(failed_attempts, key, row, i, f"Ugyldig rating ({rating_raw})", removed_rows, rows_to_remove):
-                auto_rejected += 1
+            _handle_failure(failed_attempts, key, f"Ugyldig rating ({rating_raw})")
             continue
 
         failed_attempts.pop(key, None)
@@ -253,10 +247,15 @@ def main() -> None:
     if removed_rows:
         append_rejected(removed_rows)
 
+    # Tell opp episoder som fortsatt har tekniske feil
+    still_failing = len([k for k in failed_attempts if k in {
+        (normalize(r[0]), normalize(r[1])) for _, r in unrated
+    }])
+
     print(f"OK {updated} episoder vurdert og beholdt (rating 4–6)")
-    print(f"OK {len(removed_rows) - auto_rejected} episoder fjernet (rating 1–3) og lagt til rejected_episodes.csv")
-    if auto_rejected:
-        print(f"OK {auto_rejected} episoder forkastet etter {MAX_ATTEMPTS} mislykkede forsøk")
+    print(f"OK {len(removed_rows)} episoder fjernet (rating 1–3) og lagt til rejected_episodes.csv")
+    if still_failing:
+        print(f"NB {still_failing} episode(r) hadde teknisk feil — beholdes i CSV med Rating=0, re-prøves neste kjøring")
     print(f"OK {len(kept)} episoder totalt i CSV")
 
 
