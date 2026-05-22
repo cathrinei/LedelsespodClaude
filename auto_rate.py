@@ -133,7 +133,7 @@ def rate_episode(client: OpenAI, podcast: str, title: str,
         f"Tittel: {title}\n"
         f"Publisert: {pub_date}\n"
         f"Lenke: {link}\n\n"
-        "Vurder denne episoden og svar med JSON som beskrevet i systemprompten."
+        "Vurder denne episoden og svar med JSON."
     )
 
     try:
