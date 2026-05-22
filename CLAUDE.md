@@ -13,13 +13,13 @@ This project collects and curates Norwegian-language podcast episodes on **teaml
 - `Ledelsepod_arkiv.csv` — arkivdata, episoder 3–12 måneder gamle (rullerende); eldre fjernes helt
 - `Ledelsepod.html` — interactive table with filtering, sorting, stats (CSV import button hidden); stats-bar viser «+ N arkiverte»-knapp som toggles arkivvisning (3–12 mnd)
 - `README.md` — prosjektbeskrivelse med lenke til GitHub Pages
-- `update_podcasts.py` — RSS fetcher; adds new episodes (Rating=0) since last known date per podcast
-- `auto_rate.py` — automatisk vurdering av Rating=0-episoder via GitHub Models (gpt-4o-mini, gratis)
+- `update_podcasts.py` — RSS fetcher; adds new episodes (Rating=0) since last known date per podcast. Dedup bruker to nøkler: `(podcast, tittel)` + `(podcast, lenke/guid)` — fanger opp episoder der utgiver har endret tittelen mellom to hentinger
+- `auto_rate.py` — automatisk vurdering av Rating=0-episoder via GitHub Models (gpt-4o-mini, gratis). **To typer utfall:** tekniske feil (API-feil, content filter) → episode beholdes i CSV med Rating=0 og re-prøves neste kjøring; rating 1–3 → fjernes og sendes til `rejected_episodes.csv`
 - `rate_runner.py` — stabil kjørelogikk for manuell episodeevaluering; importeres av `rate_episodes.py`
 - `rate_episodes.py` — data-only (UPDATES + REMOVE_KEYWORDS); skrives per raterunde, slettes etter bruk
-- `embed_csv.py` — skriver CSV-innholdet inn i HTML-filens `data`- og `archiveData`-array; kjøres etter hver raterunde
-- `rejected_episodes.csv` — denylist; episodes here are never re-fetched by `update_podcasts.py`
-- `failed_attempts.csv` — teller mislykkede API-forsøk per episode; etter `MAX_ATTEMPTS=3` forsøk sendes episoden automatisk til `rejected_episodes.csv`
+- `embed_csv.py` — skriver CSV-innholdet inn i HTML-filens `data`- og `archiveData`-array; kjøres etter hver raterunde. Filtrerer ut Rating=0-episoder slik at teknisk-feilede episoder ikke vises på nettsiden
+- `rejected_episodes.csv` — denylist; episodes here are never re-fetched by `update_podcasts.py`. Kun episoder med rating 1–3 havner her — aldri tekniske feil
+- `failed_attempts.csv` — teller mislykkede API-forsøk per episode; episoder med tekniske feil beholdes i CSV med Rating=0 og re-prøves automatisk til de lykkes
 - `.github/workflows/update_podcasts.yml` — GitHub Actions workflow; kjører onsdag og fredag kl 23:05, manuell trigger tilgjengelig
 - `.gitignore` — ekskluderer `__pycache__/`, `*.pyc`, `*.pyo`, `.env`
 - `docs/HTML_NOTES.md` — tekniske detaljer om Ledelsepod.html (stats, filter, mobil, dark mode osv.)
