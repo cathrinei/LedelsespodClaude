@@ -60,6 +60,7 @@ Du skal alltid inkludere én kategorietag og eventuelt relevante tematagger.
 - `rekruttering` — Ansettelse, onboarding, talentutvikling
 - `motivasjon` — Motivasjon, engasjement, trivsel
 - `coaching` — Coaching, mentoring, individuelle utviklingssamtaler
+- `endringsledelse` — Organisasjonsendring, endringsledelse, omstilling eller transformasjon
 
 ## Språkkrav
 

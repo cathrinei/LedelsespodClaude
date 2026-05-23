@@ -49,7 +49,7 @@ The `data` array in the HTML is populated from the CSV via `embed_csv.py`. Unrat
 - Language column (index 2) is kept in CSV/data array but **not displayed** in the table — all episodes are Norwegian
 - Sort: `sort` object (`col`, `asc`); `RATING_COL = 7`, `DATE_COL = 3` — default sort is date descending (newest first)
 - `data-col` in table headers refers to **data array indices** (col 2 is skipped in table display — so `data-col="3"` = date, `data-col="4"` = hosts, etc.)
-- Tags whitelisted via `tagMeta` — 8 tags: `teamledelse`, `personalledelse`, `produktledelse`, `feedback`, `kultur`, `rekruttering`, `motivasjon`, `coaching` (merk: `produktledelse`-taggen finnes fortsatt i `tagMeta` for episodevisning, men kortet og tag-pill-filteret er fjernet)
+- Tags whitelisted via `tagMeta` — 9 tags: `teamledelse`, `personalledelse`, `produktledelse`, `feedback`, `kultur`, `rekruttering`, `motivasjon`, `coaching`, `endringsledelse` (merk: `produktledelse`-taggen finnes fortsatt i `tagMeta` for episodevisning, men kortet og tag-pill-filteret er fjernet)
 - Tags can be combined (comma-separated); `tagsOf(row)` helper used for all tag checks
 - Episode titles are rendered as `<a class="cell-title">` links — clicking opens the episode URL in a new tab; styled to look like plain text (no underline until hover)
 - `safeUrl()` blocks non-HTTP(S) URLs to prevent `javascript:` injection
