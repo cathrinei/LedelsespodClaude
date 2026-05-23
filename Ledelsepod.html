@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; connect-src 'self'; img-src 'self' data:">
-<meta name="description" content="Norske ledelsespodcaster – teamledelse, personalledelse og produktledelse – siste 3 måneder rangert, filtrert og arkivert">
+<meta name="description" content="Norske ledelsespodcaster – teamledelse og personalledelse – siste 3 måneder rangert, filtrert og arkivert">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎙️</text></svg>">
 <title>Ledelse</title>
 <style>
@@ -625,7 +625,6 @@ body.dark tr.archive-divider td { background: #451a03; color: #fcd34d; }
   <div class="stat stat-btn" role="button" tabindex="0" data-filter="reset" aria-pressed="false"><span class="stat-n" id="statTotal">–</span><span class="stat-label">Episoder</span></div>
   <div class="stat stat-btn" role="button" tabindex="0" data-filter="tag:teamledelse" aria-pressed="false"><span class="stat-n" id="statTeam">–</span><span class="stat-label">Teamledelse</span></div>
   <div class="stat stat-btn" role="button" tabindex="0" data-filter="tag:personalledelse" aria-pressed="false"><span class="stat-n" id="statPers">–</span><span class="stat-label">Personalledelse</span></div>
-  <div class="stat stat-btn" role="button" tabindex="0" data-filter="tag:produktledelse" aria-pressed="false"><span class="stat-n" id="statProd">–</span><span class="stat-label">Produktledelse</span></div>
   <div class="stat stat-btn" role="button" tabindex="0" data-filter="rating:6" aria-pressed="false"><span class="stat-n" id="statTop">–</span><span class="stat-label">Toppkarakter 6/6</span></div>
   <div class="archive-hint" id="archiveHint" style="display:none">
     <button id="archiveHintBtn">+ <span id="archiveHintCount">0</span> arkiverte &#8594;</button>
@@ -659,7 +658,6 @@ body.dark tr.archive-divider td { background: #451a03; color: #fcd34d; }
       <button class="tag-pill active" data-tag="" aria-pressed="true">Alle</button>
       <button class="tag-pill" data-tag="teamledelse" aria-pressed="false">Teamledelse</button>
       <button class="tag-pill" data-tag="personalledelse" aria-pressed="false">Personalledelse</button>
-      <button class="tag-pill" data-tag="produktledelse" aria-pressed="false">Produktledelse</button>
       <button class="tag-pill" data-tag="feedback" aria-pressed="false">Feedback</button>
       <button class="tag-pill" data-tag="kultur" aria-pressed="false">Kultur</button>
       <button class="tag-pill" data-tag="rekruttering" aria-pressed="false">Rekruttering</button>
@@ -967,18 +965,16 @@ function updateArchiveHint() {
   btn.setAttribute('aria-label', label);
 }
 function updateStats() {
-  let team = 0, pers = 0, prod = 0, top = 0;
+  let team = 0, pers = 0, top = 0;
   data.forEach(r => {
     const tags = tagsOf(r);
     if (tags.includes('teamledelse'))    team++;
     if (tags.includes('personalledelse')) pers++;
-    if (tags.includes('produktledelse')) prod++;
     if (+r[7] === 6) top++;
   });
   document.getElementById('statTotal').textContent = data.length;
   document.getElementById('statTeam').textContent  = team;
   document.getElementById('statPers').textContent  = pers;
-  document.getElementById('statProd').textContent  = prod;
   document.getElementById('statTop').textContent   = top;
   updateArchiveHint();
 }
