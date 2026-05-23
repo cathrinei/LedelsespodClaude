@@ -68,6 +68,7 @@ Two layers — combine with comma (e.g. `teamledelse,feedback`):
 | `rekruttering` | Ansettelse, onboarding, talentutvikling |
 | `motivasjon` | Motivasjon, engasjement, trivsel |
 | `coaching` | Coaching, mentoring, individuelle utviklingssamtaler |
+| `endringsledelse` | Organisasjonsendring, omstilling, transformasjon, endringskultur |
 
 ## Rating rubric (1–6)
 

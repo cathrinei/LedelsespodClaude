@@ -410,6 +410,7 @@ tbody tr[data-rating="4"] td:first-child { border-left: 3px solid #6d28d9; }
 .tag-rekruttering    { background: #fce7f3; color: #831843; }
 .tag-motivasjon      { background: #dcfce7; color: #14532d; }
 .tag-coaching        { background: #fff7ed; color: #6b2110; }
+.tag-endringsledelse { background: #ffe4e6; color: #9f1239; }
 body.dark .tag-teamledelse     { background: #2e1065; color: #c4b5fd; }
 body.dark .tag-personalledelse { background: #022c22; color: #6ee7b7; }
 body.dark .tag-produktledelse  { background: #1e1b4b; color: #a5b4fc; }
@@ -418,6 +419,7 @@ body.dark .tag-kultur          { background: #1e3a5f; color: #93c5fd; }
 body.dark .tag-rekruttering    { background: #500724; color: #f9a8d4; }
 body.dark .tag-motivasjon      { background: #052e16; color: #86efac; }
 body.dark .tag-coaching        { background: #431407; color: #fdba74; }
+body.dark .tag-endringsledelse { background: #4c0519; color: #fda4af; }
 .no-tags { color: var(--text-faint); font-size: 0.76rem; }
 
 /* LISTEN LINK */
@@ -663,6 +665,7 @@ body.dark tr.archive-divider td { background: #451a03; color: #fcd34d; }
       <button class="tag-pill" data-tag="rekruttering" aria-pressed="false">Rekruttering</button>
       <button class="tag-pill" data-tag="motivasjon" aria-pressed="false">Motivasjon</button>
       <button class="tag-pill" data-tag="coaching" aria-pressed="false">Coaching</button>
+      <button class="tag-pill" data-tag="endringsledelse" aria-pressed="false">Endringsledelse</button>
     </div>
   </div>
 </div>
@@ -800,6 +803,7 @@ const tagMeta = {
   rekruttering:    { label: 'Rekruttering',    cls: 'tag-rekruttering'    },
   motivasjon:      { label: 'Motivasjon',      cls: 'tag-motivasjon'      },
   coaching:        { label: 'Coaching',        cls: 'tag-coaching'        },
+  endringsledelse: { label: 'Endringsledelse', cls: 'tag-endringsledelse' },
 };
 
 function esc(str) {
