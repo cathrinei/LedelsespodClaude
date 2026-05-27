@@ -76,7 +76,7 @@ Two layers — combine with comma (e.g. `teamledelse,feedback`):
 |---|---|---|
 | 6 | Eksepsjonell | Dyp ledelsesfaglig innsikt, ekspert-gjester/-verter, høy praktisk eller forskningsmessig verdi |
 | 5 | Svært nyttig | Solid innhold om ledelse, tydelig fokus, pålitelig og informativt |
-| 4 | Nyttig | Relevant ledelsesstoff; kan være overflatenivå eller ledelse er ett av flere temaer |
+| 4 | Nyttig | Relevant ledelsesstoff; kan være overflatenivå eller ledelse er ett av flere temaer. Hit hører bl.a.: inkludering/mangfold/PRIDE på arbeidsplassen, psykologisk trygghet, sykefravær/HMS, arbeidsrett fra leders perspektiv, wellbeing og trivsel. |
 | 3 | Delvis relevant | Beholdes ikke — fjernes fra CSV |
 | 2 | Marginal | Beholdes ikke — fjernes fra CSV |
 | 1 | Ikke relevant | Beholdes ikke — fjernes fra CSV |
