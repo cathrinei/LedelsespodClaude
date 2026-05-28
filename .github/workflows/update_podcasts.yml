@@ -27,6 +27,51 @@ jobs:
       - name: Hent nye episoder
         run: python update_podcasts.py 2>&1 | tee /tmp/fetch_output.txt
 
+      - name: Fjern duplikater
+        run: |
+          python - << 'EOF'
+          import csv, sys
+
+          def dedup(path):
+              with open(path, encoding="utf-8", newline="") as f:
+                  reader = csv.DictReader(f)
+                  fieldnames = reader.fieldnames
+                  rows = list(reader)
+
+              seen_titles = set()
+              seen_links  = set()
+              unique, removed = [], []
+
+              for r in rows:
+                  title_key = (r["Podcast Name"].strip().lower(), r["Episode Title"].strip().lower())
+                  link      = r["Platform / Link"].strip().lower()
+                  link_key  = (r["Podcast Name"].strip().lower(), link) if link else None
+
+                  if title_key in seen_titles or (link_key and link_key in seen_links):
+                      removed.append(r["Episode Title"])
+                  else:
+                      seen_titles.add(title_key)
+                      if link_key:
+                          seen_links.add(link_key)
+                      unique.append(r)
+
+              if removed:
+                  with open(path, "w", encoding="utf-8", newline="") as f:
+                      writer = csv.DictWriter(f, fieldnames=fieldnames)
+                      writer.writeheader()
+                      writer.writerows(unique)
+                  for title in removed:
+                      print(f"  Fjernet duplikat: {title}")
+              else:
+                  print(f"  Ingen duplikater i {path}")
+              return len(removed)
+
+          n  = dedup("Ledelsepod.csv")
+          n += dedup("Ledelsepod_arkiv.csv")
+          if n:
+              print(f"Totalt {n} duplikat(er) fjernet.")
+          EOF
+
       - name: Vurder nye episoder automatisk
         run: python auto_rate.py 2>&1 | tee /tmp/rate_output.txt
         env:
