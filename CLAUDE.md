@@ -13,7 +13,7 @@ This project collects and curates Norwegian-language podcast episodes on **teaml
 - `Ledelsepod_arkiv.csv` — arkivdata, episoder 3–12 måneder gamle (rullerende); eldre fjernes helt
 - `Ledelsepod.html` — interactive table with filtering, sorting, stats (CSV import button hidden); stats-bar viser «+ N arkiverte»-knapp som toggles arkivvisning (3–12 mnd)
 - `README.md` — prosjektbeskrivelse med lenke til GitHub Pages
-- `update_podcasts.py` — RSS fetcher; adds new episodes (Rating=0) since last known date per podcast. Dedup bruker to nøkler: `(podcast, tittel)` + `(podcast, lenke/guid)` — fanger opp episoder der utgiver har endret tittelen mellom to hentinger
+- `update_podcasts.py` — RSS fetcher; adds new episodes (Rating=0) since last known date per podcast. Dedup bruker to nøkler: `(podcast, tittel)` + `(podcast, lenke)` — fanger opp episoder der utgiver har endret tittelen mellom to hentinger. Lenke hentes i prioritert rekkefølge: `<link>` → `<enclosure url>` → `<guid>` (enclosure er mest stabil, inneholder alltid episode-ID)
 - `auto_rate.py` — automatisk vurdering av Rating=0-episoder via GitHub Models (gpt-4o-mini, gratis). **To typer utfall:** tekniske feil (API-feil, content filter) → episode beholdes i CSV med Rating=0 og re-prøves neste kjøring; rating 1–3 → fjernes og sendes til `rejected_episodes.csv`
 - `rate_runner.py` — stabil kjørelogikk for manuell episodeevaluering; importeres av `rate_episodes.py`
 - `rate_episodes.py` — data-only (UPDATES + REMOVE_KEYWORDS); skrives per raterunde, slettes etter bruk

@@ -177,12 +177,13 @@ def fetch_new_episodes(podcast_name, feed_url, after_dt):
         link_el = item.find("link")
         link = link_el.text.strip() if link_el is not None and link_el.text else ""
         if not link:
-            # <guid> er stabilt selv om utgiver endrer episodetittel (f.eks. Buzzsprout)
-            guid_el = item.find("guid")
-            link = guid_el.text.strip() if guid_el is not None and guid_el.text else ""
-        if not link:
+            # Enclosure-URL er mest stabil (inneholder alltid episode-ID i filnavnet).
+            # <guid> kan variere mellom kjøringer (f.eks. "Buzzsprout-19196600" vs full URL) → sjekkes sist.
             enclosure = item.find("enclosure")
             link = enclosure.attrib.get("url", "") if enclosure is not None else ""
+        if not link:
+            guid_el = item.find("guid")
+            link = guid_el.text.strip() if guid_el is not None and guid_el.text else ""
 
         host = _extract_host(podcast_name, item, channel)
 
