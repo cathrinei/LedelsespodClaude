@@ -75,7 +75,7 @@ Svar alltid med gyldig JSON og ingen annen tekst:
 
 {
   "host": "vertsnavn eller tom streng hvis ukjent",
-  "guest": "gjestenavn eller tom streng hvis ingen gjest",
+  "guest": "gjestenavn, eller \"-\" hvis ingen gjest",
   "main_topics": "2–4 konkrete emneord på norsk, kommaseparert — ikke bruk kategorietagger (som 'teamledelse', 'personalledelse') her; bruk spesifikke emneord, f.eks. 'Rekruttering, seleksjon, ansettelsesprosess'",
   "rating": <heltall 1-6>,
   "rating_notes": "Konsist norsk — bruk fraser, ikke hele setninger. Ikke start med «Episoden» eller «Denne episoden». Eksempel: 'NHH-forsker med dyp innsikt om målstyring — høy faglig verdi for ledere'",
