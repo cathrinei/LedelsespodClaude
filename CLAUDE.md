@@ -19,7 +19,7 @@ This project collects and curates Norwegian-language podcast episodes on **teaml
 - `rate_episodes.py` — data-only (UPDATES + REMOVE_KEYWORDS); skrives per raterunde, slettes etter bruk
 - `embed_csv.py` — skriver CSV-innholdet inn i HTML-filens `data`- og `archiveData`-array; kjøres etter hver raterunde. Filtrerer ut Rating=0-episoder slik at teknisk-feilede episoder ikke vises på nettsiden
 - `rejected_episodes.csv` — denylist; episodes here are never re-fetched by `update_podcasts.py`. Kun episoder med rating 1–3 havner her — aldri tekniske feil
-- `failed_attempts.csv` — teller mislykkede API-forsøk per episode; episoder med tekniske feil beholdes i CSV med Rating=0 og re-prøves automatisk til de lykkes
+- `failed_attempts.csv` — teller mislykkede API-forsøk per episode; episoder med tekniske feil beholdes i CSV med Rating=0 og re-prøves neste kjøring. Etter MAX_ATTEMPTS (3) mislykkede forsøk sendes episoden til `rejected_episodes.csv`
 - `.github/workflows/update_podcasts.yml` — GitHub Actions workflow; kjører onsdag og fredag kl 23:05, manuell trigger tilgjengelig
 - `.gitignore` — ekskluderer `__pycache__/`, `*.pyc`, `*.pyo`, `.env`
 - `docs/HTML_NOTES.md` — tekniske detaljer om Ledelsepod.html (stats, filter, mobil, dark mode osv.)
@@ -34,7 +34,7 @@ This project collects and curates Norwegian-language podcast episodes on **teaml
 | Language | Norwegian (alle episoder i dette prosjektet) |
 | Published Date | YYYY-MM-DD |
 | Host(s) | Host names |
-| Guest(s) | Guest names (if notable) |
+| Guest(s) | Guest names (if notable); `-` hvis ingen gjest eller soloepisode |
 | Main Topic(s) | 2–4 konkrete emneord, kommaseparert — **ikke** kategorietagger (`teamledelse`, `personalledelse`) |
 | Rating (1–6) | See rubric below |
 | Rating Notes | Konsist norsk — fraser, ikke hele setninger. Ikke start med «Episoden...». Eksempel: `NHH-forsker med dyp innsikt om målstyring — høy faglig verdi` |
@@ -101,7 +101,7 @@ Two layers — combine with comma (e.g. `teamledelse,feedback`):
 - Kjører onsdag og fredag kl 23:05 Oslo-tid
 - Ingen secrets nødvendig — bruker `GITHUB_TOKEN` (automatisk tilgjengelig)
 - Manuell trigger tilgjengelig via Actions-knappen i GitHub
-- Steg: fetch → rate → embed → **valider data-array** → commit/push → kjøringssammendrag
+- Steg: fetch → **dedup** → rate → embed → **valider data-array** → commit/push → kjøringssammendrag
 - Valideringssteget (`Valider data-array i HTML`) parser `const data = [...]` som JSON og feiler jobben hvis arrayen er ugyldig — forhindrer at korrupt HTML pushes
 
 ### Manuelt (lokalt)
@@ -127,11 +127,6 @@ git push -u origin 2026-MM-DD
 **Unntak — direkte til master:** rene dataoppdateringer (hente nye episoder, arkivere gamle) committes direkte til master uten branch og PR. GitHub Actions gjør dette automatisk; ved manuell kjøring gjelder samme regel.
 
 **CLAUDE.md skal alltid committes i samme commit som kodeendringene den dokumenterer** — ikke i en separat PR etterpå.
-
-```bash
-git checkout -b 2026-04-30
-git push -u origin 2026-04-30
-```
 
 All utvikling skjer på datobranchen. Merge til master via PR når sesjonen er ferdig.
 
