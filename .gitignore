@@ -5,3 +5,4 @@ __pycache__/
 lighthouse-report*
 _temp_lint.js
 .claude/settings.local.json
+.claude/worktrees/
