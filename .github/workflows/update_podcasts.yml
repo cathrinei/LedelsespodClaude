@@ -29,7 +29,7 @@ jobs:
 
       - name: Fjern duplikater
         run: |
-          python - << 'EOF'
+          python - << 'EOF' | tee /tmp/dedup_output.txt
           import csv, sys
 
           def dedup(path):
@@ -120,6 +120,11 @@ jobs:
         if: always()
         run: |
           echo "## 📻 Episodeoppdatering $(date +'%Y-%m-%d')" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Deduplisering" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat /tmp/dedup_output.txt >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### Henting" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
