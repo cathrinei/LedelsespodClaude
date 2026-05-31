@@ -21,7 +21,7 @@ This project collects and curates Norwegian-language podcast episodes on **teaml
 - `rejected_episodes.csv` — denylist; episodes here are never re-fetched by `update_podcasts.py`. Kun episoder med rating 1–3 havner her — aldri tekniske feil
 - `failed_attempts.csv` — teller mislykkede API-forsøk per episode; episoder med tekniske feil beholdes i CSV med Rating=0 og re-prøves neste kjøring. Etter MAX_ATTEMPTS (3) mislykkede forsøk sendes episoden til `rejected_episodes.csv`
 - `.github/workflows/update_podcasts.yml` — GitHub Actions workflow; kjører onsdag og fredag kl 23:05, manuell trigger tilgjengelig
-- `.gitignore` — ekskluderer `__pycache__/`, `*.pyc`, `*.pyo`, `.env`
+- `.gitignore` — ekskluderer `__pycache__/`, `*.pyc`, `*.pyo`, `.env`, samt Claude Code-filer (`.claude/settings.local.json`, `.claude/worktrees/`) som aldri skal committes
 - `docs/HTML_NOTES.md` — tekniske detaljer om Ledelsepod.html (stats, filter, mobil, dark mode osv.)
 - `docs/SCRIPTS.md` — tekniske detaljer om alle Python-skript og CSV-filer
 
