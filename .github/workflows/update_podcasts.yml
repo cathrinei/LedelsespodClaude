@@ -31,12 +31,21 @@ jobs:
         run: |
           python - << 'EOF' | tee /tmp/dedup_output.txt
           import csv, sys
+          from collections import Counter
 
           def dedup(path):
               with open(path, encoding="utf-8", newline="") as f:
                   reader = csv.DictReader(f)
                   fieldnames = reader.fieldnames
                   rows = list(reader)
+
+              # Generiske show-URLer deles av mange episoder — ekskluder fra link-dedup
+              # for å unngå at nye episoder feilaktig fjernes (samme problem som i update_podcasts.py)
+              link_counts = Counter(
+                  (r["Podcast Name"].strip().lower(), r["Platform / Link"].strip().lower())
+                  for r in rows if r["Platform / Link"].strip()
+              )
+              unique_links = {key for key, count in link_counts.items() if count == 1}
 
               seen_titles = set()
               seen_links  = set()
@@ -47,11 +56,13 @@ jobs:
                   link      = r["Platform / Link"].strip().lower()
                   link_key  = (r["Podcast Name"].strip().lower(), link) if link else None
 
-                  if title_key in seen_titles or (link_key and link_key in seen_links):
+                  # Bruk link-dedup kun for episodespesifikke URLer (ikke generiske show-URLer)
+                  use_link = link_key and link_key in unique_links
+                  if title_key in seen_titles or (use_link and link_key in seen_links):
                       removed.append(r["Episode Title"])
                   else:
                       seen_titles.add(title_key)
-                      if link_key:
+                      if use_link:
                           seen_links.add(link_key)
                       unique.append(r)
 
