@@ -116,6 +116,12 @@ Two layers — combine with comma (e.g. `teamledelse,feedback`):
 - For å legge til en ny podcast: legg til RSS-feed i `FEEDS`-dicten i `update_podcasts.py`
 
 ### Branch-workflow
+**Ved sesjonstart med kodeendringer — kjør alltid dette først:**
+```bash
+git checkout -b 2026-MM-DD   # bruk dagens dato
+git push -u origin 2026-MM-DD
+```
+
 **Alltid opprett en ny branch når datoen er ny** — bruk dato som branchnavn (`YYYY-MM-DD`):
 
 **Unntak — direkte til master:** rene dataoppdateringer (hente nye episoder, arkivere gamle) committes direkte til master uten branch og PR. GitHub Actions gjør dette automatisk; ved manuell kjøring gjelder samme regel.
