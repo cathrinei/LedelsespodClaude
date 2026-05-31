@@ -109,15 +109,20 @@ def save_failed_attempts(attempts: dict[tuple[str, str], int]) -> None:
 
 def _handle_failure(
     failed_attempts: dict, key: tuple, reason: str
-) -> None:
+) -> bool:
     """Teller opp tekniske feil for en episode.
-    Episode forblir i CSV med Rating=0 og re-prøves neste kjøring.
-    Tekniske feil sendes aldri til rejected_episodes.csv — kun rating 1–3 gjør det.
+    Returnerer True hvis episoden har nådd MAX_ATTEMPTS og skal forkastes,
+    False hvis den skal beholdes i CSV med Rating=0 og re-prøves neste kjøring.
+    Tekniske feil sendes kun til rejected_episodes.csv etter MAX_ATTEMPTS forsøk.
     """
     attempts = failed_attempts.get(key, 0) + 1
     failed_attempts[key] = attempts
+    if attempts >= MAX_ATTEMPTS:
+        print(f"    TEKNISK FEIL ({attempts}. forsøk) — MAX_ATTEMPTS nådd, forkastes\n")
+        return True
     suffix = f" ({attempts}. forsøk)" if attempts > 1 else ""
     print(f"    TEKNISK FEIL{suffix}  {reason} — re-prøves neste kjøring\n")
+    return False
 
 
 def rate_episode(client: OpenAI, podcast: str, title: str,
@@ -202,9 +207,10 @@ def main() -> None:
 
         result = rate_episode(client, podcast, title, pub_date, link)
         if result is None:
-            # Teknisk feil (API-feil, content filter, timeout) — episode beholdes i CSV
-            # med Rating=0 og re-prøves neste kjøring. Sendes aldri til rejected_episodes.csv.
-            _handle_failure(failed_attempts, key, "Ingen gyldig respons")
+            # Teknisk feil (API-feil, content filter, timeout)
+            if _handle_failure(failed_attempts, key, "Ingen gyldig respons"):
+                removed_rows.append(row)
+                rows_to_remove.add(i)
             continue
 
         rating_raw = result.get("rating", 0)
@@ -214,7 +220,9 @@ def main() -> None:
             rating = 0
 
         if rating <= 0 or rating > 6:
-            _handle_failure(failed_attempts, key, f"Ugyldig rating ({rating_raw})")
+            if _handle_failure(failed_attempts, key, f"Ugyldig rating ({rating_raw})"):
+                removed_rows.append(row)
+                rows_to_remove.add(i)
             continue
 
         failed_attempts.pop(key, None)
@@ -255,7 +263,7 @@ def main() -> None:
     print(f"OK {updated} episoder vurdert og beholdt (rating 4–6)")
     print(f"OK {len(removed_rows)} episoder fjernet (rating 1–3) og lagt til rejected_episodes.csv")
     if still_failing:
-        print(f"NB {still_failing} episode(r) hadde teknisk feil — beholdes i CSV med Rating=0, re-prøves neste kjøring")
+        print(f"NB {still_failing} episode(r) hadde teknisk feil — beholdes i CSV med Rating=0, re-prøves neste kjøring (maks {MAX_ATTEMPTS} forsøk)")
     print(f"OK {len(kept)} episoder totalt i CSV")
 
 

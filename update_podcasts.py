@@ -13,10 +13,12 @@ Skriptet:
   6. Skriver oppdatert CSV og arkiv-CSV.
 """
 
+import calendar
 import csv
 import urllib.request
 import urllib.error
 import xml.etree.ElementTree as ET
+from collections import Counter
 from datetime import datetime, timezone, timedelta
 from email.utils import parsedate_to_datetime
 import os
@@ -211,7 +213,6 @@ def months_ago(n):
     month = now.month - n
     year  = now.year + (month - 1) // 12
     month = ((month - 1) % 12) + 1
-    import calendar
     day = min(now.day, calendar.monthrange(year, month)[1])
     return now.replace(year=year, month=month, day=day, hour=0, minute=0, second=0, microsecond=0)
 
@@ -239,12 +240,17 @@ def main():
     arch_header, arch_existing = read_archive()
     rejected      = load_rejected()
     existing_keys = {(r[0].strip().lower(), r[1].strip().lower()) for r in existing_rows if len(r) >= 2}
-    # Lenke-basert dedup: fanger opp episoder der utgiver har endret tittel mellom to hentinger
-    existing_links = {
+    # Lenke-basert dedup: fanger opp episoder der utgiver har endret tittel mellom to hentinger.
+    # Kun unike lenker (én forekomst) brukes — generiske show-URLer som deles av mange episoder
+    # (f.eks. https://meyerhaugen.no/topplederpodcast/) ekskluderes for å unngå at nye episoder
+    # stille droppes som duplikater.
+    all_links = [
         r[10].strip().lower()
         for r in existing_rows + arch_existing
         if len(r) >= 11 and r[10].strip()
-    }
+    ]
+    link_counts = Counter(all_links)
+    existing_links = {link for link, count in link_counts.items() if count == 1}
     latest        = latest_date_per_podcast(existing_rows)
 
     # Rullerende 3-månedersvindu — henter ikke episoder eldre enn dette
