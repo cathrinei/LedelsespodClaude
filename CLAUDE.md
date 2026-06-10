@@ -18,9 +18,9 @@ This project collects and curates Norwegian-language podcast episodes on **teaml
 - `rate_runner.py` — stabil kjørelogikk for manuell episodeevaluering; importeres av `rate_episodes.py`
 - `rate_episodes.py` — data-only (UPDATES + REMOVE_KEYWORDS); skrives per raterunde, slettes etter bruk
 - `embed_csv.py` — skriver CSV-innholdet inn i HTML-filens `data`- og `archiveData`-array; kjøres etter hver raterunde. Filtrerer ut Rating=0-episoder slik at teknisk-feilede episoder ikke vises på nettsiden
-- `rejected_episodes.csv` — denylist; episodes here are never re-fetched by `update_podcasts.py`. Kun episoder med rating 1–3 havner her — aldri tekniske feil
+- `rejected_episodes.csv` — denylist; episodes here are never re-fetched by `update_podcasts.py`. Episoder med rating 1–3 havner her, samt episoder med tekniske feil etter MAX_ATTEMPTS (3) mislykkede forsøk
 - `failed_attempts.csv` — teller mislykkede API-forsøk per episode; episoder med tekniske feil beholdes i CSV med Rating=0 og re-prøves neste kjøring. Etter MAX_ATTEMPTS (3) mislykkede forsøk sendes episoden til `rejected_episodes.csv`
-- `.github/workflows/update_podcasts.yml` — GitHub Actions workflow; kjører onsdag og fredag kl 23:05, manuell trigger tilgjengelig
+- `.github/workflows/update_podcasts.yml` — GitHub Actions workflow; kjører onsdag og fredag kl 23:05 (CEST/sommer) / 22:05 (CET/vinter), manuell trigger tilgjengelig
 - `.gitignore` — ekskluderer `__pycache__/`, `*.pyc`, `*.pyo`, `.env`, samt Claude Code-filer (`.claude/settings.local.json`, `.claude/worktrees/`) som aldri skal committes
 - `docs/HTML_NOTES.md` — tekniske detaljer om Ledelsepod.html (stats, filter, mobil, dark mode osv.)
 - `docs/SCRIPTS.md` — tekniske detaljer om alle Python-skript og CSV-filer
