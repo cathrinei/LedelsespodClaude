@@ -110,6 +110,23 @@ Two layers — combine with comma (e.g. `teamledelse,feedback`):
 3. `python embed_csv.py` — oppdaterer HTML
 4. `git add Ledelsepod.csv Ledelsepod.html && git commit -m "..." && git push`
 
+### Forny GITHUB_TOKEN (ved utløp)
+`GITHUB_TOKEN` brukes av `auto_rate.py` lokalt. GitHub Actions genererer sitt eget token automatisk — kun lokal kjøring krever manuell fornyelse.
+
+1. Gå til https://github.com/settings/tokens og trekk tilbake det gamle tokenet
+2. Klikk **Generate new token (classic)** — gi det et navn, sett utløpsdato, huk av scope `repo`
+3. Sett det nye tokenet som miljøvariabel i PowerShell:
+   ```powershell
+   [System.Environment]::SetEnvironmentVariable("GITHUB_TOKEN", "ditt-nye-token-her", "User")
+   ```
+4. Åpne et nytt terminalvindu (eksisterende vinduer ser ikke oppdatert verdi)
+5. Verifiser:
+   ```powershell
+   python -c "import os; print('OK' if os.getenv('GITHUB_TOKEN') else 'MANGLER')"
+   ```
+
+**Viktig:** Del aldri tokenet i chat eller legg det i filer i repoet.
+
 ### Manuell overstyring (ved behov)
 - Skriv `rate_episodes.py` med `UPDATES`-dict og `REMOVE_KEYWORDS`-liste, kjør det — patcher spesifikke episoder
 - For å blokkere en episode permanent: legg til manuelt i `rejected_episodes.csv`
