@@ -17,9 +17,10 @@
 - Dedup uses four layered checks against `existing_rows + arch_existing`:
   1. `(podcast, tittel)` — eksakt tittelmatch
   2. Eksakt lenke — kun lenker som forekommer én gang (generiske show-URLer ekskluderes)
-  3. `extract_episode_id(link)` — stabil plattform-ID: UUID i URL-banen, eller numerisk ID ≥6 siffer foran slug (f.eks. Buzzsprout `18912349-tittelslug.mp3`); fanger tittelendringer der sluggen regenereres
-  4. `(podcast, dato)` — siste sikkerhetsnett; fanger resttilfeller der tittel, lenke og ID alle er nye men episoden allerede finnes på samme dato
+  3. `(podcast, extract_episode_id(link))` — stabil plattform-ID scopet per podcast: UUID i URL-banen, eller numerisk ID ≥6 siffer foran slug (f.eks. Buzzsprout `18912349-tittelslug.mp3`); scoping unngår falske positive på tvers av shows med samme ID
+  4. `(podcast, dato)` — siste sikkerhetsnett; brukes **kun** når `extract_episode_id()` returnerer `None` (plattformer uten stabil ID); forhindrer at dato-sjekken blokkerer genuine dobbeltutgivelser på Buzzsprout m.fl.
 - Per-feed output shows: `+ N ny(e)`, `N hoppet over (forkastet)`, `N duplikat(er)`, `N dato-duplikat(er)` as relevant
+- CSV og arkiv skrives dato-sortert (nyest først) etter hver kjøring
 - `_extract_host(podcast_name, item, channel)` henter vertsnavn direkte fra RSS — prioriteringsrekkefølge: `itunes:author` (item) → `dc:creator` (item) → `HOST_OVERRIDES` → `itunes:author` (channel) → `managingEditor` (channel)
 - `HOST_OVERRIDES` dict: manuell overstyring for podcaster der RSS kun inneholder forkortet navn eller organisasjonsnavn — aktive oppføringer: Lederskap (NHH) → "Therese Egeland, Joel W. Berge", Lederliv → "Ole Christian Apeland"
 
@@ -44,6 +45,8 @@
 
 ## embed_csv.py
 - Leser `Ledelsepod.csv`, serialiserer hver rad som JSON og erstatter `const data = [...]` i `Ledelsepod.html`
+- Filtrerer ut `Rating=0`-episoder — vises ikke i HTML før de er vurdert
+- Sorterer `rated_rows` og `archive_rows` på dato descending før embedding — HTML-arrayen er alltid forhåndssortert, uavhengig av JS-sort
 - Validerer: fil finnes, CSV har minst én daterad, header har ≥ 11 kolonner, JSON-serialisering lykkes — `sys.exit(1)` med tydelig feilmelding ved alle feil
 - Rader med færre enn 11 kolonner paddes med tomme strenger
 - `re.subn` forventer nøyaktig 1 treff på `const data = \[.*?\]` — feiler hvis mønsteret ikke finnes eller matcher flere ganger
