@@ -290,6 +290,13 @@ def main():
         for ep_id in [extract_episode_id(r[10])]
         if ep_id
     }
+    # Dato-basert dedup: fanger opp resterende tilfeller der tittel, lenke og plattform-ID
+    # alle er ulike, men dato er identisk — nesten alltid samme episode med ny tittel.
+    existing_podcast_dates = {
+        (r[0].strip().lower(), r[3].strip())
+        for r in existing_rows + arch_existing
+        if len(r) >= 4 and r[3].strip()
+    }
     latest        = latest_date_per_podcast(existing_rows)
 
     # Rullerende 3-månedersvindu — henter ikke episoder eldre enn dette
@@ -318,17 +325,26 @@ def main():
             ep for ep, k in ep_keys
             if k not in rejected
             and k not in existing_keys
-            and ep[10].lower() not in existing_links          # lenke-basert dedup
+            and ep[10].lower() not in existing_links                     # lenke-basert dedup
             and extract_episode_id(ep[10]) not in existing_episode_ids  # plattform-ID-dedup
+            and (ep[0].lower(), ep[3]) not in existing_podcast_dates    # dato-basert dedup
         ]
         n_rejected = sum(1 for _, k in ep_keys if k in rejected)
-        n_dup      = len(episodes) - len(filtered) - n_rejected
+        n_date_dup = sum(
+            1 for ep, k in ep_keys
+            if k not in rejected and k not in existing_keys
+            and ep[10].lower() not in existing_links
+            and extract_episode_id(ep[10]) not in existing_episode_ids
+            and (ep[0].lower(), ep[3]) in existing_podcast_dates
+        )
+        n_dup      = len(episodes) - len(filtered) - n_rejected - n_date_dup
 
         parts = []
-        if filtered:   parts.append(f"+ {len(filtered)} ny(e)")
-        if n_rejected: parts.append(f"{n_rejected} hoppet over (forkastet)")
-        if n_dup:      parts.append(f"{n_dup} duplikat(er)")
-        if not parts:  parts.append("– ingen nye")
+        if filtered:    parts.append(f"+ {len(filtered)} ny(e)")
+        if n_rejected:  parts.append(f"{n_rejected} hoppet over (forkastet)")
+        if n_dup:       parts.append(f"{n_dup} duplikat(er)")
+        if n_date_dup:  parts.append(f"{n_date_dup} dato-duplikat(er)")
+        if not parts:   parts.append("– ingen nye")
         print(", ".join(parts))
 
         all_new.extend(filtered)
