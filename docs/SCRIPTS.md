@@ -14,9 +14,12 @@
 - `pending_review()` runs at end of every execution — flags unrated episodes older than `REVIEW_AFTER_DAYS = 2` days
 - Errors distinguish between HTTP errors and network errors
 - `REJECTED_PATH` points to `rejected_episodes.csv` — loaded via `load_rejected()` at startup
-- `existing_keys` built from current CSV rows — prevents re-adding duplicates within CSV
-- New episodes filtered against both `rejected` and `existing_keys` before being appended
-- Per-feed output shows: `+ N ny(e)`, `N hoppet over (forkastet)`, `N duplikat(er)` as relevant
+- Dedup uses four layered checks against `existing_rows + arch_existing`:
+  1. `(podcast, tittel)` — eksakt tittelmatch
+  2. Eksakt lenke — kun lenker som forekommer én gang (generiske show-URLer ekskluderes)
+  3. `extract_episode_id(link)` — stabil plattform-ID: UUID i URL-banen, eller numerisk ID ≥6 siffer foran slug (f.eks. Buzzsprout `18912349-tittelslug.mp3`); fanger tittelendringer der sluggen regenereres
+  4. `(podcast, dato)` — siste sikkerhetsnett; fanger resttilfeller der tittel, lenke og ID alle er nye men episoden allerede finnes på samme dato
+- Per-feed output shows: `+ N ny(e)`, `N hoppet over (forkastet)`, `N duplikat(er)`, `N dato-duplikat(er)` as relevant
 - `_extract_host(podcast_name, item, channel)` henter vertsnavn direkte fra RSS — prioriteringsrekkefølge: `itunes:author` (item) → `dc:creator` (item) → `HOST_OVERRIDES` → `itunes:author` (channel) → `managingEditor` (channel)
 - `HOST_OVERRIDES` dict: manuell overstyring for podcaster der RSS kun inneholder forkortet navn eller organisasjonsnavn — aktive oppføringer: Lederskap (NHH) → "Therese Egeland, Joel W. Berge", Lederliv → "Ole Christian Apeland"
 
