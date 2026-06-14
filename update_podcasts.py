@@ -283,19 +283,24 @@ def main():
     # Plattform-ID-basert dedup: fanger opp tittelendringer der URL-sluggen endres men
     # episode-IDen er stabil (f.eks. Buzzsprout). Motvirker at samme episode hentes på nytt
     # med oppdatert tittel og ny slug.
+    # Scopes episode-ID med podcastnavn for å unngå falske positive på tvers av shows
+    # (f.eks. to podcaster med samme numeriske ID i URL — umulig for Buzzsprout, men mulig
+    # for fremtidige kilder med dato-baserte IDer som 20260612).
     existing_episode_ids = {
-        ep_id
+        (r[0].strip().lower(), ep_id)
         for r in existing_rows + arch_existing
         if len(r) >= 11
         for ep_id in [extract_episode_id(r[10])]
         if ep_id
     }
-    # Dato-basert dedup: fanger opp resterende tilfeller der tittel, lenke og plattform-ID
-    # alle er ulike, men dato er identisk — nesten alltid samme episode med ny tittel.
+    # Dato-basert dedup: siste sikkerhetsnett for plattformer uten stabil ID i URL-en.
+    # Brukes KUN når extract_episode_id() ikke finner noen ID — unngår falske positive
+    # for podcaster som publiserer to genuine episoder på samme dato.
     existing_podcast_dates = {
         (r[0].strip().lower(), r[3].strip())
         for r in existing_rows + arch_existing
         if len(r) >= 4 and r[3].strip()
+        and not extract_episode_id(r[10] if len(r) >= 11 else "")
     }
     latest        = latest_date_per_podcast(existing_rows)
 
@@ -321,20 +326,27 @@ def main():
             continue
 
         ep_keys    = [(ep, (ep[0].lower(), ep[1].lower())) for ep in episodes]
-        filtered   = [
-            ep for ep, k in ep_keys
-            if k not in rejected
-            and k not in existing_keys
-            and ep[10].lower() not in existing_links                     # lenke-basert dedup
-            and extract_episode_id(ep[10]) not in existing_episode_ids  # plattform-ID-dedup
-            and (ep[0].lower(), ep[3]) not in existing_podcast_dates    # dato-basert dedup
-        ]
+
+        def _is_dup(ep, k):
+            if k in rejected or k in existing_keys:
+                return False
+            if ep[10].lower() in existing_links:
+                return True
+            ep_id = extract_episode_id(ep[10])
+            if ep_id and (ep[0].lower(), ep_id) in existing_episode_ids:
+                return True
+            # Dato-dedup kun som siste utvei når ingen stabil plattform-ID finnes
+            if not ep_id and (ep[0].lower(), ep[3]) in existing_podcast_dates:
+                return True
+            return False
+
+        filtered   = [ep for ep, k in ep_keys if k not in rejected and not _is_dup(ep, k)]
         n_rejected = sum(1 for _, k in ep_keys if k in rejected)
         n_date_dup = sum(
             1 for ep, k in ep_keys
             if k not in rejected and k not in existing_keys
             and ep[10].lower() not in existing_links
-            and extract_episode_id(ep[10]) not in existing_episode_ids
+            and not extract_episode_id(ep[10])
             and (ep[0].lower(), ep[3]) in existing_podcast_dates
         )
         n_dup      = len(episodes) - len(filtered) - n_rejected - n_date_dup
