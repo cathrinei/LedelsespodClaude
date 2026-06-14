@@ -15,6 +15,7 @@ Skriptet:
 
 import calendar
 import csv
+import re
 import urllib.request
 import urllib.error
 import xml.etree.ElementTree as ET
@@ -46,6 +47,21 @@ FEEDS = {
     "Psykologkameratene":                 "https://feed.podbean.com/psykologkameratene/feed.xml",
     "Åpen kilde":                         "https://feeds.acast.com/public/shows/apen-kilde",
 }
+
+
+def extract_episode_id(link):
+    """Returnerer en stabil plattform-episodeidentifikator fra lenken, eller None.
+
+    Buzzsprout-URLer inneholder en numerisk episode-ID som er stabil selv når
+    utgiveren endrer tittelen (og dermed URL-sluggen). Eksempel:
+      .../episodes/18912349-ny-tittel.mp3  →  "buzzsprout:18912349"
+    """
+    if not link:
+        return None
+    m = re.search(r"buzzsprout\.com/\d+/episodes/(\d+)", link)
+    if m:
+        return f"buzzsprout:{m.group(1)}"
+    return None
 
 
 def load_rejected():
@@ -251,6 +267,16 @@ def main():
     ]
     link_counts = Counter(all_links)
     existing_links = {link for link, count in link_counts.items() if count == 1}
+    # Plattform-ID-basert dedup: fanger opp tittelendringer der URL-sluggen endres men
+    # episode-IDen er stabil (f.eks. Buzzsprout). Motvirker at samme episode hentes på nytt
+    # med oppdatert tittel og ny slug.
+    existing_episode_ids = {
+        ep_id
+        for r in existing_rows + arch_existing
+        if len(r) >= 11
+        for ep_id in [extract_episode_id(r[10])]
+        if ep_id
+    }
     latest        = latest_date_per_podcast(existing_rows)
 
     # Rullerende 3-månedersvindu — henter ikke episoder eldre enn dette
@@ -279,7 +305,8 @@ def main():
             ep for ep, k in ep_keys
             if k not in rejected
             and k not in existing_keys
-            and ep[10].lower() not in existing_links  # lenke-basert dedup
+            and ep[10].lower() not in existing_links          # lenke-basert dedup
+            and extract_episode_id(ep[10]) not in existing_episode_ids  # plattform-ID-dedup
         ]
         n_rejected = sum(1 for _, k in ep_keys if k in rejected)
         n_dup      = len(episodes) - len(filtered) - n_rejected
