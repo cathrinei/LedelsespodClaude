@@ -58,6 +58,9 @@ def main():
     if n_unrated:
         print(f"NB: {n_unrated} uraterte episode(r) (Rating=0) utelatt fra HTML")
 
+    # Sorter dato descending slik at data-arrayen i HTML er forhåndssortert
+    rated_rows.sort(key=lambda r: r[3] if len(r) > 3 else "", reverse=True)
+
     # Bygg hoved-array
     new_data_array = csv_to_js_array(rated_rows, "data")
 
@@ -68,6 +71,7 @@ def main():
             arch_all = list(csv.reader(f))
         if len(arch_all) >= 2:
             archive_rows = arch_all[1:]
+    archive_rows.sort(key=lambda r: r[3] if len(r) > 3 else "", reverse=True)
     new_archive_array = csv_to_js_array(archive_rows, "archiveData")
 
     if not os.path.exists(HTML_PATH):

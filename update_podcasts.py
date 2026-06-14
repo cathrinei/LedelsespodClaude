@@ -371,6 +371,10 @@ def main():
     arch_kept = [r for r in arch_all if len(r) >= 4 and r[3].strip() >= archive_str]
     n_arch_pruned = len(arch_all) - len(arch_kept)
 
+    # Sorter begge filer på dato descending før skriving
+    main_rows.sort(key=lambda r: r[3] if len(r) > 3 else "", reverse=True)
+    arch_kept.sort(key=lambda r: r[3] if len(r) > 3 else "", reverse=True)
+
     # Skriv begge filer
     n_pruned = len(all_rows) - len(main_rows)
     with open(CSV_PATH, "w", encoding="utf-8", newline="") as f:
