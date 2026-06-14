@@ -50,17 +50,30 @@ FEEDS = {
 
 
 def extract_episode_id(link):
-    """Returnerer en stabil plattform-episodeidentifikator fra lenken, eller None.
+    """Returnerer en stabil episode-token fra lenken for dedup, eller None.
 
-    Buzzsprout-URLer inneholder en numerisk episode-ID som er stabil selv når
-    utgiveren endrer tittelen (og dermed URL-sluggen). Eksempel:
-      .../episodes/18912349-ny-tittel.mp3  →  "buzzsprout:18912349"
+    Mange plattformer legger en stabil ID inn i URL-en (numerisk eller UUID),
+    etterfulgt av en slug som kan endres når tittelen oppdateres. Funksjonen
+    trekker ut den stabile delen slik at episoden ikke plukkes opp på nytt
+    under en ny tittel.
+
+    Støttede mønstre:
+    - UUID i URL-banen (Acast m.fl.):
+        .../episodes/a1b2c3d4-…  →  "uuid:a1b2c3d4-…"
+    - Numerisk ID (≥6 siffer) etterfulgt av bindestrek eller punktum (Buzzsprout m.fl.):
+        .../episodes/18912349-tittelslug.mp3  →  "numid:18912349"
+      Tar siste treff slik at show-IDen i URL-en ikke forveksles med episode-IDen.
     """
     if not link:
         return None
-    m = re.search(r"buzzsprout\.com/\d+/episodes/(\d+)", link)
+    # UUID i URL-banen
+    m = re.search(r"([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})", link, re.I)
     if m:
-        return f"buzzsprout:{m.group(1)}"
+        return f"uuid:{m.group(1).lower()}"
+    # Numerisk ID (≥6 siffer) med bindestrek/punktum som avgrenser — siste forekomst
+    matches = re.findall(r"(?<=[/\-])(\d{6,})(?=[\-.])", link)
+    if matches:
+        return f"numid:{matches[-1]}"
     return None
 
 
